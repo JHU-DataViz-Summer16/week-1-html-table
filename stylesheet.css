@@ -1,0 +1,26 @@
+body {
+	background-color: #d3e0e4;
+}	
+
+h1 {
+	font-family: Trebuchet MS;
+}
+
+p {
+	text-align: left;
+	font-size: 16px;
+	font-family: Trebuchet MS;
+	margin: 25px;
+}
+
+table {
+
+	text-align: left;
+	font-size: 16px;
+	font-family: Trebuchet MS;
+	width: 70%;
+} 
+
+th, td {
+    border-bottom: 1px solid #9ebbc4;
+}
