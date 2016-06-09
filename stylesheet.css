@@ -1,23 +1,26 @@
 body {
 	background-color: #d3e0e4;
+	font-family: "Trebuchet MS", Helvetica;
+	font-size: 16px;	
 }	
 
-h1 {
-	font-family: Trebuchet MS;
+.header { 
+	padding-bottom: 10px; 
+	text-align: center;
+}
+
+.table { 
+	margin: 0 auto; 
 }
 
 p {
 	text-align: left;
-	font-size: 16px;
-	font-family: Trebuchet MS;
 	margin: 25px;
 }
 
 table {
 
 	text-align: left;
-	font-size: 16px;
-	font-family: Trebuchet MS;
 	width: 70%;
 } 
 
