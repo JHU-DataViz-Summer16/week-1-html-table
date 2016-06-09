@@ -13,21 +13,28 @@
       text-align: left;
     }
     table {
-    border-collapse: collapse;
-    width: 100px;
+      border-collapse: collapse;
+      width: 100px;
     }
 
     th, td {
-    padding: 8px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
     }
+
+    td:nth-child(1),th:nth-child(1) { width:200px; }
+    td:nth-child(2),th:nth-child(2) { text-align: center; }
+    td:nth-child(4) { text-align: center; }
+    
 
     tr:hover td{font-weight: bold;
     }
 
     body {
       background-color: #4C4C4C;
+      font-family: 'Arimo', sans-serif;
+      color: #B7B7B7;
           }
 
     th {
@@ -35,15 +42,11 @@
         color: #FFFFFF;
         width: 400px;
                 } 
-   h1,h3{
-       font-family: 'Exo', sans-serif;
+    h1,h3{
+        font-family: 'Exo', sans-serif;
         color: #FFFFFF;
                 }   
-    p,td {
-       font-family: 'Arimo', sans-serif;
-        color: #B7B7B7
-                }
-  </style>
+     </style>
 </head>
 <body>
   <div class="container">
