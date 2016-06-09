@@ -6,24 +6,41 @@
   <title>Page Title</title><!-- Latest compiled and minified CSS -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
   <style>
+   
+
+
+    tr:hover td {
+        background-color: #f5f5f5 
+    }
+
+    tr:hover .winner{
+      font-weight: bolder;
+    }
+
+    .winner:hover{
+      background-color: #f5f5f5
+    }
+
+    .winner{
+      background-color: #cce0ff
+    }
+
     .header {
       text-align: center;
     }
 
-    tr:hover {
-        background-color: #f5f5f5
+    tr, th {
+      text-align: center;
+      font-size: large;
     }
 
-    tr,th {
-      text-align: center;
-    }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
-      <h1>Percentage of Delegates Won</h1>
-      <p>We'll add our data to this table.</p>
+      <h1>Democratic Primary Delegates</h1>
+      <p>Number of Delegates won in each primary by each candidate.</p>
     </div>
     <table class="table">
       <thead>
