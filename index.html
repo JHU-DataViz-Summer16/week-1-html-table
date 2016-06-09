@@ -3,10 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Week 1: HTML Tables</title><!-- Latest compiled and minified CSS -->
+  <title>Page Title</title><!-- Latest compiled and minified CSS -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
   <style>
     .header {
+      text-align: center;
+    }
+
+    tr:hover {
+        background-color: #f5f5f5
+    }
+
+    tr,th {
       text-align: center;
     }
   </style>
@@ -14,32 +22,67 @@
 <body>
   <div class="container">
     <div class="header">
-      <h1>Week 1: HTML Tables</h1>
+      <h1>Percentage of Delegates Won</h1>
       <p>We'll add our data to this table.</p>
     </div>
     <table class="table">
       <thead>
         <tr>
-          <th>Fruit</th>
-          <th>Price</th>
-          <th>Quantity</th>
+          <th>State</th>
+          <th>Clinton</th>
+          <th>Sanders</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td>Apples</td>
-          <td>$0.55</td>
-          <td>5</td>
+          <td>California </td>
+          <td class="winner">261</td>
+          <td>206</td>
         </tr>
         <tr>
-          <td>Oranges</td>
-          <td>$0.80</td>
+          <td>Montana</td>
+          <td>10</td>
+          <td class="winner">11</td>
+        </tr>
+        <tr>
+          <td>New Jersey</td>
+          <td class="winner">79</td>
+          <td>47</td>
+        </tr>
+        <tr>
+          <td>New Mexico</td>
+          <td class="winner">18</td>
+          <td>16</td>
+        </tr>
+        <tr>
+          <td>South Dakota</td>
+          <td>10</td>
           <td>10</td>
         </tr>
         <tr>
-          <td>Pears</td>
-          <td>$0.95</td>
-          <td>3</td>
+          <td>Puerto Rico</td>
+          <td class="winner">36</td>
+          <td>23</td>
+        </tr>
+        <tr>
+          <td>Virgin Islands</td>
+          <td class="winner">7 </td>
+          <td>0</td>
+        </tr>
+        <tr>
+          <td>Oregon</td>
+          <td>25</td>
+          <td class="winner">36</td>
+        </tr>
+        <tr>
+          <td>Kentucky</td>
+          <td class="winner">28</td>
+          <td>27</td>
+        </tr>
+        <tr>
+          <td>West Virginia</td>
+          <td>11</td>
+          <td class="winner">18</td>
         </tr>
       </tbody>
     </table>
@@ -47,3 +90,5 @@
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
 </body>
 </html>
+
+
