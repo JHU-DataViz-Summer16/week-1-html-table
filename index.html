@@ -1,39 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>National Homlessness</title><!-- Latest compiled and minified CSS -->
+  <title>National Homelessness</title>
+
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300,700' rel='stylesheet' type='text/css'>
+  
   <style>
+
     .header {
-      text-align: center;
-            } 
-    h1      {
-      color:blue;
-      font-family: "Trebuchet MS";
+      text-align: left;
+    } 
+
+    h1 {
+      color:#355C7D;
+      font-family: 'Open Sans Condensed', Helvetica, sans-serif;
       font-size: 300%;
-            } 
-    table {border: 1px solid black;}
-    tr:nth-child(even) {background-color:#f5f5f5}
-    th      { 
-      background-color: green;
+    } 
+
+    p {
+      color:#355C7D;
+      font-family: 'Open Sans Condensed', Helvetica, sans-serif;
+      font-size: 90%;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      white-space: nowrap; 
+      font-family: 'Open Sans Condensed', Helevetica, sans-serif;
+      font-weight: 500;
+      color: #F67280;
+    }
+
+    th { 
+      background-color: #355C7D;
+      font-family: 'Open Sans Condensed', Helvetica, sans-serif;
       color: white;
-            }
-  </style>
+    }
+    
+    tr:nth-child(even) {background-color:#6C5B7B
+    }
+
+    tr:hover td{font-weight: bold;
+    }
+
+    body {background-color: #F8B195;
+    }
+
+   </style>
+
 </head>
 <body>
+
   <div class="container">
+
     <div class="header">
-      <h1>Change in Overall Homelessness, 2013-2014</h1>
-      <a href="http://www.endhomelessness.org/page/-/files/State_of_Homelessness_2015_FINAL_online.pdf">Source: National Alliance to End Homelessness</a>
+      <h1>Homelessness in the United States</h1>
+      <p>Source: National Alliance to End Homelessness</p>
     </div>
+
     <table class="table">
       <thead>
       <tr>
           <th>State</th>
-          <th>2014 Rate per 10,000</th>
-          <th>Percent Change (2013 versus 2014)</th>
+          <th>2014 Rate per 10K</th>
+          <th>Percent Change (2013 v 2014)</th>
         </tr>
       </thead>
       <tbody>
@@ -306,11 +341,6 @@
           <td>WY</td>
           <td>13.0</td>
           <td>-20.6</td>
-        </tr>
-        <tr>
-          <td>US</td>
-          <td>18.3</td>
-          <td>-2.3</td>
         </tr>
       </tbody>
     </table>
