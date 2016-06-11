@@ -51,9 +51,11 @@
 
     .bar {height: 20px; background: #F67280;}
    </style>
+
 </head>
 
 <body>
+
   <div class="container">
     
     <div class="header">
@@ -63,11 +65,28 @@
     
     <div class="controls section">
     <div class ="container">
-        <div class="btn-group" role="group" aria-label="Sort">
-           <button type="button" class="btn btn-default" id="sort-asc">Ascending</button>
-           <button type="button" class="btn btn-default" id="sort-desc">Descending</button>
-        </div>
+      <div class="btn-group" role="group" aria-label="Sort">
+        <button type="button" class="btn btn-default" id="sort-asc">Ascending</button>
+        <button type="button" class="btn btn-default" id="sort-desc">Descending</button>
+      </div>
     </div>
+    </div>
+
+    <div class="main section">
+      <div class="container">
+        <table class="table" id="data-table">
+          <thead>
+            <tr>
+              <th>State</th>
+              <th>2014 Rate per 10K</th>
+              <th>Percent Change (2013 v 2014)</th>
+              <th>Visualizing Change (2013 v 2014)</th>
+            </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        </table>
+      </div>
     </div>
 
 
