@@ -100,7 +100,7 @@
         {"state":"CA","rate":29.7},
         {"state":"CO","rate":19.0},
         {"state":"CT","rate":12.4},
-        {"state":"DC","rate":120},
+        {"state":"DC","rate":120.0},
         {"state":"DE","rate":9.7},
         {"state":"FL","rate":21.2},
         {"state":"GA","rate":16.5},
@@ -147,6 +147,8 @@
         {"state":"WY","rate":13.0}
       ]; 
 
+      var MAX_RATE = 120; 
+
       var options = {
       	sorted: false, 
       	filtered: false, 
@@ -183,13 +185,13 @@
           var barWrapper = document.createElement('td'); 
           var bar = document.createElement('div'); 
           bar.setAttribute('class', 'bar'); 
-          bar.setAttribute('style', 'width: ' + d.rate); 
+          var rateComparison = d.rate / MAX_RATE; 
+          bar.setAttribute('style', 'width: ' + (rateComparison * 100) + '%;'); 
           barWrapper.appendChild(bar); 
           row.appendChild(barWrapper); 
 
           tbody.appendChild(row); 
         }); 
-
       }
 
       updateTable(); 
