@@ -14,6 +14,10 @@
 
     .header {text-align: left;} 
 
+    #data-table td {width: 25%;}
+
+    .bar {height: 20px; background: #F67280;}
+
     h1 {
       color:#355C7D;
       font-family: 'Open Sans Condensed', Helvetica, sans-serif;
@@ -46,30 +50,28 @@
     tr:hover td{font-weight: bold;}
 
     body {background-color: #F8B195;}
-
-    #data-table td {width: 25%;}
-
-    .bar {height: 20px; background: #F67280;}
    </style>
 
 </head>
 
 <body>
 
-  <div class="container">
-    
-    <div class="header">
-      <h1>Homelessness in the United States</h1>
-      <p>Data Source: National Alliance to End Homelessness</p>
+    <div class="header section">
+      <div class="container">
+        <h1>Homelessness in the United States</h1>
+        <p>Data Source: National Alliance to End Homelessness</p>
+      </div>
     </div>
     
     <div class="controls section">
-    <div class ="container">
-      <div class="btn-group" role="group" aria-label="Sort">
-        <button type="button" class="btn btn-default" id="sort-asc">Ascending</button>
-        <button type="button" class="btn btn-default" id="sort-desc">Descending</button>
+      <div class="container">
+        <div class="btn-toolbar">
+          <div class="btn-group">
+            <button type="button" class="btn btn-default" id="sort-asc">Ascending</button>
+            <button type="button" class="btn btn-default" id="sort-desc">Descending</button>
+          </div>
+        </div>
       </div>
-    </div>
     </div>
 
     <div class="main section">
@@ -91,61 +93,59 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
     <script>
       var states = [
-        {"State":"AK","Rate":24.3},
-        {"State":"AL","Rate":9.4},
-        {"State":"AR","Rate":9.9},
-        {"State":"AZ","Rate":15.8},
-        {"State":"CA","Rate":29.7},
-        {"State":"CO","Rate":19.0},
-        {"State":"CT","Rate":12.4},
-        {"State":"DC","Rate":120},
-        {"State":"DE","Rate":9.7},
-        {"State":"FL","Rate":21.2},
-        {"State":"GA","Rate":16.5},
-        {"State":"HI","Rate":49.3},
-        {"State":"IA","Rate":10.1},
-        {"State":"ID","Rate":13.1},
-        {"State":"IL","Rate":10.2},
-        {"State":"IN","Rate":9.1},
-        {"State":"KS","Rate":9.6},
-        {"State":"KY","Rate":11.6},
-        {"State":"LA","Rate":10.0},
-        {"State":"MA","Rate":31.7},
-        {"State":"MD","Rate":13.3},
-        {"State":"ME","Rate":20.5},
-        {"State":"MI","Rate":12.4},
-        {"State":"MN","Rate":15.5},
-        {"State":"MO","Rate":12.0},
-        {"State":"MS","Rate":7.4},
-        {"State":"MT","Rate":17.2},
-        {"State":"NC","Rate":11.7},
-        {"State":"ND","Rate":17.4},
-        {"State":"NE","Rate":16.2},
-        {"State":"NH","Rate":10.4},
-        {"State":"NJ","Rate":13.1},
-        {"State":"NM","Rate":13.2},
-        {"State":"NV","Rate":37.8},
-        {"State":"NY","Rate":41.0},
-        {"State":"OH","Rate":10.2},
-        {"State":"OK","Rate":10.9},
-        {"State":"OR","Rate":31.0},
-        {"State":"PA","Rate":12.0},
-        {"State":"PR","Rate":11.4},
-        {"State":"RI","Rate":11.3},
-        {"State":"SC","Rate":10.6},
-        {"State":"SD","Rate":10.5},
-        {"State":"TN","Rate":14.5},
-        {"State":"TX","Rate":10.8},
-        {"State":"UT","Rate":10.6},
-        {"State":"VA","Rate":8.5},
-        {"State":"VT","Rate":24.9},
-        {"State":"WA","Rate":26.5},
-        {"State":"WI","Rate":10.5},
-        {"State":"WV","Rate":10.9},
-        {"State":"WY","Rate":13.0}
+        {"state":"AK","rate":24.3},
+        {"state":"AL","rate":9.4},
+        {"state":"AR","rate":9.9},
+        {"state":"AZ","rate":15.8},
+        {"state":"CA","rate":29.7},
+        {"state":"CO","rate":19.0},
+        {"state":"CT","rate":12.4},
+        {"state":"DC","rate":120},
+        {"state":"DE","rate":9.7},
+        {"state":"FL","rate":21.2},
+        {"state":"GA","rate":16.5},
+        {"state":"HI","rate":49.3},
+        {"state":"IA","rate":10.1},
+        {"state":"ID","rate":13.1},
+        {"state":"IL","rate":10.2},
+        {"state":"IN","rate":9.1},
+        {"state":"KS","rate":9.6},
+        {"state":"KY","rate":11.6},
+        {"state":"LA","rate":10.0},
+        {"state":"MA","rate":31.7},
+        {"state":"MD","rate":13.3},
+        {"state":"ME","rate":20.5},
+        {"state":"MI","rate":12.4},
+        {"state":"MN","rate":15.5},
+        {"state":"MO","rate":12.0},
+        {"state":"MS","rate":7.4},
+        {"state":"MT","rate":17.2},
+        {"state":"NC","rate":11.7},
+        {"state":"ND","rate":17.4},
+        {"state":"NE","rate":16.2},
+        {"state":"NH","rate":10.4},
+        {"state":"NJ","rate":13.1},
+        {"state":"NM","rate":13.2},
+        {"state":"NV","rate":37.8},
+        {"state":"NY","rate":41.0},
+        {"state":"OH","rate":10.2},
+        {"state":"OK","rate":10.9},
+        {"state":"OR","rate":31.0},
+        {"state":"PA","rate":12.0},
+        {"state":"PR","rate":11.4},
+        {"state":"RI","rate":11.3},
+        {"state":"SC","rate":10.6},
+        {"state":"SD","rate":10.5},
+        {"state":"TN","rate":14.5},
+        {"state":"TX","rate":10.8},
+        {"state":"UT","rate":10.6},
+        {"state":"VA","rate":8.5},
+        {"state":"VT","rate":24.9},
+        {"state":"WA","rate":26.5},
+        {"state":"WI","rate":10.5},
+        {"state":"WV","rate":10.9},
+        {"state":"WY","rate":13.0}
       ]; 
-
-      var MAX_RATE = 10000; 
 
       var options = {
       	sorted: false, 
@@ -157,7 +157,7 @@
 
         var data = states.slice();
         if (options.sorted) {
-        	if (options.sorted === 'acs') { 
+        	if (options.sorted === 'asc') { 
         		data.sort(function (a,b) { return a.rate - b.rate; });
         	} else if (options.sorted === 'desc') {
         		data.sort(function (a,b) {return b.rate - a.rate; }); 
@@ -165,7 +165,7 @@
         }
 
         var table = document.getElementById('data-table'); 
-        var tbody = table.getElementsByTagName('tbody') [0]; 
+        var tbody = table.getElementsByTagName('tbody')[0]; 
 
         tbody.innerHTML = ''; 
 
@@ -183,10 +183,7 @@
           var barWrapper = document.createElement('td'); 
           var bar = document.createElement('div'); 
           bar.setAttribute('class', 'bar'); 
-
-          var rateViz = d.rate; 
-          bar.setAttribute('style', 'width: ' + rateViz); 
-
+          bar.setAttribute('style', 'width: ' + d.rate); 
           barWrapper.appendChild(bar); 
           row.appendChild(barWrapper); 
 
