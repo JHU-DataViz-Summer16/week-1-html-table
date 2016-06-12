@@ -79,7 +79,7 @@
             <tr>
               <th>State</th>
               <th>2014 Rate per 10K</th>
-              <th>Visualizing Change (2013 v 2014)</th>
+              <th>Visualizing the Rate</th>
             </tr>
           </thead>
           <tbody>
@@ -145,7 +145,7 @@
         {"State":"WY","Rate":13.0}
       ]; 
 
-      var MAX_CHANGE = 120; 
+      var MAX_RATE = 10000; 
 
       var options = {
       	sorted: false, 
@@ -154,22 +154,69 @@
       }; 
 
       function updateTable() {
+
         var data = states.slice();
         if (options.sorted) {
         	if (options.sorted === 'acs') { 
-        		data.sort(function (a,b) { return a.})}
+        		data.sort(function (a,b) { return a.rate - b.rate; });
+        	} else if (options.sorted === 'desc') {
+        		data.sort(function (a,b) {return b.rate - a.rate; }); 
+        	}
         }
 
+        var table = document.getElementById('data-table'); 
+        var tbody = table.getElementsByTagName('tbody') [0]; 
 
+        tbody.innerHTML = ''; 
 
+        data.forEach(function (d) {
+          var row = document.createElement('tr'); 
 
+          var state = document.createElement('td'); 
+          state.innerHTML = d.state; 
+          row.appendChild(state); 
 
-        
-        
-  
-      </tbody>
-    </table>
-  </div>
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
+          var rate = document.createElement('td'); 
+          rate.innerHTML = d.rate; 
+          row.appendChild(rate); 
+
+          var barWrapper = document.createElement('td'); 
+          var bar = document.createElement('div'); 
+          bar.setAttribute('class', 'bar'); 
+
+          var rateViz = d.rate; 
+          bar.setAttribute('style', 'width: ' + rateViz); 
+
+          barWrapper.appendChild(bar); 
+          row.appendChild(barWrapper); 
+
+          tbody.appendChild(row); 
+        }); 
+
+      }
+
+      updateTable(); 
+
+      document.getElementById('sort-asc').addEventListener('click', function ()
+        {
+        if (options.sorted === 'asc') {
+      	    options.sorted = false; 
+        }   else {
+        	options.sorted = 'asc'; 
+        }
+        updateTable(); 
+      }); 
+
+      document.getElementById('sort-desc').addEventListener('click', function ()
+        {
+        if (options.sorted === 'desc') {
+      	    options.sorted = false; 
+        }   else {
+        	options.sorted = 'desc'; 
+        }
+        updateTable(); 
+      }); 
+
+</script> 
 </body>
 </html>
