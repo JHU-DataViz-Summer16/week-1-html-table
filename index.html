@@ -79,7 +79,6 @@
             <tr>
               <th>State</th>
               <th>2014 Rate per 10K</th>
-              <th>Percent Change (2013 v 2014)</th>
               <th>Visualizing Change (2013 v 2014)</th>
             </tr>
           </thead>
@@ -89,293 +88,85 @@
       </div>
     </div>
 
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
+    <script>
+      var states = [
+        {"State":"AK","Rate":24.3},
+        {"State":"AL","Rate":9.4},
+        {"State":"AR","Rate":9.9},
+        {"State":"AZ","Rate":15.8},
+        {"State":"CA","Rate":29.7},
+        {"State":"CO","Rate":19.0},
+        {"State":"CT","Rate":12.4},
+        {"State":"DC","Rate":120},
+        {"State":"DE","Rate":9.7},
+        {"State":"FL","Rate":21.2},
+        {"State":"GA","Rate":16.5},
+        {"State":"HI","Rate":49.3},
+        {"State":"IA","Rate":10.1},
+        {"State":"ID","Rate":13.1},
+        {"State":"IL","Rate":10.2},
+        {"State":"IN","Rate":9.1},
+        {"State":"KS","Rate":9.6},
+        {"State":"KY","Rate":11.6},
+        {"State":"LA","Rate":10.0},
+        {"State":"MA","Rate":31.7},
+        {"State":"MD","Rate":13.3},
+        {"State":"ME","Rate":20.5},
+        {"State":"MI","Rate":12.4},
+        {"State":"MN","Rate":15.5},
+        {"State":"MO","Rate":12.0},
+        {"State":"MS","Rate":7.4},
+        {"State":"MT","Rate":17.2},
+        {"State":"NC","Rate":11.7},
+        {"State":"ND","Rate":17.4},
+        {"State":"NE","Rate":16.2},
+        {"State":"NH","Rate":10.4},
+        {"State":"NJ","Rate":13.1},
+        {"State":"NM","Rate":13.2},
+        {"State":"NV","Rate":37.8},
+        {"State":"NY","Rate":41.0},
+        {"State":"OH","Rate":10.2},
+        {"State":"OK","Rate":10.9},
+        {"State":"OR","Rate":31.0},
+        {"State":"PA","Rate":12.0},
+        {"State":"PR","Rate":11.4},
+        {"State":"RI","Rate":11.3},
+        {"State":"SC","Rate":10.6},
+        {"State":"SD","Rate":10.5},
+        {"State":"TN","Rate":14.5},
+        {"State":"TX","Rate":10.8},
+        {"State":"UT","Rate":10.6},
+        {"State":"VA","Rate":8.5},
+        {"State":"VT","Rate":24.9},
+        {"State":"WA","Rate":26.5},
+        {"State":"WI","Rate":10.5},
+        {"State":"WV","Rate":10.9},
+        {"State":"WY","Rate":13.0}
+      ]; 
+
+      var MAX_CHANGE = 120; 
+
+      var options = {
+      	sorted: false, 
+      	filtered: false, 
+      	page: 0
+      }; 
+
+      function updateTable() {
+        var data = states.slice();
+        if (options.sorted) {
+        	if (options.sorted === 'acs') { 
+        		data.sort(function (a,b) { return a.})}
+        }
 
 
 
 
 
-
-
-
-    <table class="table">
-      <thead>
-      <tr>
-          <th>State</th>
-          <th>2014 Rate per 10K</th>
-          <th>Percent Change (2013 v 2014)</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>AK</td>
-          <td>24.3</td>
-          <td>-8.3</td>
-        </tr>
-        <tr>
-          <td>AL</td>
-          <td>9.4</td>
-          <td>-2.7</td>
-        </tr>
-        <tr>
-          <td>AR</td>
-          <td>9.9</td>
-          <td>-23.0</td>
-        </tr>
-        <tr>
-          <td>AZ</td>
-          <td>15.8</td>
-          <td>-0.6</td>
-        </tr>
-        <tr>
-          <td>CA</td>
-          <td>29.7</td>
-          <td>-3.9</td>
-        </tr>
-        <tr>
-          <td>CO</td>
-          <td>19.0</td>
-          <td>2.8</td>
-        </tr>
-        <tr>
-          <td>CT</td>
-          <td>12.4</td>
-          <td>0.0</td>
-        </tr>
-        <tr>
-          <td>DC</td>
-          <td>119.9</td>
-          <td>12.9</td>
-        </tr>
-        <tr>
-          <td>DE</td>
-          <td>9.7</td>
-          <td>-4.8</td>
-        </tr>
-        <tr>
-          <td>FL</td>
-          <td>21.2</td>
-          <td>-13.2</td>
-        </tr>
-        <tr>
-          <td>GA</td>
-          <td>16.5</td>
-          <td>-2.7</td>
-        </tr>
-        <tr>
-          <td>GU</td>
-          <td>-</td>
-          <td>6.7</td>
-        </tr>
-        <tr>
-          <td>HI</td>
-          <td>49.3</td>
-          <td>9.2</td>
-        </tr>
-        <tr>
-          <td>IA</td>
-          <td>10.1</td>
-          <td>1.2</td>
-        </tr>
-        <tr>
-          <td>ID</td>
-          <td>13.1</td>
-          <td>18.1</td>
-        </tr>
-        <tr>
-          <td>IL</td>
-          <td>10.2</td>
-          <td>-2.4</td>
-        </tr>
-        <tr>
-          <td>IN</td>
-          <td>9.1</td>
-          <td>-2.1</td>
-        </tr>
-        <tr>
-          <td>KS</td>
-          <td>9.6</td>
-          <td>3.3</td>
-        </tr>
-        <tr>
-          <td>KY</td>
-          <td>11.6</td>
-          <td>-3.0</td>
-        </tr>
-        <tr>
-          <td>LA</td>
-          <td>10.0</td>
-          <td>-11.9</td>
-        </tr>
-        <tr>
-          <td>MA</td>
-          <td>31.7</td>
-          <td>11.6</td>
-        </tr>
-        <tr>
-          <td>MD</td>
-          <td>13.3</td>
-          <td>-4.3</td>
-        </tr>
-        <tr>
-          <td>ME</td>
-          <td>20.5</td>
-          <td>-9.6</td>
-        </tr>
-        <tr>
-          <td>MI</td>
-          <td>12.4</td>
-          <td>6.1</td>
-        </tr>
-        <tr>
-          <td>MN</td>
-          <td>15.5</td>
-          <td>2.0</td>
-        </tr>
-        <tr>
-          <td>MO</td>
-          <td>12.0</td>
-          <td>-15.1</td>
-        </tr>
-        <tr>
-          <td>MS</td>
-          <td>7.4</td>
-          <td>-7.4</td>
-        </tr>
-        <tr>
-          <td>MT</td>
-          <td>17.2</td>
-          <td>-7.1</td>
-        </tr>
-        <tr>
-          <td>NC</td>
-          <td>11.7</td>
-          <td>-5.6</td>
-        </tr>
-        <tr>
-          <td>ND</td>
-          <td>17.4</td>
-          <td>-39.2</td>
-        </tr>
-        <tr>
-          <td>NE</td>
-          <td>16.2</td>
-          <td>-3.8</td>
-        </tr>
-        <tr>
-          <td>NH</td>
-          <td>10.4</td>
-          <td>-4.9</td>
-        </tr>
-        <tr>
-          <td>NJ</td>
-          <td>13.1</td>
-          <td>-2.8</td>
-        </tr>
-        <tr>
-          <td>NM</td>
-          <td>13.2</td>
-          <td>-2.6</td>
-        </tr>
-        <tr>
-          <td>NV</td>
-          <td>37.8</td>
-          <td>25.0</td>
-        </tr>
-        <tr>
-          <td>NY</td>
-          <td>41.0</td>
-          <td>4.1</td>
-        </tr>
-        <tr>
-          <td>OH</td>
-          <td>10.2</td>
-          <td>-4.1</td>
-        </tr>
-        <tr>
-          <td>OK</td>
-          <td>10.9</td>
-          <td>-4.9</td>
-        </tr>
-        <tr>
-          <td>OR</td>
-          <td>31.0</td>
-          <td>-12.0</td>
-        </tr>
-        <tr>
-          <td>PA</td>
-          <td>12.0</td>
-          <td>1.6</td>
-        </tr>
-        <tr>
-          <td>PR</td>
-          <td>11.4</td>
-          <td>0.1</td>
-        </tr>
-        <tr>
-          <td>RI</td>
-          <td>11.3</td>
-          <td>-14.0</td>
-        </tr>
-        <tr>
-          <td>SC</td>
-          <td>10.6</td>
-          <td>-22.7</td>
-        </tr>
-        <tr>
-          <td>SD</td>
-          <td>10.5</td>
-          <td>-19.1</td>
-        </tr>
-        <tr>
-          <td>TN</td>
-          <td>14.5</td>
-          <td>-1.2</td>
-        </tr>
-        <tr>
-          <td>TX</td>
-          <td>10.8</td>
-          <td>-3.8</td>
-        </tr>
-        <tr>
-          <td>UT</td>
-          <td>10.6</td>
-          <td>-6.0</td>
-        </tr>
-        <tr>
-          <td>VA</td>
-          <td>8.5</td>
-          <td>-7.9</td>
-        </tr>
-        <tr>
-          <td>VI</td>
-          <td>-</td>
-          <td>-7.1</td>
-        </tr>
-        <tr>
-          <td>VT</td>
-          <td>24.9</td>
-          <td>7.2</td>
-        </tr>
-        <tr>
-          <td>WA</td>
-          <td>26.5</td>
-          <td>3.8</td>
-        </tr>
-        <tr>
-          <td>WI</td>
-          <td>10.5</td>
-          <td>-0.8</td>
-        </tr>
-        <tr>
-          <td>WV</td>
-          <td>10.9</td>
-          <td>-10.1</td>
-        </tr>
-        <tr>
-          <td>WY</td>
-          <td>13.0</td>
-          <td>-20.6</td>
-        </tr>
+        
+        
+  
       </tbody>
     </table>
   </div>
