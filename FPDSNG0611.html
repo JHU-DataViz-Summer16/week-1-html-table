@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Federal Procurement Data System Report</title><!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <style>
+    .section { padding: 1em 0; }
+    .header {
+      background: linear-gradient(to bottom, #337ab7 0%, #135a97 100%);
+      color: white;
+      padding: 1em 0 2em;
+    }
+    #data-table td {
+      width: 1%;
+      /* The table has eleven columns, so this rule makes them of equal width. */
+    }
+    .bar {
+      height: 20px;
+      /* Note that we'll set the width dynamically using Javascript. */
+      background: #337ab7;
+    }
+  </style>
+</head>
+<body>
+<div class="header section">
+  <div class="container">
+    <h1>Federal Procurement Data 2011 and 2012</h1>
+    <p>Contracts Reported to FPDS.</p>
+</div>
+<div class="controls section">
+  <div class="container">
+    <div class="btn-toolbar">
+      <div class="btn-group">
+        <button type="button" class="btn btn-default" id="sort-asc">Ascending</button>
+        <button type="button" class="btn btn-default" id="sort-desc">Descending</button>
+      </div>
+      <div class="btn-group">
+        <button type="button" class="btn btn-default" id="filter-dod">DOD</button>
+        <button type="button" class="btn btn-default" id="filter-epa">EPA</button>
+        <button type="button" class="btn btn-default" id="filter-fema">FEMA</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="main section">
+  <div class="container">
+    <table class="table" id="data-table">
+      <thead>
+        <tr>
+          <th>Agency Name</th>
+          <th>Annual Contract Revenue</th>
+          <th>City</th>
+          <th>State</th>
+          <th>Country</th>
+          <th>Congressional District Code</th>
+          <th>Contracting Agency</th>
+          <th>Contracting Office</th>
+          <th>DUNS</th>
+          <th>Contract Date</th>
+          <th>Vendor Name</th>
+        </tr> 
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+    <nav>
+      <ul class="pager">
+        <li class="previous"><a href="#" id="page-prev">Previous</a></li>
+        <li class="next"><a href="#" id="page-next">Next</a></li>
+      </ul>
+    </nav>
+  </div>
+<div>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
+<script>  
+//contracts data from FPDS NG sorted by Agency Name Country Annual Contract Revenue and Contract data.  Having issues with Contract Revenue showing up as dollar value?  
+var contracts = [{"Agency Name":"AGENCY FOR INTERNATIONAL DEVELOPMENT","Annual Contract Revenue":"1,000,000","City":"WASHINGTON","State":"DISTRICT OF COLUMBIA","Country":"USA","Zip Code":200362603,"Congressional District Code":0,"Contracting Agency":"AGENCY FOR INTERNATIONAL DEVELOPMENT","Contracting Office":"AGENCY FOR INTERNATIONAL DEVELOPMENT","DUNS":788395994,"Contract Date":2011,"Vendor Name":"SIBLEY INTERNATIONAL CORP."},
+{"Agency Name":"AGENCY FOR INTERNATIONAL DEVELOPMENT","Annual Contract Revenue":"50,000,000","City":"ARLINGTON","State":"VIRGINIA","Country":"USA","Zip Code":222031546,"Congressional District Code":8,"Contracting Agency":"AGENCY FOR INTERNATIONAL DEVELOPMENT","Contracting Office":"AGENCY FOR INTERNATIONAL DEVELOPMENT","DUNS":9585279,"Contract Date":2011,"Vendor Name":"TETRA TECH ES, INC."},
+{"Agency Name":"AGENCY FOR INTERNATIONAL DEVELOPMENT","Annual Contract Revenue":"100,000,000","City":"FAIRFAX","State":"VIRGINIA","Country":"USA","Zip Code":220335501,"Congressional District Code":10,"Contracting Agency":"AGENCY FOR INTERNATIONAL DEVELOPMENT","Contracting Office":"AGENCY FOR INTERNATIONAL DEVELOPMENT","DUNS":42424338,"Contract Date":2011,"Vendor Name":"LEE TECHNOLOGIES SERVICES, INC."},
+{"Agency Name":"AGENCY FOR INTERNATIONAL DEVELOPMENT","Annual Contract Revenue":"250,000,000","City":"BETHESDA","State":"MARYLAND","Country":"USA","Zip Code":208143657,"Congressional District Code":8,"Contracting Agency":"AGENCY FOR INTERNATIONAL DEVELOPMENT","Contracting Office":"AGENCY FOR INTERNATIONAL DEVELOPMENT","DUNS":66781956,"Contract Date":2011,"Vendor Name":"DEVELOPMENT ALTERNATIVES, INC."},
+{"Agency Name":"AGENCY FOR INTERNATIONAL DEVELOPMENT","Annual Contract Revenue":"25,600,000,000,000","City":"CUPERTINO","State":"CALIFORNIA","Country":"USA","Zip Code":950142084,"Congressional District Code":15,"Contracting Agency":"AGENCY FOR INTERNATIONAL DEVELOPMENT","Contracting Office":"AGENCY FOR INTERNATIONAL DEVELOPMENT","DUNS":60704780,"Contract Date":2011,"Vendor Name":"APPLE INC."},
+{"Agency Name":"AGRICULTURAL MARKETING SERVICE","Annual Contract Revenue":"30,748,493","City":"WATSONVILLE","State":"CALIFORNIA","Country":"USA","Zip Code":950763567,"Congressional District Code":17,"Contracting Agency":"AGRICULTURAL MARKETING SERVICE","Contracting Office":"AMS 3J16","DUNS":81448284,"Contract Date":2011,"Vendor Name":"V. J. CATALANO, INC."},
+{"Agency Name":"AGRICULTURAL MARKETING SERVICE","Annual Contract Revenue":"132,978,034","City":"WATSONVILLE","State":"CALIFORNIA","Country":"USA","Zip Code":950764525,"Congressional District Code":17,"Contracting Agency":"AGRICULTURAL MARKETING SERVICE","Contracting Office":"AMS 3J16","DUNS":76126317,"Contract Date":2011,"Vendor Name":"INN FOODS, INC."},
+{"Agency Name":"AGRICULTURAL RESEARCH SERVICE","Annual Contract Revenue":"200.000","City":"VERDIGRE","State":"NEBRASKA","Country":"USA","Zip Code":687835045,"Congressional District Code":3,"Contracting Agency":"AGRICULTURAL RESEARCH SERVICE","Contracting Office":"USDA ARS MWA 5114","DUNS":162032762,"Contract Date":2011,"Vendor Name":"LARSEN, ROBERT DALE"},
+{"Agency Name":"AGRICULTURAL RESEARCH SERVICE","Annual Contract Revenue":"400.000","City":"PLAISTOW","State":"NEW HAMPSHIRE","Country":"USA","Zip Code":38652827,"Congressional District Code":1,"Contracting Agency":"AGRICULTURAL RESEARCH SERVICE","Contracting Office":"USDA ARS APD 3K06","DUNS":932548233,"Contract Date":2011,"Vendor Name":"APTITUNE CORPORATION"},
+{"Agency Name":"AGRICULTURAL RESEARCH SERVICE","Annual Contract Revenue":"1,400,000","City":"CHICAGO","State":"ILLINOIS","Country":"USA","Zip Code":606108103,"Congressional District Code":7,"Contracting Agency":"AGRICULTURAL RESEARCH SERVICE","Contracting Office":"USDA ARS MWA 5114","DUNS":845976976,"Contract Date":2011,"Vendor Name":"BAILEY EDWARD DESIGN INCORPORATED"},
+{"Agency Name":"AGRICULTURAL RESEARCH SERVICE","Annual Contract Revenue":"100,000,000","City":"BRYAN","State":"TEXAS","Country":"USA","Zip Code":778031241,"Congressional District Code":17,"Contracting Agency":"AGRICULTURAL RESEARCH SERVICE","Contracting Office":"USDA ARS PA 7D74","DUNS":27133453,"Contract Date":2011,"Vendor Name":"COUFAL-PRATER EQUIPMENT LTD"},
+{"Agency Name":"AGRICULTURAL RESEARCH SERVICE","Annual Contract Revenue":"130,000,000","City":"ARLINGTON","State":"VIRGINIA","Country":"USA","Zip Code":222014798,"Congressional District Code":8,"Contracting Agency":"AGRICULTURAL RESEARCH SERVICE","Contracting Office":"USDA ARS FD 3K15","DUNS":173361601,"Contract Date":2011,"Vendor Name":"JACOBS FACILITIES INCORPORATED"},
+{"Agency Name":"AGRICULTURAL RESEARCH SERVICE","Annual Contract Revenue":"877,932,849","City":"AUBURN","State":"ALABAMA","Country":"USA","Zip Code":368490001,"Congressional District Code":3,"Contracting Agency":"AGRICULTURAL RESEARCH SERVICE","Contracting Office":"USDA ARS SEA 4463","DUNS":66470972,"Contract Date":2011,"Vendor Name":"AUBURN UNIVERSITY"},
+{"Agency Name":"AGRICULTURAL RESEARCH SERVICE","Annual Contract Revenue":"1,600,000,000","City":"NORWALK","State":"CONNECTICUT","Country":"USA","Zip Code":68511070,"Congressional District Code":4,"Contracting Agency":"AGRICULTURAL RESEARCH SERVICE","Contracting Office":"USDA ARS APD 3K06","DUNS":1184480,"Contract Date":2011,"Vendor Name":"APPLERA CORPORATION"},
+{"Agency Name":"AGRICULTURAL RESEARCH SERVICE","Annual Contract Revenue":"9,000,000,000","City":"ASHEVILLE","State":"NORTH CAROLINA","Country":"USA","Zip Code":288035053,"Congressional District Code":11,"Contracting Agency":"AGRICULTURAL RESEARCH SERVICE","Contracting Office":"USDA ARS SEA 4431","DUNS":170755479,"Contract Date":2011,"Vendor Name":"THERMO FISHER SCIENTIFIC (ASHEVILLE) LLC"},
+{"Agency Name":"AGRICULTURAL RESEARCH SERVICE","Annual Contract Revenue":"80,000,000,000","City":"PLEASANTON","State":"CALIFORNIA","Country":"USA","Zip Code":945883355,"Congressional District Code":11,"Contracting Agency":"AGRICULTURAL RESEARCH SERVICE","Contracting Office":"USDA ARS PWA 91H2","DUNS":111653155,"Contract Date":2011,"Vendor Name":"HITACHI HIGH TECHNOLOGIES AMERICA, INC"},
+{"Agency Name":"ANIMAL AND PLANT HEALTH INSPECTION SERVICE","Annual Contract Revenue":"1,300,000","City":"NEW CANEY","State":"TEXAS","Country":"USA","Zip Code":773576803,"Congressional District Code":8,"Contracting Agency":"ANIMAL AND PLANT HEALTH INSPECTION SERVICE","Contracting Office":"USDA APHIS MRPBS","DUNS":133339205,"Contract Date":2011,"Vendor Name":"LONE STAR LIVESTOCK EQUIPMENT CO., INC."},
+{"Agency Name":"ANIMAL AND PLANT HEALTH INSPECTION SERVICE","Annual Contract Revenue":"143,638,000","City":"CINCINNATI","State":"OHIO","Country":"USA","Zip Code":452443023,"Congressional District Code":2,"Contracting Agency":"ANIMAL AND PLANT HEALTH INSPECTION SERVICE","Contracting Office":"USDA APHIS MRPBS","DUNS":66132549,"Contract Date":2011,"Vendor Name":"MERIDIAN LIFE SCIENCE, INC."},
+{"Agency Name":"ANIMAL AND PLANT HEALTH INSPECTION SERVICE","Annual Contract Revenue":"2,213,644,032","City":"VERNON HILLS","State":"ILLINOIS","Country":"USA","Zip Code":600611577,"Congressional District Code":10,"Contracting Agency":"ANIMAL AND PLANT HEALTH INSPECTION SERVICE","Contracting Office":"ANIMAL & PLANT HLTH INSPECT SVC","DUNS":26157235,"Contract Date":2011,"Vendor Name":"CDW GOVERNMENT LLC"},
+{"Agency Name":"ATF ACQUISITION AND PROPERTY MGMT DIV","Annual Contract Revenue":"30,000","City":"BASTROP","State":"TEXAS","Country":"USA","Zip Code":786029513,"Congressional District Code":25,"Contracting Agency":"ATF ACQUISITION AND PROPERTY MGMT DIV","Contracting Office":"ATF LOGISTICS AND ACQUISITIONS DIVISION","DUNS":107963758,"Contract Date":2011,"Vendor Name":"CARPENTER, DANNY"},
+{"Agency Name":"ATF ACQUISITION AND PROPERTY MGMT DIV","Annual Contract Revenue":"150,000","City":"YULEE","State":"FLORIDA","Country":"USA","Zip Code":320978620,"Congressional District Code":4,"Contracting Agency":"ATF ACQUISITION AND PROPERTY MGMT DIV","Contracting Office":"ATF LOGISTICS AND ACQUISITIONS DIVISION","DUNS":90225694,"Contract Date":2011,"Vendor Name":"ANDERSON, GLEN"},
+{"Agency Name":"ATF ACQUISITION AND PROPERTY MGMT DIV","Annual Contract Revenue":"864,000","City":"RESTON","State":"VIRGINIA","Country":"USA","Zip Code":201905244,"Congressional District Code":8,"Contracting Agency":"ATF ACQUISITION AND PROPERTY MGMT DIV","Contracting Office":"ATF LOGISTICS AND ACQUISITIONS DIVISION","DUNS":141611272,"Contract Date":2011,"Vendor Name":"NVE, INC"},
+{"Agency Name":"BROADCASTING BOARD OF GOVERNORS","Annual Contract Revenue":"13,000","City":"HIALEAH","State":"FLORIDA","Country":"USA","Zip Code":330122849,"Congressional District Code":21,"Contracting Agency":"BROADCASTING BOARD OF GOVERNORS","Contracting Office":"OFFICE OF CUBA BROADCASTING RADIO/TV","DUNS":140537833,"Contract Date":2011,"Vendor Name":"ORLANDO G PENA"},
+{"Agency Name":"BUREAU OF ENGRAVING AND PRINTING","Annual Contract Revenue":"1,200,000","City":"ALEXANDRIA","State":"VIRGINIA","Country":"USA","Zip Code":223153730,"Congressional District Code":8,"Contracting Agency":"BUREAU OF ENGRAVING AND PRINTING","Contracting Office":"DEPT OF TREAS/BUREAU OF ENGRAV AND PRINT","DUNS":17422341,"Contract Date":2013,"Vendor Name":"CMMD ENTERPRISES INC"},
+{"Agency Name":"BUREAU OF INDIAN AFFAIRS","Annual Contract Revenue":"13,000","City":"ABERDEEN","State":"SOUTH DAKOTA","Country":"USA","Zip Code":574012240,"Congressional District Code":0,"Contracting Agency":"BUREAU OF INDIAN AFFAIRS","Contracting Office":"GREAT PLAINS REGION","DUNS":168454036,"Contract Date":2011,"Vendor Name":"SCHEID, LARRY"},
+{"Agency Name":"BUREAU OF INDIAN AFFAIRS","Annual Contract Revenue":"54,315,000","City":"WASHINGTON","State":"DISTRICT OF COLUMBIA","Country":"USA","Zip Code":200053132,"Congressional District Code":0,"Contracting Agency":"BUREAU OF INDIAN AFFAIRS","Contracting Office":"CENTRAL OFFICE","DUNS":147218333,"Contract Date":2011,"Vendor Name":"PRUDENTIAL RELOCATION, INC."},
+{"Agency Name":"BUREAU OF INDIAN AFFAIRS","Annual Contract Revenue":"70,284,992","City":"HOLBROOK","State":"ARIZONA","Country":"USA","Zip Code":860252200,"Congressional District Code":1,"Contracting Agency":"BUREAU OF INDIAN AFFAIRS","Contracting Office":"CENTRAL OFFICE","DUNS":81685620,"Contract Date":2011,"Vendor Name":"BRADCO, INC."},
+{"Agency Name":"BUREAU OF INDIAN AFFAIRS","Annual Contract Revenue":"91,245,544","City":"FORT DEFIANCE","State":"ARIZONA","Country":"USA","Zip Code":865040170,"Congressional District Code":1,"Contracting Agency":"BUREAU OF INDIAN AFFAIRS","Contracting Office":"CENTRAL OFFICE","DUNS":800021990,"Contract Date":2012,"Vendor Name":"NAVAJO TRIBAL UTILITY AUTHORITY COMPANY"},
+{"Agency Name":"BUREAU OF INDIAN AFFAIRS","Annual Contract Revenue":"900,000,000","City":"MESA","State":"ARIZONA","Country":"USA","Zip Code":852106003,"Congressional District Code":5,"Contracting Agency":"BUREAU OF INDIAN AFFAIRS","Contracting Office":"WESTERN REGIONAL OFFICE","DUNS":13475020,"Contract Date":2011,"Vendor Name":"EMPIRE SOUTHWEST, LLC"},
+{"Agency Name":"BUREAU OF LABOR STATISTICS","Annual Contract Revenue":"700,000,000","City":"ARLINGTON","State":"VIRGINIA","Country":"USA","Zip Code":222045714,"Congressional District Code":8,"Contracting Agency":"OFFICE OF THE ASSISTANT SECRETARY FOR ADMIN AND MANAGEMENT","Contracting Office":"OFFICE OF ADMINISTRATIVE SERVICES REG IX","DUNS":626578041,"Contract Date":2011,"Vendor Name":"KONICA MINOLTA BUSINESS SOLUTIONS USA INCORPORATED"},
+{"Agency Name":"BUREAU OF LAND MANAGEMENT","Annual Contract Revenue":"20,000","City":"CODY","State":"WYOMING","Country":"USA","Zip Code":824141824,"Congressional District Code":0,"Contracting Agency":"BUREAU OF LAND MANAGEMENT","Contracting Office":"MT-MILES CITY FIELD OFFICE","DUNS":829087019,"Contract Date":2011,"Vendor Name":"MOUCHA, CODY"},
+{"Agency Name":"BUREAU OF LAND MANAGEMENT","Annual Contract Revenue":"20,000","City":"STUART","State":"NEBRASKA","Country":"USA","Zip Code":687801756,"Congressional District Code":3,"Contracting Agency":"BUREAU OF LAND MANAGEMENT","Contracting Office":"OR-OREGON STATE OFFICE","DUNS":830833906,"Contract Date":2011,"Vendor Name":"BLOOMIN RANCH SERVICE, LLC"},
+{"Agency Name":"BUREAU OF LAND MANAGEMENT","Annual Contract Revenue":"50,000","City":"MOAB","State":"UTAH","Country":"USA","Zip Code":845323818,"Congressional District Code":2,"Contracting Agency":"BUREAU OF LAND MANAGEMENT","Contracting Office":"UT-MOAB FIELD OFFICE","DUNS":142553093,"Contract Date":2011,"Vendor Name":"BROOKSHIER, SHARON"},
+{"Agency Name":"BUREAU OF LAND MANAGEMENT","Annual Contract Revenue":"60,000","City":"IDAHO FALLS","State":"IDAHO","Country":"USA","Zip Code":834023035,"Congressional District Code":2,"Contracting Agency":"BUREAU OF LAND MANAGEMENT","Contracting Office":"ID-SALMON FIELD OFFICE","DUNS":790932425,"Contract Date":2011,"Vendor Name":"HORSBURGH, CHARLES A"},
+{"Agency Name":"BUREAU OF LAND MANAGEMENT","Annual Contract Revenue":"100,000","City":"HENDERSON","State":"NEVADA","Country":"USA","Zip Code":890114029,"Congressional District Code":3,"Contracting Agency":"BUREAU OF LAND MANAGEMENT","Contracting Office":"NV-LAS VEGAS FIELD OFFICE","DUNS":15233242,"Contract Date":2012,"Vendor Name":"EDGECO, INC."},
+{"Agency Name":"BUREAU OF LAND MANAGEMENT","Annual Contract Revenue":"151,000","City":"PEORIA","State":"ARIZONA","Country":"USA","Zip Code":853832169,"Congressional District Code":2,"Contracting Agency":"BUREAU OF LAND MANAGEMENT","Contracting Office":"ID-SALMON FIELD OFFICE","DUNS":88057158,"Contract Date":2012,"Vendor Name":"BSE PERFORMANCE LLC"},
+{"Agency Name":"BUREAU OF LAND MANAGEMENT","Annual Contract Revenue":"200,000","City":"PEORIA","State":"ARIZONA","Country":"USA","Zip Code":853458240,"Congressional District Code":2,"Contracting Agency":"BUREAU OF LAND MANAGEMENT","Contracting Office":"ARIZONA STATE OFFICE","DUNS":149098220,"Contract Date":2012,"Vendor Name":"CSC ELECTRIC LLC"},
+{"Agency Name":"BUREAU OF LAND MANAGEMENT","Annual Contract Revenue":"250,000","City":"DELTA","State":"UTAH","Country":"USA","Zip Code":846247190,"Congressional District Code":3,"Contracting Agency":"BUREAU OF LAND MANAGEMENT","Contracting Office":"SALT LAKE FIELD OFFICE","DUNS":794257964,"Contract Date":2011,"Vendor Name":"DELTA GARBAGE SERVICE INC"},
+{"Agency Name":"BUREAU OF LAND MANAGEMENT","Annual Contract Revenue":"400,000","City":"MALTA","State":"MONTANA","Country":"USA","Zip Code":595380193,"Congressional District Code":0,"Contracting Agency":"BUREAU OF LAND MANAGEMENT","Contracting Office":"MT-LEWISTOWN FIELD OFFICE","DUNS":967343356,"Contract Date":2011,"Vendor Name":"BISHOP, INC."},
+{"Agency Name":"BUREAU OF LAND MANAGEMENT","Annual Contract Revenue":"640,000","City":"FLORENCE","State":"MONTANA","Country":"USA","Zip Code":598336663,"Congressional District Code":0,"Contracting Agency":"BUREAU OF LAND MANAGEMENT","Contracting Office":"CO - COLORADO STATE OFFICE","DUNS":825178606,"Contract Date":2012,"Vendor Name":"BITTERROOT SERVICES&TECHNOLOGY LLC"},
+{"Agency Name":"BUREAU OF LAND MANAGEMENT","Annual Contract Revenue":"750,000","City":"ALBUQUERQUE","State":"NEW MEXICO","Country":"USA","Zip Code":871074565,"Congressional District Code":1,"Contracting Agency":"BUREAU OF LAND MANAGEMENT","Contracting Office":"ID-SALMON FIELD OFFICE","DUNS":809239205,"Contract Date":2011,"Vendor Name":"ECOSYSTEM MANAGEMENT, INC"},
+{"Agency Name":"BUREAU OF LAND MANAGEMENT","Annual Contract Revenue":"757,852","City":"MYRTLE POINT","State":"OREGON","Country":"USA","Zip Code":974581670,"Congressional District Code":4,"Contracting Agency":"BUREAU OF LAND MANAGEMENT","Contracting Office":"OR-COOS BAY DISTRICT OFFICE","DUNS":9619701,"Contract Date":2011,"Vendor Name":"KINCHELOE&SONS INC"},
+{"Agency Name":"BUREAU OF LAND MANAGEMENT","Annual Contract Revenue":"757,852","City":"MYRTLE POINT","State":"OREGON","Country":"USA","Zip Code":974581670,"Congressional District Code":4,"Contracting Agency":"BUREAU OF LAND MANAGEMENT","Contracting Office":"OR-COOS BAY DISTRICT OFFICE","DUNS":9619701,"Contract Date":2011,"Vendor Name":"KINCHELOE&SONS INC"},
+{"Agency Name":"BUREAU OF LAND MANAGEMENT","Annual Contract Revenue":"1,000,000","City":"ATLANTA","State":"KANSAS","Country":"USA","Zip Code":670089300,"Congressional District Code":4,"Contracting Agency":"BUREAU OF LAND MANAGEMENT","Contracting Office":"NOC SERVICE & SUPPLIES ACQUISITION BRANCH","DUNS":127764764,"Contract Date":2011,"Vendor Name":"GRAND EAGLE SUMMIT, LLC"},
+{"Agency Name":"BUREAU OF LAND MANAGEMENT","Annual Contract Revenue":"1,145,249","City":"BILLINGS","State":"MONTANA","Country":"USA","Zip Code":591014013,"Congressional District Code":0,"Contracting Agency":"BUREAU OF LAND MANAGEMENT","Contracting Office":"MT-MONTANA STATE OFFICE","DUNS":965873318,"Contract Date":2011,"Vendor Name":"NORTHERN INDUSTRIAL HYGIENE INC"},
+{"Agency Name":"BUREAU OF LAND MANAGEMENT","Annual Contract Revenue":"1,450,759","City":"LOVELL","State":"WYOMING","Country":"USA","Zip Code":824312110,"Congressional District Code":0,"Contracting Agency":"BUREAU OF LAND MANAGEMENT","Contracting Office":"WY-WORLAND FIELD OFFICE","DUNS":790013846,"Contract Date":2011,"Vendor Name":"BAIRCO CONSTRUCTION, INC."},
+{"Agency Name":"BUREAU OF LAND MANAGEMENT","Annual Contract Revenue":"1,600,000","City":"POLO","State":"ILLINOIS","Country":"USA","Zip Code":610641850,"Congressional District Code":16,"Contracting Agency":"BUREAU OF LAND MANAGEMENT","Contracting Office":"OR-COOS BAY DISTRICT OFFICE","DUNS":25759234,"Contract Date":2011,"Vendor Name":"CEDAR FOREST PRODUCTS COMPANY"},
+{"Agency Name":"BUREAU OF LAND MANAGEMENT","Annual Contract Revenue":"1,750,000","City":"PORTLAND","State":"OREGON","Country":"USA","Zip Code":972323054,"Congressional District Code":3,"Contracting Agency":"BUREAU OF LAND MANAGEMENT","Contracting Office":"CO - COLORADO STATE OFFICE","DUNS":785579947,"Contract Date":2011,"Vendor Name":"KADRI INTERNATIONAL CO DBA VALUECAD"},
+{"Agency Name":"BUREAU OF LAND MANAGEMENT","Annual Contract Revenue":"1,850,000","City":"NEW YORK","State":"NEW YORK","Country":"USA","Zip Code":100186492,"Congressional District Code":8,"Contracting Agency":"BUREAU OF LAND MANAGEMENT","Contracting Office":"NV - NEVADA STATE OFFICE","DUNS":784141384,"Contract Date":2012,"Vendor Name":"PREMIER AND COMPANIES INCORPORATED"}];
+</script>
+</body>
+</html>
