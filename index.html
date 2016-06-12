@@ -6,8 +6,19 @@
   <title>Wage Gap in Occupations</title><!-- Latest compiled and minified CSS -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
   <style>
+    .section { padding: 1em 0; }
     .header {
-      text-align: center
+      text-align: center;
+      padding: 1em 0 2em;
+    }
+     #data-table td {
+      width: 20%;
+      /* The table has five columns, so this rule makes them of equal width. */
+    }
+    .bar {
+      height: 20px;
+      /* Note that we'll set the width dynamically using Javascript. */
+      background: #337ab7;
     }
     th {
     background-color: #4CAF50;
@@ -23,84 +34,344 @@
    </style>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
+<div class="header section">
+  <div class="container">    
       <h1>Wage Gap Varies by Occupation</h1>
-      <p>Median 2015 Earnings - Current Population Survey</p>
+      <p>Median Weekly 2015 Earnings - Current Population Survey From the <a href="http://www.bls.gov/cps/cpsaat39.htm">Bureau of Labor Statistics</a></p>
+  </div>
+</div>
+<div class="controls section">
+  <div class="container">
+    <div class="btn-toolbar">
+      <div class="btn-group">
+        <button type="button" class="btn btn-default" id="sort-asc">Ascending</button>
+        <button type="button" class="btn btn-default" id="sort-desc">Descending</button>
+      </div>
+      <div class="btn-group">
+        <button type="button" class="btn btn-default" id="filter-Mgt">Management</button>
+        <button type="button" class="btn btn-default" id="filter-Sr">Sales And Related</button>
+        <button type="button" class="btn btn-default" id="filter-Drs">Healthcare Practitioners</button>
+        <button type="button" class="btn btn-default" id="filter-Admin">Office and Administrative Support</button>
+      </div>
     </div>
-    <table class="table">
+  </div>
+</div>
+<div class="main section">
+  <div class="container">
+    <table id="data-table">
       <thead>
         <tr>
           <th>Occupation</th>
-          <th>Male Earnings</th>
-          <th>Female Earnings</th>
-          <th>Women's Earnings as % of Men's</th>
+          <th>Group Name</th>
+          <th>Men's Earnings</th>
+          <th>Women's Earnings</th>
+          <th>Women's Earnings as Percentage of Men's</th>
         </tr>
       </thead>
       <tbody>
-      	<tr>
-          <td>Data Entry Keyers</td>
-          <td>$589</td>
-          <td>$638</td>
-          <td>108%</td>
-        </tr>
-      	<tr>
-          <td>Counselors</td>
-          <td>$908</td>
-          <td>$902</td>
-          <td>99%</td>
-        </tr>
-      	<tr>
-          <td>Bill and Account Collectors</td>
-          <td>$674</td>
-          <td>$648</td>
-          <td>96%</td>
-        </tr>
-      	<tr>
-          <td>Social Workers</td>
-          <td>$943</td>
-          <td>$862</td>
-          <td>91%</td>
-        </tr>
-      	<tr>
-          <td>Maids and Housekeeping Cleaners</td>
-          <td>$974</td>
-          <td>$833</td>
-          <td>85%</td>
-        </tr>
-        <tr>
-          <td>Physicians and Surgeons</td>
-          <td>$1,915</td>
-          <td>$1,533</td>
-          <td>80%</td>
-        </tr>
-      	<tr>
-          <td>First Line Supv. Retail Sales Workers</td>
-          <td>$825</td>
-          <td>$614</td>
-          <td>74%</td>
-        </tr>
-      	<tr>
-          <td>Admin. Services Managers</td>
-          <td>$1,451</td>
-          <td>$981</td>
-          <td>67%</td>
-        </tr>
-      	<tr>
-          <td>Advertising Sales Agents</td>
-          <td>$1,155</td>
-          <td>$729</td>
-          <td>63%</td>
-        </tr>
-        <tr>
-          <td>Financial Sales Agents</td>
-          <td>$1,451</td>
-          <td>$767</td>
-          <td>52%</td>
-        </tr>
       </tbody>
     </table>
+    <nav>
+      <ul class="pager">
+        <li class="previous"><a href="#" id="page-prev">Previous</a></li>
+        <li class="next"><a href="#" id="page-next">Next</a></li>
+      </ul>
+    </nav>
   </div>
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
+</div>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
+<script>
+  var occupations = [
+  {"SOC":"11-0000","Category":"Major","Group_Code":"11-0000","Group":"Mgt","Group_Name":"Management","Occupation_name":"Management occupations","Total_Workers":12.480,"Median_Earn":"$1,351 ","Men_Earn":"$1,486 ","Women_Earn":"$1,139 ","ME":1486,"WE":1139,"Women_Percent":0.766487214},
+  {"SOC":"11-1010","Category":"Minor","Group_Code":"11-0000","Group":"Mgt","Group_Name":"Management","Occupation_name":"Chief executives","Total_Workers":1.046,"Median_Earn":"$2,041 ","Men_Earn":"$2,251 ","Women_Earn":"$1,836 ","ME":2251,"WE":1836,"Women_Percent":0.815637494},
+  {"SOC":"11-1020","Category":"Minor","Group_Code":"11-0000","Group":"Mgt","Group_Name":"Management","Occupation_name":"General and operations managers","Total_Workers":823,"Median_Earn":"$1,260 ","Men_Earn":"$1,347 ","Women_Earn":"$1,002 ","ME":1347,"WE":1002,"Women_Percent":0.743875278},
+  {"SOC":"11-2020","Category":"Minor","Group_Code":"11-0000","Group":"Mgt","Group_Name":"Management","Occupation_name":"Marketing and sales managers","Total_Workers":948,"Median_Earn":"$1,462 ","Men_Earn":"$1,603 ","Women_Earn":"$1,258 ","ME":1603,"WE":1258,"Women_Percent":0.78477854},
+  {"SOC":"11-3010","Category":"Minor","Group_Code":"11-0000","Group":"Mgt","Group_Name":"Management","Occupation_name":"Administrative services managers","Total_Workers":170,"Median_Earn":"$1,191 ","Men_Earn":"$1,451 ","Women_Earn":"$981 ","ME":1451,"WE":981,"Women_Percent":0.676085458},
+  {"SOC":"11-3020","Category":"Minor","Group_Code":"11-0000","Group":"Mgt","Group_Name":"Management","Occupation_name":"Computer and information systems managers","Total_Workers":636,"Median_Earn":"$1,728 ","Men_Earn":"$1,817 ","Women_Earn":"$1,563 ","ME":1817,"WE":1563,"Women_Percent":0.860209136},
+  {"SOC":"11-3030","Category":"Minor","Group_Code":"11-0000","Group":"Mgt","Group_Name":"Management","Occupation_name":"Financial managers","Total_Workers":1.124,"Median_Earn":"$1,408 ","Men_Earn":"$1,732 ","Women_Earn":"$1,130 ","ME":1732,"WE":1130,"Women_Percent":0.652424942},
+  {"SOC":"11-3060","Category":"Minor","Group_Code":"11-0000","Group":"Mgt","Group_Name":"Management","Occupation_name":"Purchasing managers","Total_Workers":193,"Median_Earn":"$1,348 ","Men_Earn":"$1,404 ","Women_Earn":"$1,226 ","ME":1404,"WE":1226,"Women_Percent":0.873219373},
+  {"SOC":"11-3070","Category":"Minor","Group_Code":"11-0000","Group":"Mgt","Group_Name":"Management","Occupation_name":"Transportation, storage, and distribution managers","Total_Workers":276,"Median_Earn":"$966 ","Men_Earn":"$1,006 ","Women_Earn":"$749 ","ME":1006,"WE":749,"Women_Percent":0.744532803},
+  {"SOC":"11-3120","Category":"Minor","Group_Code":"11-0000","Group":"Mgt","Group_Name":"Management","Occupation_name":"Human resources managers","Total_Workers":254,"Median_Earn":"$1,365 ","Men_Earn":"$1,495 ","Women_Earn":"$1,274 ","ME":1495,"WE":1274,"Women_Percent":0.852173913},
+  {"SOC":"11-9030","Category":"Minor","Group_Code":"11-0000","Group":"Mgt","Group_Name":"Management","Occupation_name":"Education administrators","Total_Workers":778,"Median_Earn":"$1,423 ","Men_Earn":"$1,585 ","Women_Earn":"$1,252 ","ME":1585,"WE":1252,"Women_Percent":0.789905363},
+  {"SOC":"11-9050","Category":"Minor","Group_Code":"11-0000","Group":"Mgt","Group_Name":"Management","Occupation_name":"Food service managers","Total_Workers":763,"Median_Earn":"$742 ","Men_Earn":"$820 ","Women_Earn":"$680 ","ME":820,"WE":680,"Women_Percent":0.829268293},
+  {"SOC":"11-9080","Category":"Minor","Group_Code":"11-0000","Group":"Mgt","Group_Name":"Management","Occupation_name":"Lodging managers","Total_Workers":123,"Median_Earn":"$985 ","Men_Earn":"$1,171 ","Women_Earn":"$902 ","ME":1171,"WE":902,"Women_Percent":0.77028181},
+  {"SOC":"11-9110","Category":"Minor","Group_Code":"11-0000","Group":"Mgt","Group_Name":"Management","Occupation_name":"Medical and health services managers","Total_Workers":592,"Median_Earn":"$1,210 ","Men_Earn":"$1,422 ","Women_Earn":"$1,156 ","ME":1422,"WE":1156,"Women_Percent":0.812939522},
+  {"SOC":"11-9140","Category":"Minor","Group_Code":"11-0000","Group":"Mgt","Group_Name":"Management","Occupation_name":"Property, real estate, and community association managers","Total_Workers":401,"Median_Earn":"$914 ","Men_Earn":"$1,137 ","Women_Earn":"$823 ","ME":1137,"WE":823,"Women_Percent":0.723834653},
+  {"SOC":"11-9150","Category":"Minor","Group_Code":"11-0000","Group":"Mgt","Group_Name":"Management","Occupation_name":"Social and community service managers","Total_Workers":305,"Median_Earn":"$1,022 ","Men_Earn":"$1,142 ","Women_Earn":"$965 ","ME":1142,"WE":965,"Women_Percent":0.845008757},
+  {"SOC":"11-9199","Category":"Minor","Group_Code":"11-0000","Group":"Mgt","Group_Name":"Management","Occupation_name":"Managers, all other","Total_Workers":2.803,"Median_Earn":"$1,408 ","Men_Earn":"$1,525 ","Women_Earn":"$1,213 ","ME":1525,"WE":1213,"Women_Percent":0.795409836},
+  {"SOC":"13-0000","Category":"Major","Group_Code":"13-0000","Group":"BusFin","Group_Name":"Business and Financial Operations","Occupation_name":"Business and financial operations occupations","Total_Workers":5.942,"Median_Earn":"$1,137 ","Men_Earn":"$1,327 ","Women_Earn":"$1,004 ","ME":1327,"WE":1004,"Women_Percent":0.756593821},
+  {"SOC":"13-1022","Category":"Minor","Group_Code":"13-0000","Group":"BusFin","Group_Name":"Business and Financial Operations","Occupation_name":"Wholesale and retail buyers, except farm products","Total_Workers":142,"Median_Earn":"$926 ","Men_Earn":"$886 ","Women_Earn":"$985 ","ME":886,"WE":985,"Women_Percent":1.111738149},
+  {"SOC":"13-1023","Category":"Minor","Group_Code":"13-0000","Group":"BusFin","Group_Name":"Business and Financial Operations","Occupation_name":"Purchasing agents, except wholesale, retail, and farm products","Total_Workers":260,"Median_Earn":"$1,009 ","Men_Earn":"$1,020 ","Women_Earn":"$986 ","ME":1020,"WE":986,"Women_Percent":0.966666667},
+  {"SOC":"13-1030","Category":"Minor","Group_Code":"13-0000","Group":"BusFin","Group_Name":"Business and Financial Operations","Occupation_name":"Claims adjusters, appraisers, examiners, and investigators","Total_Workers":317,"Median_Earn":"$963 ","Men_Earn":"$1,134 ","Women_Earn":"$824 ","ME":1134,"WE":824,"Women_Percent":0.726631393},
+  {"SOC":"13-1040","Category":"Minor","Group_Code":"13-0000","Group":"BusFin","Group_Name":"Business and Financial Operations","Occupation_name":"Compliance officers","Total_Workers":235,"Median_Earn":"$1,198 ","Men_Earn":"$1,375 ","Women_Earn":"$1,025 ","ME":1375,"WE":1025,"Women_Percent":0.745454545},
+  {"SOC":"13-1070","Category":"Minor","Group_Code":"13-0000","Group":"BusFin","Group_Name":"Business and Financial Operations","Occupation_name":"Human resources workers","Total_Workers":592,"Median_Earn":"$1,002 ","Men_Earn":"$1,158 ","Women_Earn":"$984 ","ME":1158,"WE":984,"Women_Percent":0.849740933},
+  {"SOC":"13-1110","Category":"Minor","Group_Code":"13-0000","Group":"BusFin","Group_Name":"Business and Financial Operations","Occupation_name":"Management analysts","Total_Workers":529,"Median_Earn":"$1,431 ","Men_Earn":"$1,519 ","Women_Earn":"$1,348 ","ME":1519,"WE":1348,"Women_Percent":0.887425938},
+  {"SOC":"13-1160","Category":"Minor","Group_Code":"13-0000","Group":"BusFin","Group_Name":"Business and Financial Operations","Occupation_name":"Market research analysts and marketing specialists","Total_Workers":203,"Median_Earn":"$1,284 ","Men_Earn":"$1,411 ","Women_Earn":"$1,239 ","ME":1411,"WE":1239,"Women_Percent":0.878100638},
+  {"SOC":"13-1199","Category":"Minor","Group_Code":"13-0000","Group":"BusFin","Group_Name":"Business and Financial Operations","Occupation_name":"Business operations specialists, all other","Total_Workers":186,"Median_Earn":"$1,090 ","Men_Earn":"$1,461 ","Women_Earn":"$969 ","ME":1461,"WE":969,"Women_Percent":0.663244353},
+  {"SOC":"13-2010","Category":"Minor","Group_Code":"13-0000","Group":"BusFin","Group_Name":"Business and Financial Operations","Occupation_name":"Accountants and auditors","Total_Workers":1.464,"Median_Earn":"$1,132 ","Men_Earn":"$1,345 ","Women_Earn":"$988 ","ME":1345,"WE":988,"Women_Percent":0.734572491},
+  {"SOC":"13-2052","Category":"Minor","Group_Code":"13-0000","Group":"BusFin","Group_Name":"Business and Financial Operations","Occupation_name":"Personal financial advisors","Total_Workers":407,"Median_Earn":"$1,419 ","Men_Earn":"$1,738 ","Women_Earn":"$1,033 ","ME":1738,"WE":1033,"Women_Percent":0.594361335},
+  {"SOC":"13-2070","Category":"Minor","Group_Code":"13-0000","Group":"BusFin","Group_Name":"Business and Financial Operations","Occupation_name":"Credit counselors and loan officers","Total_Workers":313,"Median_Earn":"$997 ","Men_Earn":"$1,186 ","Women_Earn":"$906 ","ME":1186,"WE":906,"Women_Percent":0.76391231},
+  {"SOC":"15-0000","Category":"Major","Group_Code":"15-0000","Group":"Comp","Group_Name":"Computer and Mathematical","Occupation_name":"Computer and mathematical occupations","Total_Workers":4.009,"Median_Earn":"$1,428 ","Men_Earn":"$1,503 ","Women_Earn":"$1,245 ","ME":1503,"WE":1245,"Women_Percent":0.828343313},
+  {"SOC":"15-1134","Category":"Minor","Group_Code":"15-0000","Group":"Comp","Group_Name":"Computer and Mathematical","Occupation_name":"Web developers","Total_Workers":151,"Median_Earn":"$1,165 ","Men_Earn":"$1,233 ","Women_Earn":"$1,026 ","ME":1233,"WE":1026,"Women_Percent":0.832116788},
+  {"SOC":"15-1150","Category":"Minor","Group_Code":"15-0000","Group":"Comp","Group_Name":"Computer and Mathematical","Occupation_name":"Computer support specialists","Total_Workers":396,"Median_Earn":"$1,079 ","Men_Earn":"$1,135 ","Women_Earn":"$908 ","ME":1135,"WE":908,"Women_Percent":0.8},
+  {"SOC":"15-1199","Category":"Minor","Group_Code":"15-0000","Group":"Comp","Group_Name":"Computer and Mathematical","Occupation_name":"Computer occupations, all other","Total_Workers":490,"Median_Earn":"$1,227 ","Men_Earn":"$1,252 ","Women_Earn":"$1,145 ","ME":1252,"WE":1145,"Women_Percent":0.914536741},
+  {"SOC":"15-2030","Category":"Minor","Group_Code":"15-0000","Group":"Comp","Group_Name":"Computer and Mathematical","Occupation_name":"Operations research analysts","Total_Workers":122,"Median_Earn":"$1,441 ","Men_Earn":"$1,574 ","Women_Earn":"$1,325 ","ME":1574,"WE":1325,"Women_Percent":0.84180432},
+  {"SOC":"17-0000","Category":"Major","Group_Code":"17-0000","Group":"Eng","Group_Name":"Architecture and Engineering","Occupation_name":"Architecture and engineering occupations","Total_Workers":2.656,"Median_Earn":"$1,424 ","Men_Earn":"$1,452 ","Women_Earn":"$1,257 ","ME":1452,"WE":1257,"Women_Percent":0.865702479},
+  {"SOC":"17-2199","Category":"Minor","Group_Code":"17-0000","Group":"Eng","Group_Name":"Architecture and Engineering","Occupation_name":"Engineers, all other","Total_Workers":393,"Median_Earn":"$1,527 ","Men_Earn":"$1,537 ","Women_Earn":"$1,448 ","ME":1537,"WE":1448,"Women_Percent":0.94209499},
+  {"SOC":"17-3020","Category":"Minor","Group_Code":"17-0000","Group":"Eng","Group_Name":"Architecture and Engineering","Occupation_name":"Engineering technicians, except drafters","Total_Workers":352,"Median_Earn":"$963 ","Men_Earn":"$984 ","Women_Earn":"$827 ","ME":984,"WE":827,"Women_Percent":0.840447154},
+  {"SOC":"19-0000","Category":"Major","Group_Code":"19-0000","Group":"LPSS","Group_Name":"Life, Physical, and Social Science","Occupation_name":"Life, physical, and social science occupations","Total_Workers":1.176,"Median_Earn":"$1,206 ","Men_Earn":"$1,379 ","Women_Earn":"$1,067 ","ME":1379,"WE":1067,"Women_Percent":0.773749094},
+  {"SOC":"19-1040","Category":"Minor","Group_Code":"19-0000","Group":"LPSS","Group_Name":"Life, Physical, and Social Science","Occupation_name":"Medical scientists","Total_Workers":151,"Median_Earn":"$1,250 ","Men_Earn":"$1,362 ","Women_Earn":"$1,082 ","ME":1362,"WE":1082,"Women_Percent":0.794419971},
+  {"SOC":"19-2099","Category":"Minor","Group_Code":"19-0000","Group":"LPSS","Group_Name":"Life, Physical, and Social Science","Occupation_name":"Physical scientists, all other","Total_Workers":189,"Median_Earn":"$1,553 ","Men_Earn":"$1,770 ","Women_Earn":"$1,170 ","ME":1770,"WE":1170,"Women_Percent":0.661016949},
+  {"SOC":"19-4090","Category":"Minor","Group_Code":"19-0000","Group":"LPSS","Group_Name":"Life, Physical, and Social Science","Occupation_name":"Miscellaneous life, physical, and social science technicians","Total_Workers":157,"Median_Earn":"$846 ","Men_Earn":"$1,001 ","Women_Earn":"$780 ","ME":1001,"WE":780,"Women_Percent":0.779220779},
+  {"SOC":"21-0000","Category":"Major","Group_Code":"21-0000","Group":"SS","Group_Name":"Community and Social Service","Occupation_name":"Community and social service occupations","Total_Workers":2.143,"Median_Earn":"$889 ","Men_Earn":"$973 ","Women_Earn":"$845 ","ME":973,"WE":845,"Women_Percent":0.868448099},
+  {"SOC":"21-1010","Category":"Minor","Group_Code":"21-0000","Group":"SS","Group_Name":"Community and Social Service","Occupation_name":"Counselors","Total_Workers":635,"Median_Earn":"$904 ","Men_Earn":"$908 ","Women_Earn":"$902 ","ME":908,"WE":902,"Women_Percent":0.99339207},
+  {"SOC":"21-1020","Category":"Minor","Group_Code":"21-0000","Group":"SS","Group_Name":"Community and Social Service","Occupation_name":"Social workers","Total_Workers":677,"Median_Earn":"$877 ","Men_Earn":"$943 ","Women_Earn":"$862 ","ME":943,"WE":862,"Women_Percent":0.914103924},
+  {"SOC":"21-2010","Category":"Minor","Group_Code":"21-0000","Group":"SS","Group_Name":"Community and Social Service","Occupation_name":"Clergy","Total_Workers":376,"Median_Earn":"$1,002 ","Men_Earn":"$1,021 ","Women_Earn":"$924 ","ME":1021,"WE":924,"Women_Percent":0.904995103},
+  {"SOC":"23-0000","Category":"Major","Group_Code":"23-0000","Group":"Legal","Group_Name":"Legal","Occupation_name":"Legal occupations","Total_Workers":1.346,"Median_Earn":"$1,391 ","Men_Earn":"$1,877 ","Women_Earn":"$1,135 ","ME":1877,"WE":1135,"Women_Percent":0.604688332},
+  {"SOC":"25-0000","Category":"Major","Group_Code":"25-0000","Group":"Edu","Group_Name":"Education, Training, and Library","Occupation_name":"Education, training, and library occupations","Total_Workers":6.884,"Median_Earn":"$956 ","Men_Earn":"$1,144 ","Women_Earn":"$907 ","ME":1144,"WE":907,"Women_Percent":0.792832168},
+  {"SOC":"25-1000","Category":"Minor","Group_Code":"25-0000","Group":"Edu","Group_Name":"Education, Training, and Library","Occupation_name":"Postsecondary teachers","Total_Workers":917,"Median_Earn":"$1,258 ","Men_Earn":"$1,405 ","Women_Earn":"$1,144 ","ME":1405,"WE":1144,"Women_Percent":0.814234875},
+  {"SOC":"25-2020","Category":"Minor","Group_Code":"25-0000","Group":"Edu","Group_Name":"Education, Training, and Library","Occupation_name":"Elementary and middle school teachers","Total_Workers":2.806,"Median_Earn":"$974 ","Men_Earn":"$1,077 ","Women_Earn":"$957 ","ME":1077,"WE":957,"Women_Percent":0.888579387},
+  {"SOC":"25-2030","Category":"Minor","Group_Code":"25-0000","Group":"Edu","Group_Name":"Education, Training, and Library","Occupation_name":"Secondary school teachers","Total_Workers":1.048,"Median_Earn":"$1,066 ","Men_Earn":"$1,149 ","Women_Earn":"$1,006 ","ME":1149,"WE":1006,"Women_Percent":0.875543951},
+  {"SOC":"25-3000","Category":"Minor","Group_Code":"25-0000","Group":"Edu","Group_Name":"Education, Training, and Library","Occupation_name":"Other teachers and instructors","Total_Workers":378,"Median_Earn":"$896 ","Men_Earn":"$1,024 ","Women_Earn":"$817 ","ME":1024,"WE":817,"Women_Percent":0.797851563},
+  {"SOC":"27-0000","Category":"Major","Group_Code":"27-0000","Group":"Arts","Group_Name":"Arts, Design, Entertainment, Sports, and Media","Occupation_name":"Arts, design, entertainment, sports, and media occupations","Total_Workers":1.643,"Median_Earn":"$1,001 ","Men_Earn":"$1,088 ","Women_Earn":"$942 ","ME":1088,"WE":942,"Women_Percent":0.865808824},
+  {"SOC":"27-1020","Category":"Minor","Group_Code":"27-0000","Group":"Arts","Group_Name":"Arts, Design, Entertainment, Sports, and Media","Occupation_name":"Designers","Total_Workers":593,"Median_Earn":"$993 ","Men_Earn":"$1,099 ","Women_Earn":"$918 ","ME":1099,"WE":918,"Women_Percent":0.835304823},
+  {"SOC":"27-2012","Category":"Minor","Group_Code":"27-0000","Group":"Arts","Group_Name":"Arts, Design, Entertainment, Sports, and Media","Occupation_name":"Producers and directors","Total_Workers":120,"Median_Earn":"$1,270 ","Men_Earn":"$1,340 ","Women_Earn":"$1,234 ","ME":1340,"WE":1234,"Women_Percent":0.920895522},
+  {"SOC":"29-0000","Category":"Major","Group_Code":"29-0000","Group":"Drs","Group_Name":"Healthcare Practitioners and Technical","Occupation_name":"Healthcare practitioners and technical occupations","Total_Workers":6.566,"Median_Earn":"$1,041 ","Men_Earn":"$1,272 ","Women_Earn":"$991 ","ME":1272,"WE":991,"Women_Percent":0.77908805},
+  {"SOC":"29-1050","Category":"Minor","Group_Code":"29-0000","Group":"Drs","Group_Name":"Healthcare Practitioners and Technical","Occupation_name":"Pharmacists","Total_Workers":206,"Median_Earn":"$1,920 ","Men_Earn":"$2,117 ","Women_Earn":"$1,811 ","ME":2117,"WE":1811,"Women_Percent":0.855455834},
+  {"SOC":"29-1060","Category":"Minor","Group_Code":"29-0000","Group":"Drs","Group_Name":"Healthcare Practitioners and Technical","Occupation_name":"Physicians and surgeons","Total_Workers":740,"Median_Earn":"$1,824 ","Men_Earn":"$1,915 ","Women_Earn":"$1,533 ","ME":1915,"WE":1533,"Women_Percent":0.800522193},
+  {"SOC":"29-1123","Category":"Minor","Group_Code":"29-0000","Group":"Drs","Group_Name":"Healthcare Practitioners and Technical","Occupation_name":"Physical therapists","Total_Workers":178,"Median_Earn":"$1,265 ","Men_Earn":"$1,347 ","Women_Earn":"$1,215 ","ME":1347,"WE":1215,"Women_Percent":0.902004454},
+  {"SOC":"29-1140","Category":"Minor","Group_Code":"29-0000","Group":"Drs","Group_Name":"Healthcare Practitioners and Technical","Occupation_name":"Registered nurses","Total_Workers":2.382,"Median_Earn":"$1,116 ","Men_Earn":"$1,222 ","Women_Earn":"$1,098 ","ME":1222,"WE":1098,"Women_Percent":0.898527005},
+  {"SOC":"29-2010","Category":"Minor","Group_Code":"29-0000","Group":"Drs","Group_Name":"Healthcare Practitioners and Technical","Occupation_name":"Clinical laboratory technologists and technicians","Total_Workers":270,"Median_Earn":"$901 ","Men_Earn":"$1,089 ","Women_Earn":"$796 ","ME":1089,"WE":796,"Women_Percent":0.730945822},
+  {"SOC":"29-2030","Category":"Minor","Group_Code":"29-0000","Group":"Drs","Group_Name":"Healthcare Practitioners and Technical","Occupation_name":"Diagnostic related technologists and technicians","Total_Workers":253,"Median_Earn":"$964 ","Men_Earn":"$1,106 ","Women_Earn":"$908 ","ME":1106,"WE":908,"Women_Percent":0.820976492},
+  {"SOC":"29-2050","Category":"Minor","Group_Code":"29-0000","Group":"Drs","Group_Name":"Healthcare Practitioners and Technical","Occupation_name":"Health practitioner support technologists and technicians","Total_Workers":487,"Median_Earn":"$636 ","Men_Earn":"$652 ","Women_Earn":"$633 ","ME":652,"WE":633,"Women_Percent":0.970858896},
+  {"SOC":"31-0000","Category":"Major","Group_Code":"31-0000","Group":"Health","Group_Name":"Healthcare Support","Occupation_name":"Healthcare support occupations","Total_Workers":2.395,"Median_Earn":"$498 ","Men_Earn":"$577 ","Women_Earn":"$490 ","ME":577,"WE":490,"Women_Percent":0.849220104},
+  {"SOC":"31-1000","Category":"Minor","Group_Code":"31-0000","Group":"Health","Group_Name":"Healthcare Support","Occupation_name":"Nursing, psychiatric, and home health aides","Total_Workers":1.400,"Median_Earn":"$467 ","Men_Earn":"$526 ","Women_Earn":"$457 ","ME":526,"WE":457,"Women_Percent":0.868821293},
+  {"SOC":"31-1010","Category":"Minor","Group_Code":"31-0000","Group":"Health","Group_Name":"Healthcare Support","Occupation_name":"Nursing, psychiatric, and home health aides","Total_Workers":1.400,"Median_Earn":"$467 ","Men_Earn":"$526 ","Women_Earn":"$457 ","ME":526,"WE":457,"Women_Percent":0.868821293},
+  {"SOC":"33-0000","Category":"Major","Group_Code":"33-0000","Group":"Prot","Group_Name":"Protective Service","Occupation_name":"Protective service occupations","Total_Workers":2.729,"Median_Earn":"$796 ","Men_Earn":"$851 ","Women_Earn":"$655 ","ME":851,"WE":655,"Women_Percent":0.769682726},
+  {"SOC":"33-3010","Category":"Minor","Group_Code":"33-0000","Group":"Prot","Group_Name":"Protective Service","Occupation_name":"Bailiffs, correctional officers, and jailers","Total_Workers":453,"Median_Earn":"$754 ","Men_Earn":"$779 ","Women_Earn":"$686 ","ME":779,"WE":686,"Women_Percent":0.880616175},
+  {"SOC":"33-9030","Category":"Minor","Group_Code":"33-0000","Group":"Prot","Group_Name":"Protective Service","Occupation_name":"Security guards and gaming surveillance officers","Total_Workers":708,"Median_Earn":"$567 ","Men_Earn":"$592 ","Women_Earn":"$515 ","ME":592,"WE":515,"Women_Percent":0.869932432},
+  {"SOC":"35-0000","Category":"Major","Group_Code":"35-0000","Group":"Food","Group_Name":"Food Preparation and Serving Related","Occupation_name":"Food preparation and serving related occupations","Total_Workers":4.124,"Median_Earn":"$441 ","Men_Earn":"$481 ","Women_Earn":"$414 ","ME":481,"WE":414,"Women_Percent":0.860706861},
+  {"SOC":"35-1012","Category":"Minor","Group_Code":"35-0000","Group":"Food","Group_Name":"Food Preparation and Serving Related","Occupation_name":"First-line supervisors of food preparation and serving workers","Total_Workers":378,"Median_Earn":"$498 ","Men_Earn":"$621 ","Women_Earn":"$458 ","ME":621,"WE":458,"Women_Percent":0.737520129},
+  {"SOC":"35-2010","Category":"Minor","Group_Code":"35-0000","Group":"Food","Group_Name":"Food Preparation and Serving Related","Occupation_name":"Cooks","Total_Workers":1.302,"Median_Earn":"$416 ","Men_Earn":"$427 ","Women_Earn":"$400 ","ME":427,"WE":400,"Women_Percent":0.93676815},
+  {"SOC":"35-2020","Category":"Minor","Group_Code":"35-0000","Group":"Food","Group_Name":"Food Preparation and Serving Related","Occupation_name":"Food preparation workers","Total_Workers":366,"Median_Earn":"$402 ","Men_Earn":"$414 ","Women_Earn":"$388 ","ME":414,"WE":388,"Women_Percent":0.937198068},
+  {"SOC":"35-3010","Category":"Minor","Group_Code":"35-0000","Group":"Food","Group_Name":"Food Preparation and Serving Related","Occupation_name":"Bartenders","Total_Workers":252,"Median_Earn":"$521 ","Men_Earn":"$569 ","Women_Earn":"$493 ","ME":569,"WE":493,"Women_Percent":0.866432337},
+  {"SOC":"35-3030","Category":"Minor","Group_Code":"35-0000","Group":"Food","Group_Name":"Food Preparation and Serving Related","Occupation_name":"Waiters and waitresses","Total_Workers":868,"Median_Earn":"$451 ","Men_Earn":"$501 ","Women_Earn":"$411 ","ME":501,"WE":411,"Women_Percent":0.820359281},
+  {"SOC":"37-0000","Category":"Major","Group_Code":"37-0000","Group":"Mainten","Group_Name":"Building and Grounds Cleaning and Maintenance","Occupation_name":"Building and grounds cleaning and maintenance occupations","Total_Workers":3.605,"Median_Earn":"$486 ","Men_Earn":"$517 ","Women_Earn":"$419 ","ME":517,"WE":419,"Women_Percent":0.810444874},
+  {"SOC":"37-2012","Category":"Minor","Group_Code":"37-0000","Group":"Mainten","Group_Name":"Building and Grounds Cleaning and Maintenance","Occupation_name":"Maids and housekeeping cleaners","Total_Workers":876,"Median_Earn":"$416 ","Men_Earn":"$475 ","Women_Earn":"$407 ","ME":475,"WE":407,"Women_Percent":0.856842105},
+  {"SOC":"39-0000","Category":"Major","Group_Code":"39-0000","Group":"Serv","Group_Name":"Personal Care and Service","Occupation_name":"Personal care and service occupations","Total_Workers":2.427,"Median_Earn":"$498 ","Men_Earn":"$597 ","Women_Earn":"$475 ","ME":597,"WE":475,"Women_Percent":0.795644891},
+  {"SOC":"39-1010","Category":"Minor","Group_Code":"39-0000","Group":"Serv","Group_Name":"Personal Care and Service","Occupation_name":"First-line supervisors of gaming workers","Total_Workers":117,"Median_Earn":"$769 ","Men_Earn":"$900 ","Women_Earn":"$680 ","ME":900,"WE":680,"Women_Percent":0.755555556},
+  {"SOC":"39-9020","Category":"Minor","Group_Code":"39-0000","Group":"Serv","Group_Name":"Personal Care and Service","Occupation_name":"Personal care aides","Total_Workers":680,"Median_Earn":"$462 ","Men_Earn":"$537 ","Women_Earn":"$441 ","ME":537,"WE":441,"Women_Percent":0.82122905},
+  {"SOC":"39-9030","Category":"Minor","Group_Code":"39-0000","Group":"Serv","Group_Name":"Personal Care and Service","Occupation_name":"Recreation and fitness workers","Total_Workers":185,"Median_Earn":"$555 ","Men_Earn":"$684 ","Women_Earn":"$526 ","ME":684,"WE":526,"Women_Percent":0.769005848},
+  {"SOC":"41-0000","Category":"Major","Group_Code":"41-0000","Group":"Sr","Group_Name":"Sales and Related","Occupation_name":"Sales and related occupations","Total_Workers":9.725,"Median_Earn":"$716 ","Men_Earn":"$880 ","Women_Earn":"$578 ","ME":880,"WE":578,"Women_Percent":0.656818182},
+  {"SOC":"41-1012","Category":"Minor","Group_Code":"41-0000","Group":"Sr","Group_Name":"Sales and Related","Occupation_name":"First-line supervisors of non-retail sales workers","Total_Workers":835,"Median_Earn":"$1,028 ","Men_Earn":"$1,140 ","Women_Earn":"$896 ","ME":1140,"WE":896,"Women_Percent":0.785964912},
+  {"SOC":"41-2010","Category":"Minor","Group_Code":"41-0000","Group":"Sr","Group_Name":"Sales and Related","Occupation_name":"Cashiers","Total_Workers":1.342,"Median_Earn":"$415 ","Men_Earn":"$471 ","Women_Earn":"$405 ","ME":471,"WE":405,"Women_Percent":0.859872611},
+  {"SOC":"41-2030","Category":"Minor","Group_Code":"41-0000","Group":"Sr","Group_Name":"Sales and Related","Occupation_name":"Retail salespersons","Total_Workers":1.918,"Median_Earn":"$590 ","Men_Earn":"$694 ","Women_Earn":"$494 ","ME":694,"WE":494,"Women_Percent":0.711815562},
+  {"SOC":"41-3010","Category":"Minor","Group_Code":"41-0000","Group":"Sr","Group_Name":"Sales and Related","Occupation_name":"Advertising sales agents","Total_Workers":161,"Median_Earn":"$925 ","Men_Earn":"$1,155 ","Women_Earn":"$729 ","ME":1155,"WE":729,"Women_Percent":0.631168831},
+  {"SOC":"41-3020","Category":"Minor","Group_Code":"41-0000","Group":"Sr","Group_Name":"Sales and Related","Occupation_name":"Insurance sales agents","Total_Workers":427,"Median_Earn":"$815 ","Men_Earn":"$1,028 ","Women_Earn":"$717 ","ME":1028,"WE":717,"Women_Percent":0.697470817},
+  {"SOC":"41-3030","Category":"Minor","Group_Code":"41-0000","Group":"Sr","Group_Name":"Sales and Related","Occupation_name":"Securities, commodities, and financial services sales agents","Total_Workers":211,"Median_Earn":"$1,155 ","Men_Earn":"$1,461 ","Women_Earn":"$767 ","ME":1461,"WE":767,"Women_Percent":0.524982888},
+  {"SOC":"41-3099","Category":"Minor","Group_Code":"41-0000","Group":"Sr","Group_Name":"Sales and Related","Occupation_name":"Sales representatives, services, all other","Total_Workers":406,"Median_Earn":"$966 ","Men_Earn":"$1,147 ","Women_Earn":"$699 ","ME":1147,"WE":699,"Women_Percent":0.609415867},
+  {"SOC":"41-4000","Category":"Minor","Group_Code":"41-0000","Group":"Sr","Group_Name":"Sales and Related","Occupation_name":"Sales representatives, wholesale and manufacturing","Total_Workers":1.138,"Median_Earn":"$1,020 ","Men_Earn":"$1,066 ","Women_Earn":"$917 ","ME":1066,"WE":917,"Women_Percent":0.860225141},
+  {"SOC":"41-4010","Category":"Minor","Group_Code":"41-0000","Group":"Sr","Group_Name":"Sales and Related","Occupation_name":"Sales representatives, wholesale and manufacturing","Total_Workers":1.138,"Median_Earn":"$1,020 ","Men_Earn":"$1,066 ","Women_Earn":"$917 ","ME":1066,"WE":917,"Women_Percent":0.860225141},
+  {"SOC":"41-9020","Category":"Minor","Group_Code":"41-0000","Group":"Sr","Group_Name":"Sales and Related","Occupation_name":"Real estate brokers and sales agents","Total_Workers":463,"Median_Earn":"$837 ","Men_Earn":"$1,052 ","Women_Earn":"$735 ","ME":1052,"WE":735,"Women_Percent":0.698669202},
+  {"SOC":"41-9099","Category":"Minor","Group_Code":"41-0000","Group":"Sr","Group_Name":"Sales and Related","Occupation_name":"Sales and related workers, all other","Total_Workers":158,"Median_Earn":"$916 ","Men_Earn":"$1,088 ","Women_Earn":"$727 ","ME":1088,"WE":727,"Women_Percent":0.668198529},
+  {"SOC":"43-0000","Category":"Major","Group_Code":"43-0000","Group":"Admin","Group_Name":"Office and Administrative Support","Occupation_name":"Office and administrative support occupations","Total_Workers":13.894,"Median_Earn":"$656 ","Men_Earn":"$693 ","Women_Earn":"$646 ","ME":693,"WE":646,"Women_Percent":0.932178932},
+  {"SOC":"43-1010","Category":"Minor","Group_Code":"43-0000","Group":"Admin","Group_Name":"Office and Administrative Support","Occupation_name":"First-line supervisors of office and administrative support workers","Total_Workers":1.297,"Median_Earn":"$812 ","Men_Earn":"$878 ","Women_Earn":"$781 ","ME":878,"WE":781,"Women_Percent":0.88952164},
+  {"SOC":"43-3010","Category":"Minor","Group_Code":"43-0000","Group":"Admin","Group_Name":"Office and Administrative Support","Occupation_name":"Bill and account collectors","Total_Workers":152,"Median_Earn":"$657 ","Men_Earn":"$674 ","Women_Earn":"$648 ","ME":674,"WE":648,"Women_Percent":0.961424332},
+  {"SOC":"43-3030","Category":"Minor","Group_Code":"43-0000","Group":"Admin","Group_Name":"Office and Administrative Support","Occupation_name":"Bookkeeping, accounting, and auditing clerks","Total_Workers":769,"Median_Earn":"$692 ","Men_Earn":"$690 ","Women_Earn":"$692 ","ME":690,"WE":692,"Women_Percent":1.002898551},
+  {"SOC":"43-4050","Category":"Minor","Group_Code":"43-0000","Group":"Admin","Group_Name":"Office and Administrative Support","Occupation_name":"Customer service representatives","Total_Workers":1.760,"Median_Earn":"$621 ","Men_Earn":"$690 ","Women_Earn":"$604 ","ME":690,"WE":604,"Women_Percent":0.875362319},
+  {"SOC":"43-4080","Category":"Minor","Group_Code":"43-0000","Group":"Admin","Group_Name":"Office and Administrative Support","Occupation_name":"Hotel, motel, and resort desk clerks","Total_Workers":127,"Median_Earn":"$481 ","Men_Earn":"$486 ","Women_Earn":"$467 ","ME":486,"WE":467,"Women_Percent":0.96090535},
+  {"SOC":"43-4170","Category":"Minor","Group_Code":"43-0000","Group":"Admin","Group_Name":"Office and Administrative Support","Occupation_name":"Receptionists and information clerks","Total_Workers":852,"Median_Earn":"$575 ","Men_Earn":"$619 ","Women_Earn":"$569 ","ME":619,"WE":569,"Women_Percent":0.919224556},
+  {"SOC":"43-5030","Category":"Minor","Group_Code":"43-0000","Group":"Admin","Group_Name":"Office and Administrative Support","Occupation_name":"Dispatchers","Total_Workers":250,"Median_Earn":"$698 ","Men_Earn":"$759 ","Women_Earn":"$655 ","ME":759,"WE":655,"Women_Percent":0.862977602},
+  {"SOC":"43-5052","Category":"Minor","Group_Code":"43-0000","Group":"Admin","Group_Name":"Office and Administrative Support","Occupation_name":"Postal service mail carriers","Total_Workers":302,"Median_Earn":"$954 ","Men_Earn":"$1,021 ","Women_Earn":"$854 ","ME":1021,"WE":854,"Women_Percent":0.836434868},
+  {"SOC":"43-5060","Category":"Minor","Group_Code":"43-0000","Group":"Admin","Group_Name":"Office and Administrative Support","Occupation_name":"Production, planning, and expediting clerks","Total_Workers":256,"Median_Earn":"$838 ","Men_Earn":"$978 ","Women_Earn":"$732 ","ME":978,"WE":732,"Women_Percent":0.748466258},
+  {"SOC":"43-5070","Category":"Minor","Group_Code":"43-0000","Group":"Admin","Group_Name":"Office and Administrative Support","Occupation_name":"Shipping, receiving, and traffic clerks","Total_Workers":502,"Median_Earn":"$591 ","Men_Earn":"$604 ","Women_Earn":"$566 ","ME":604,"WE":566,"Women_Percent":0.937086093},
+  {"SOC":"43-5080","Category":"Minor","Group_Code":"43-0000","Group":"Admin","Group_Name":"Office and Administrative Support","Occupation_name":"Stock clerks and order fillers","Total_Workers":1.027,"Median_Earn":"$520 ","Men_Earn":"$537 ","Women_Earn":"$506 ","ME":537,"WE":506,"Women_Percent":0.942271881},
+  {"SOC":"43-6000","Category":"Minor","Group_Code":"43-0000","Group":"Admin","Group_Name":"Office and Administrative Support","Occupation_name":"Secretaries and administrative assistants","Total_Workers":2.223,"Median_Earn":"$687 ","Men_Earn":"$786 ","Women_Earn":"$683 ","ME":786,"WE":683,"Women_Percent":0.868956743},
+  {"SOC":"43-6010","Category":"Minor","Group_Code":"43-0000","Group":"Admin","Group_Name":"Office and Administrative Support","Occupation_name":"Secretaries and administrative assistants","Total_Workers":2.223,"Median_Earn":"$687 ","Men_Earn":"$786 ","Women_Earn":"$683 ","ME":786,"WE":683,"Women_Percent":0.868956743},
+  {"SOC":"43-9040","Category":"Minor","Group_Code":"43-0000","Group":"Admin","Group_Name":"Office and Administrative Support","Occupation_name":"Insurance claims and policy processing clerks","Total_Workers":259,"Median_Earn":"$689 ","Men_Earn":"$762 ","Women_Earn":"$675 ","ME":762,"WE":675,"Women_Percent":0.885826772},
+  {"SOC":"43-9060","Category":"Minor","Group_Code":"43-0000","Group":"Admin","Group_Name":"Office and Administrative Support","Occupation_name":"Office clerks, general","Total_Workers":929,"Median_Earn":"$620 ","Men_Earn":"$609 ","Women_Earn":"$622 ","ME":609,"WE":622,"Women_Percent":1.02134647},
+  {"SOC":"43-9199","Category":"Minor","Group_Code":"43-0000","Group":"Admin","Group_Name":"Office and Administrative Support","Occupation_name":"Office and administrative support workers, all other","Total_Workers":391,"Median_Earn":"$745 ","Men_Earn":"$852 ","Women_Earn":"$718 ","ME":852,"WE":718,"Women_Percent":0.842723005},
+  {"SOC":"45-0000","Category":"Major","Group_Code":"45-0000","Group":"Farm","Group_Name":"Farming, Fishing, and Forestry","Occupation_name":"Farming, fishing, and forestry occupations","Total_Workers":810,"Median_Earn":"$464 ","Men_Earn":"$477 ","Women_Earn":"$437 ","ME":477,"WE":437,"Women_Percent":0.916142558},
+  {"SOC":"45-2090","Category":"Minor","Group_Code":"45-0000","Group":"Farm","Group_Name":"Farming, Fishing, and Forestry","Occupation_name":"Miscellaneous agricultural workers","Total_Workers":613,"Median_Earn":"$445 ","Men_Earn":"$460 ","Women_Earn":"$398 ","ME":460,"WE":398,"Women_Percent":0.865217391},
+  {"SOC":"47-0000","Category":"Major","Group_Code":"47-0000","Group":"Const","Group_Name":"Construction and Extraction","Occupation_name":"Construction and extraction occupations","Total_Workers":5.722,"Median_Earn":"$749 ","Men_Earn":"$751 ","Women_Earn":"$704 ","ME":751,"WE":704,"Women_Percent":0.937416778},
+  {"SOC":"49-0000","Category":"Major","Group_Code":"49-0000","Group":"Install","Group_Name":"Installation, Maintenance, and Repair","Occupation_name":"Installation, maintenance, and repair occupations","Total_Workers":4.301,"Median_Earn":"$839 ","Men_Earn":"$842 ","Women_Earn":"$761 ","ME":842,"WE":761,"Women_Percent":0.903800475},
+  {"SOC":"51-0000","Category":"Major","Group_Code":"51-0000","Group":"Prod","Group_Name":"Production","Occupation_name":"Production occupations","Total_Workers":7.551,"Median_Earn":"$663 ","Men_Earn":"$729 ","Women_Earn":"$519 ","ME":729,"WE":519,"Women_Percent":0.711934156},
+  {"SOC":"51-1010","Category":"Minor","Group_Code":"51-0000","Group":"Prod","Group_Name":"Production","Occupation_name":"First-line supervisors of production and operating workers","Total_Workers":783,"Median_Earn":"$875 ","Men_Earn":"$924 ","Women_Earn":"$623 ","ME":924,"WE":623,"Women_Percent":0.674242424},
+  {"SOC":"51-2020","Category":"Minor","Group_Code":"51-0000","Group":"Prod","Group_Name":"Production","Occupation_name":"Electrical, electronics, and electromechanical assemblers","Total_Workers":123,"Median_Earn":"$554 ","Men_Earn":"$566 ","Women_Earn":"$544 ","ME":566,"WE":544,"Women_Percent":0.961130742},
+  {"SOC":"51-2090","Category":"Minor","Group_Code":"51-0000","Group":"Prod","Group_Name":"Production","Occupation_name":"Miscellaneous assemblers and fabricators","Total_Workers":950,"Median_Earn":"$581 ","Men_Earn":"$637 ","Women_Earn":"$512 ","ME":637,"WE":512,"Women_Percent":0.803767661},
+  {"SOC":"51-3010","Category":"Minor","Group_Code":"51-0000","Group":"Prod","Group_Name":"Production","Occupation_name":"Bakers","Total_Workers":150,"Median_Earn":"$505 ","Men_Earn":"$570 ","Women_Earn":"$475 ","ME":570,"WE":475,"Women_Percent":0.833333333},
+  {"SOC":"51-3020","Category":"Minor","Group_Code":"51-0000","Group":"Prod","Group_Name":"Production","Occupation_name":"Butchers and other meat, poultry, and fish processing workers","Total_Workers":247,"Median_Earn":"$542 ","Men_Earn":"$582 ","Women_Earn":"$463 ","ME":582,"WE":463,"Women_Percent":0.795532646},
+  {"SOC":"51-3099","Category":"Minor","Group_Code":"51-0000","Group":"Prod","Group_Name":"Production","Occupation_name":"Food processing workers, all other","Total_Workers":132,"Median_Earn":"$594 ","Men_Earn":"$679 ","Women_Earn":"$508 ","ME":679,"WE":508,"Women_Percent":0.748159057},
+  {"SOC":"51-4199","Category":"Minor","Group_Code":"51-0000","Group":"Prod","Group_Name":"Production","Occupation_name":"Metal workers and plastic workers, all other","Total_Workers":351,"Median_Earn":"$639 ","Men_Earn":"$678 ","Women_Earn":"$581 ","ME":678,"WE":581,"Women_Percent":0.856932153},
+  {"SOC":"51-6010","Category":"Minor","Group_Code":"51-0000","Group":"Prod","Group_Name":"Production","Occupation_name":"Laundry and dry-cleaning workers","Total_Workers":133,"Median_Earn":"$466 ","Men_Earn":"$487 ","Women_Earn":"$460 ","ME":487,"WE":460,"Women_Percent":0.944558522},
+  {"SOC":"51-9060","Category":"Minor","Group_Code":"51-0000","Group":"Prod","Group_Name":"Production","Occupation_name":"Inspectors, testers, sorters, samplers, and weighers","Total_Workers":701,"Median_Earn":"$710 ","Men_Earn":"$844 ","Women_Earn":"$583 ","ME":844,"WE":583,"Women_Percent":0.690758294},
+  {"SOC":"51-9110","Category":"Minor","Group_Code":"51-0000","Group":"Prod","Group_Name":"Production","Occupation_name":"Packaging and filling machine operators and tenders","Total_Workers":239,"Median_Earn":"$518 ","Men_Earn":"$605 ","Women_Earn":"$482 ","ME":605,"WE":482,"Women_Percent":0.796694215},
+  {"SOC":"51-9199","Category":"Minor","Group_Code":"51-0000","Group":"Prod","Group_Name":"Production","Occupation_name":"Production workers, all other","Total_Workers":846,"Median_Earn":"$625 ","Men_Earn":"$666 ","Women_Earn":"$501 ","ME":666,"WE":501,"Women_Percent":0.752252252},
+  {"SOC":"53-0000","Category":"Major","Group_Code":"53-0000","Group":"Trans","Group_Name":"Transportation and Material Moving","Occupation_name":"Transportation and material moving occupations","Total_Workers":6.953,"Median_Earn":"$646 ","Men_Earn":"$679 ","Women_Earn":"$494 ","ME":679,"WE":494,"Women_Percent":0.727540501},
+  {"SOC":"53-3020","Category":"Minor","Group_Code":"53-0000","Group":"Trans","Group_Name":"Transportation and Material Moving","Occupation_name":"Bus drivers","Total_Workers":323,"Median_Earn":"$615 ","Men_Earn":"$681 ","Women_Earn":"$572 ","ME":681,"WE":572,"Women_Percent":0.839941263},
+  {"SOC":"53-3030","Category":"Minor","Group_Code":"53-0000","Group":"Trans","Group_Name":"Transportation and Material Moving","Occupation_name":"Driver/sales workers and truck drivers","Total_Workers":2.687,"Median_Earn":"$747 ","Men_Earn":"$751 ","Women_Earn":"$632 ","ME":751,"WE":632,"Women_Percent":0.841544607},
+  {"SOC":"53-7062","Category":"Minor","Group_Code":"53-0000","Group":"Trans","Group_Name":"Transportation and Material Moving","Occupation_name":"Laborers and freight, stock, and material movers, hand","Total_Workers":1.433,"Median_Earn":"$526 ","Men_Earn":"$547 ","Women_Earn":"$455 ","ME":547,"WE":455,"Women_Percent":0.831809872},
+  {"SOC":"53-7064","Category":"Minor","Group_Code":"53-0000","Group":"Trans","Group_Name":"Transportation and Material Moving","Occupation_name":"Packers and packagers, hand","Total_Workers":385,"Median_Earn":"$438 ","Men_Earn":"$462 ","Women_Earn":"$424 ","ME":462,"WE":424,"Women_Percent":0.917748918}
+];
+
+var options = {
+    sorted: false,
+    filtered: false,
+    page: 0
+  };
+
+function updateTable() {
+    // Make a copy of the data
+    var data = occupations.slice();
+
+    // Sort occupations by women's earnings as a percent of men's
+    if (options.sorted) {
+      if (options.sorted === 'asc') {
+        data.sort(function (a, b) { return a.Women_Percent - b.Women_Percent; });
+      } else if (options.sorted === 'desc') {
+        data.sort(function (a, b) { return b.Women_Percent - a.Women_Percent; });
+        // Note that this is just the opposite of the above.
+      }
+    }
+
+    // Filter Occupations to Major Group TYpes
+    if (options.filtered) {
+        if (options.filtered === 'Mgt') {
+            data = data.filter(function (d) {return d.Group === 'Mgt'})
+        } else if (options.filtered === 'Sr') {
+            data = data.filter(function (d) {return d.Group === 'Sr'})
+        } else if (options.filtered === 'Drs') {
+            data = data.filter(function (d) {return d.Group === 'Drs'})
+        } else if (options.filtered === 'Admin') {
+            data = data.filter(function (d) {return d.Group === 'Admin'})
+        }
+    }
+
+    // Select only the schools from the current page (slice)
+
+    var table = document.getElementById('data-table');
+    var tbody = table.getElementsByTagName('tbody')[0];
+    // Because getElementsByTagName returns an array of DOM nodes (technically, it's an HTMLCollection),
+    // we need to select the first item in the array with the [0].
+
+    // Remove any existing rows
+    tbody.innerHTML = '';
+
+    // Add a new row for each datum (item in the 'data' array)
+    data.forEach(function (d) {
+      var row = document.createElement('tr');
+      // This is like create a new <tr></tr> in HTML, but it doesn't yet exist in the DOM, so we can't
+      // see it. At the bottom of this forEach() loop, we append it to an element that is in the DOM,
+      // at which point it appears. We'll follow this same pattern for each of the <td></td> elements
+      // we create below.
+
+      var Occupation_name = document.createElement('td');
+      Occupation_name.innerHTML = d.Occupation_name;
+      row.appendChild(Occupation_name);
+
+      var Group_Name = document.createElement('td');
+      Group_Name.innerHTML = d.Group_Name;
+      row.appendChild(Group_Name);
+
+      var Men_Earn = document.createElement('td');
+      Men_Earn.innerHTML = d.Men_Earn;
+      row.appendChild(Men_Earn);
+
+      var Women_Earn = document.createElement('td');
+      Women_Earn.innerHTML = d.Women_Earn;
+      row.appendChild(Women_Earn);
+
+      var barWrapper = document.createElement('td');
+      var bar = document.createElement('div');
+      bar.setAttribute('class', 'bar');
+      var FemPercent = d.WE / d.ME;
+      bar.setAttribute('style', 'width: ' + (FemPercent * 100) + '%;');
+      barWrapper.appendChild(bar);
+      row.appendChild(barWrapper);
+
+      tbody.appendChild(row);
+    });
+  }
+
+  // The function declaration above just creates the function, it doesn't yet run it. That's what we
+  // do here, to make sure that the table is populated prior to the user clicking anything.
+  updateTable();
+
+  // This is creating an event listener, a function that the browser will call every time the specified
+  // event is "fired" by the selected element (here the button with the id 'sort-asc').
+  document.getElementById('sort-asc').addEventListener('click', function () {
+    // Disable the sort if 'asc' was previously selected, otherwise set the sort to 'asc'
+    if (options.sorted === 'asc') {
+      options.sorted = false;
+    } else {
+      options.sorted = 'asc';
+    }
+
+    // And now we need to re-run the function that populates the table. Note that the results will be
+    // different because we've change the options object.
+    updateTable();
+  });
+
+  document.getElementById('sort-desc').addEventListener('click', function () {
+    // Disable the sort if 'desc' was previously selected, otherwise set the sort to 'desc'
+    if (options.sorted === 'desc') {
+      options.sorted = false;
+    } else {
+      options.sorted = 'desc';
+    }
+
+    updateTable();
+  });
+
+  // This is where we'll need to create new event listeners for our filter and next/previous page buttons.
+  // They'll look very similar to the above, just listening to different elements, and perhaps performing
+  // different actions when clicked.
+
+  document.getElementById('filter-Mgt').addEventListener('click', function () {
+    // Disable the sort if 'desc' was previously selected, otherwise set the sort to 'desc'
+    if (options.filtered === 'Mgt') {
+      options.filtered = false;
+    } else {
+      options.filtered = 'Mgt';
+    }
+
+    updateTable();
+  });
+
+
+  document.getElementById('filter-Sr').addEventListener('click', function () {
+    // Disable the sort if 'desc' was previously selected, otherwise set the sort to 'desc'
+    if (options.filtered === 'Sr') {
+      options.filtered = false;
+    } else {
+      options.filtered = 'Sr';
+    }
+
+    updateTable();
+  });
+
+  document.getElementById('filter-Drs').addEventListener('click', function () {
+    // Disable the sort if 'desc' was previously selected, otherwise set the sort to 'desc'
+    if (options.filtered === 'Drs') {
+      options.filtered = false;
+    } else {
+      options.filtered = 'Drs';
+    }
+
+    updateTable();
+  });
+
+  document.getElementById('filter-Admin').addEventListener('click', function () {
+    // Disable the sort if 'desc' was previously selected, otherwise set the sort to 'desc'
+    if (options.filtered === 'Admin') {
+      options.filtered = false;
+    } else {
+      options.filtered = 'Admin';
+    }
+
+    updateTable();
+  });
+
+</script>
 </body>
 </html>
