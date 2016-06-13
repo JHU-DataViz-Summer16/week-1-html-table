@@ -25,6 +25,13 @@ th {
     background-color: #4CAF50;
     color: white;
 }
+     #data-table td {
+     width: 25%;
+     }
+     bar {
+       height: 20px;
+       background: #337ab7;
+     }
   </style>
 </head>
      
@@ -55,6 +62,7 @@ th {
           <th>State</th>
           <th>Days' worth GF reserves</th>
           <th>Total reserves in millions</th>
+          <th>Chart</th>
         </tr>
       </thead>
       <tbody>
@@ -123,6 +131,8 @@ th {
       {"State":"Wyoming","Region":"West","Days' worth GF reserves ":197.5,"Total reserves in millions":"$960"}]
     ];
 
+    var MAX_DAYS = 447
+
     function updateTable() {
       var data = schools;
       var table = document.getElementById('data-table');
@@ -143,6 +153,14 @@ th {
         var enrollment = document.createElement('td');
         enrollment.innerHTML = d.enrollment + ' students';
         row.appendChild(enrollment);
+
+        var barWrapper = document.createElement('td');
+        var bar = document.createElement('div');
+        bar.setAttribute('class', 'bar');
+        bar.setAttribute('style', 'width: ' + (d.enrollment / MAX_DAYS * 100) + '%;');
+        barWrapper.appendChild(bar);
+        row.appendChild(barWrapper);
+  
     
         tbody.appendChild(row);
       });
