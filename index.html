@@ -49,6 +49,7 @@ th {
     </div>
   </div>
     <table class="table">
+    <table class="table" id="data-table">
       <thead>
         <tr>
           <th>State</th>
@@ -121,6 +122,33 @@ th {
       {"State":"Wisconsin","Region":"Midwest","Days' worth GF reserves ":9.8,"Total reserves in millions":"$416"},
       {"State":"Wyoming","Region":"West","Days' worth GF reserves ":197.5,"Total reserves in millions":"$960"}]
     ];
+
+    function updateTable() {
+      var data = schools;
+      var table = document.getElementById('data-table');
+      var tbody = table.getElementsByTagName('tbody')[0];
+      tbody.innerHTML = '';
+  
+      data.forEach(function (d) {
+        var row = document.createElement('tr');
+
+        var school = document.createElement('td');
+        school.innerHTML = d.name;
+        row.appendChild(school);
+
+        var level = document.createElement('td');
+        level.innerHTML = d.level_text;
+        row.appendChild(level);
+  
+        var enrollment = document.createElement('td');
+        enrollment.innerHTML = d.enrollment + ' students';
+        row.appendChild(enrollment);
+    
+        tbody.appendChild(row);
+      });
+    }
+  
+    updateTable();
   </script> 
 </body>
 </html>
