@@ -133,8 +133,23 @@ th {
 
     var MAX_DAYS = 447
 
+    var options = {
+      sorted: false,
+      filtered: false,
+      page: 0
+    };
+  
+
     function updateTable() {
-      var data = schools;
+      var data = schools.slice();
+      if (options.sorted) {
+       if (options.sorted === 'asc') {
+          data.sort(function (a, b) { return a.enrollment - b.enrollment; });
+        } else if (options.sorted === 'desc') {
+          data.sort(function (a, b) { return b.enrollment - a.enrollment; });
+        }
+      }
+
       var table = document.getElementById('data-table');
       var tbody = table.getElementsByTagName('tbody')[0];
       tbody.innerHTML = '';
@@ -167,6 +182,26 @@ th {
     }
   
     updateTable();
+
+    document.getElementById('sort-asc').addEventListener('click', function () {
+      if (options.sorted === 'asc') {
+        options.sorted = false;
+      } else {
+        options.sorted = 'asc';
+      }
+  
+      updateTable();
+    });
+  
+    document.getElementById('sort-desc').addEventListener('click', function () {
+      if (options.sorted === 'desc') {
+        options.sorted = false;
+      } else {
+        options.sorted = 'desc';
+      }
+  
+      updateTable();
+    });
   </script> 
 </body>
 </html>
