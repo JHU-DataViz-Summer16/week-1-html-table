@@ -61,61 +61,61 @@
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
 <script>
   var states = [
-{"State":"Alabama","Employment":1959.0,"Region":"South"},
-{"State":"Alaska","Employment":338.4,"Region":"West"},
-{"State":"Arizona","Employment":2691.9,"Region":"West"},
-{"State":"Arkansas","Employment":1224.4,"Region":"South"},
-{"State":"California","Employment":16321.9,"Region":"West"},
-{"State":"Colorado","Employment":2595.8,"Region":"West"},
-{"State":"Connecticut","Employment":1686.3,"Region":"Northeast"},
-{"State":"Delaware","Employment":458.6,"Region":"South"},
-{"State":"District of Columbia","Employment":773.8,"Region":"South"},
-{"State":"Florida","Employment":8252.8,"Region":"South"},
-{"State":"Georgia","Employment":4360.7,"Region":"South"},
-{"State":"Hawaii","Employment":651.4,"Region":"West"},
-{"State":"Idaho","Employment":691.7,"Region":"West"},
-{"State":"Illinois","Employment":6006.7,"Region":"Midwest"},
-{"State":"Indiana","Employment":3062.1,"Region":"Midwest"},
-{"State":"Iowa","Employment":1576.5,"Region":"Midwest"},
-{"State":"Kansas","Employment":1399.2,"Region":"Midwest"},
-{"State":"Kentucky","Employment":1908.9,"Region":"South"},
-{"State":"Louisiana","Employment":1977.1,"Region":"South"},
-{"State":"Maine","Employment":614.6,"Region":"Northeast"},
-{"State":"Maryland","Employment":2704.6,"Region":"South"},
-{"State":"Massachusetts","Employment":3537.1,"Region":"Northeast"},
-{"State":"Michigan","Employment":4324.9,"Region":"Midwest"},
-{"State":"Minnesota","Employment":2876.2,"Region":"Midwest"},
-{"State":"Mississippi","Employment":1147.1,"Region":"South"},
-{"State":"Missouri","Employment":2801.2,"Region":"Midwest"},
-{"State":"Montana","Employment":464.6,"Region":"West"},
-{"State":"Nebraska","Employment":1017.3,"Region":"Midwest"},
-{"State":"Nevada","Employment":1282.7,"Region":"West"},
-{"State":"New Hampshire","Employment":664.9,"Region":"Northeast"},
-{"State":"New Jersey","Employment":4073.9,"Region":"Northeast"},
-{"State":"New Mexico","Employment":827.6,"Region":"West"},
-{"State":"New York","Employment":9332.9,"Region":"Northeast"},
-{"State":"North Carolina","Employment":4310.5,"Region":"South"},
-{"State":"North Dakota","Employment":440.0,"Region":"Midwest"},
-{"State":"Ohio","Employment":5491.4,"Region":"Midwest"},
-{"State":"Oklahoma","Employment":1666.0,"Region":"South"},
-{"State":"Oregon","Employment":1823.2,"Region":"West"},
-{"State":"Pennsylvania","Employment":5894.6,"Region":"Northeast"},
-{"State":"Rhode Island","Employment":490.6,"Region":"Northeast"},
-{"State":"South Carolina","Employment":2039.6,"Region":"South"},
-{"State":"South Dakota","Employment":432.3,"Region":"Midwest"},
-{"State":"Tennessee","Employment":2951.7,"Region":"South"},
-{"State":"Texas","Employment":11961.6,"Region":"South"},
-{"State":"Utah","Employment":1411.7,"Region":"West"},
-{"State":"Vermont","Employment":316.5,"Region":"Northeast"},
-{"State":"Virginia","Employment":3919.1,"Region":"South"},
-{"State":"Washington","Employment":3230.5,"Region":"West"},
-{"State":"West Virginia","Employment":761.8,"Region":"South"},
-{"State":"Wisconsin","Employment":2936.2,"Region":"Midwest"},
-{"State":"Wyoming","Employment":284.4,"Region":"West"}
+	{"state":"Alabama","employment":1959.0,"region":"South"},
+	{"state":"Alaska","employment":338.4,"region":"West"},
+	{"state":"Arizona","employment":2691.9,"region":"West"},
+	{"state":"Arkansas","employment":1224.4,"region":"South"},
+	{"state":"California","employment":16321.9,"region":"West"},
+	{"state":"Colorado","employment":2595.8,"region":"West"},
+	{"state":"Connecticut","employment":1686.3,"region":"Northeast"},
+	{"state":"Delaware","employment":458.6,"region":"South"},
+	{"state":"District of Columbia","employment":773.8,"region":"South"},
+	{"state":"Florida","employment":8252.8,"region":"South"},
+	{"state":"Georgia","employment":4360.7,"region":"South"},
+	{"state":"Hawaii","employment":651.4,"region":"West"},
+	{"state":"Idaho","employment":691.7,"region":"West"},
+	{"state":"Illinois","employment":6006.7,"region":"Midwest"},
+	{"state":"Indiana","employment":3062.1,"region":"Midwest"},
+	{"state":"Iowa","employment":1576.5,"region":"Midwest"},
+	{"state":"Kansas","employment":1399.2,"region":"Midwest"},
+	{"state":"Kentucky","employment":1908.9,"region":"South"},
+	{"state":"Louisiana","employment":1977.1,"region":"South"},
+	{"state":"Maine","employment":614.6,"region":"Northeast"},
+	{"state":"Maryland","employment":2704.6,"region":"South"},
+	{"state":"Massachusetts","employment":3537.1,"region":"Northeast"},
+	{"state":"Michigan","employment":4324.9,"region":"Midwest"},
+	{"state":"Minnesota","employment":2876.2,"region":"Midwest"},
+	{"state":"Mississippi","employment":1147.1,"region":"South"},
+	{"state":"Missouri","employment":2801.2,"region":"Midwest"},
+	{"state":"Montana","employment":464.6,"region":"West"},
+	{"state":"Nebraska","employment":1017.3,"region":"Midwest"},
+	{"state":"Nevada","employment":1282.7,"region":"West"},
+	{"state":"New Hampshire","employment":664.9,"region":"Northeast"},
+	{"state":"New Jersey","employment":4073.9,"region":"Northeast"},
+	{"state":"New Mexico","employment":827.6,"region":"West"},
+	{"state":"New York","employment":9332.9,"region":"Northeast"},
+	{"state":"North Carolina","employment":4310.5,"region":"South"},
+	{"state":"North Dakota","employment":440.0,"region":"Midwest"},
+	{"state":"Ohio","employment":5491.4,"region":"Midwest"},
+	{"state":"Oklahoma","employment":1666.0,"region":"South"},
+	{"state":"Oregon","employment":1823.2,"region":"West"},
+	{"state":"Pennsylvania","employment":5894.6,"region":"Northeast"},
+	{"state":"Rhode Island","employment":490.6,"region":"Northeast"},
+	{"state":"South Carolina","employment":2039.6,"region":"South"},
+	{"state":"South Dakota","employment":432.3,"region":"Midwest"},
+	{"state":"Tennessee","employment":2951.7,"region":"South"},
+	{"state":"Texas","employment":11961.6,"region":"South"},
+	{"state":"Utah","employment":1411.7,"region":"West"},
+	{"state":"Vermont","employment":316.5,"region":"Northeast"},
+	{"state":"Virginia","employment":3919.1,"region":"South"},
+	{"state":"Washington","employment":3230.5,"region":"West"},
+	{"state":"West Virginia","employment":761.8,"region":"South"},
+	{"state":"Wisconsin","employment":2936.2,"region":"Midwest"},
+	{"state":"Wyoming","employment":284.4,"region":"West"}
   ];
 
   // The ALL_CAPS treatment here is signalling that this variable is a constant - it should never change.
-  var MAX_EMPLOYMENT = 16321.9;
+  var MAX_EMPLOYMENT = 16321;
 
   // This is where we'll store the data representing user interaction; event handlers (the functions that
   // are called when a user clicks a button) work by updating the properties of this object. An alternative
@@ -159,7 +159,7 @@
 
     // Select only the schools from the current page (slice)
 
- /*   var table = document.getElementById('data-table');
+    var table = document.getElementById('data-table');
     var tbody = table.getElementsByTagName('tbody')[0];
     // Because getElementsByTagName returns an array of DOM nodes (technically, it's an HTMLCollection),
     // we need to select the first item in the array with the [0].
@@ -175,25 +175,27 @@
       // at which point it appears. We'll follow this same pattern for each of the <td></td> elements
       // we create below.
 
-      var school = document.createElement('td');
-      school.innerHTML = d.name;
-      row.appendChild(school);  
+      var state = document.createElement('td');
+      state.innerHTML = d.state;
+      row.appendChild(state);  
 
-      var level = document.createElement('td');
-      level.innerHTML = d.level_text;
-      row.appendChild(level);
+      var employment = document.createElement('td');
+      employment.innerHTML = d.employment + ' employees';
+      row.appendChild(employment);
 
-      var enrollment = document.createElement('td');
-      enrollment.innerHTML = d.enrollment + ' students';
-      row.appendChild(enrollment);
+      var region = document.createElement('td');
+      region.innerHTML = d.region;
+      row.appendChild(region);
+
+
 
       var barWrapper = document.createElement('td');
       var bar = document.createElement('div');
       bar.setAttribute('class', 'bar');
       // We set the class to 'bar' so we can use the .bar class we have in our styles. This gives it a
       // consistent height and a color.
-      var enrollmentPercentage = d.enrollment / MAX_ENROLLMENT;
-      bar.setAttribute('style', 'width: ' + (enrollmentPercentage * 100) + '%;');
+      var employmentPercentage = d.employment / MAX_EMPLOYMENT;
+      bar.setAttribute('style', 'width: ' + (employmentPercentage * 100) + '%;');
       // I've broken this operation up into two steps, which is a little different than we did in class.
       // The end result is the same, though. If 'enrollmentPercentage' equals 0.75, this set the style
       // attribute of our DIV so that it looks something like <div style="width: 75%;"></div>
@@ -232,7 +234,7 @@
     }
 
     updateTable();
-  });*/
+  });
 
   // This is where we'll need to create new event listeners for our filter and next/previous page buttons.
   // They'll look very similar to the above, just listening to different elements, and perhaps performing
