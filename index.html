@@ -42,7 +42,7 @@
       <thead>
         <tr>
           <th>State</th>
-          <th>Employment</th>
+          <th>Employees (thousands)</th>
           <th>Region</th>
           <th>Chart</th>
         </tr>
@@ -115,7 +115,7 @@
   ];
 
   // The ALL_CAPS treatment here is signalling that this variable is a constant - it should never change.
-  var MAX_EMPLOYMENT = 16321;
+  var MAX_EMPLOYMENT = 16321.9;
 
   // This is where we'll store the data representing user interaction; event handlers (the functions that
   // are called when a user clicks a button) work by updating the properties of this object. An alternative
@@ -180,14 +180,12 @@
       row.appendChild(state);  
 
       var employment = document.createElement('td');
-      employment.innerHTML = d.employment + ' employees';
+      employment.innerHTML = d.employment;
       row.appendChild(employment);
 
       var region = document.createElement('td');
       region.innerHTML = d.region;
       row.appendChild(region);
-
-
 
       var barWrapper = document.createElement('td');
       var bar = document.createElement('div');
