@@ -35,10 +35,10 @@
           <button type="button" class="btn btn-default" id="sort-desc">Descending</button>
         </div>
         <div class="btn-group">
-          <button type="button" class="btn btn-default" id="filter-es">Northeast</button>
-          <button type="button" class="btn btn-default" id="filter-es">South</button>
-          <button type="button" class="btn btn-default" id="filter-ms">West</button>
-          <button type="button" class="btn btn-default" id="filter-hs">Midwest</button>
+          <button type="button" class="btn btn-default" id="filter-n">Northeast</button>
+          <button type="button" class="btn btn-default" id="filter-s">South</button>
+          <button type="button" class="btn btn-default" id="filter-w">West</button>
+          <button type="button" class="btn btn-default" id="filter-mw">Midwest</button>
         </div>
       </div>
     </div>
@@ -67,56 +67,56 @@
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
  <script>
     var states =[
-      {"State":"Alabama","Region":"South","Days' worth GF reserves ":29.7,"Total reserves in millions":"$627"},
-      {"State":"Alaska","Region":"West","Days' worth GF reserves ":447,"Total reserves in millions":"$7,365"},
-      {"State":"Arizona","Region":"West","Days' worth GF reserves ":29.4,"Total reserves in millions":"$748"},
-      {"State":"Arkansas","Region":"South","Days' worth GF reserves ":0,"Total reserves in millions":"$0"},
-      {"State":"California","Region":"West","Days' worth GF reserves ":17.5,"Total reserves in millions":"$5,481"},
-      {"State":"Colorado","Region":"West","Days' worth GF reserves ":23,"Total reserves in millions":"$612"},
-      {"State":"Connecticut","Region":"Northeast","Days' worth GF reserves ":7.9,"Total reserves in millions":"$377"},
-      {"State":"Delaware","Region":"South","Days' worth GF reserves ":51.1,"Total reserves in millions":"$537"},
-      {"State":"Florida","Region":"South","Days' worth GF reserves ":45.2,"Total reserves in millions":"$3,491"},
-      {"State":"Georgia","Region":"South","Days' worth GF reserves ":26.4,"Total reserves in millions":"$1,451"},
-      {"State":"Hawaii","Region":"West","Days' worth GF reserves ":52.2,"Total reserves in millions":"$918"},
-      {"State":"Idaho","Region":"West","Days' worth GF reserves ":28.8,"Total reserves in millions":"$232"},
-      {"State":"Illinois","Region":"Midwest","Days' worth GF reserves ":4.1,"Total reserves in millions":"$350"},
-      {"State":"Indiana","Region":"Midwest","Days' worth GF reserves ":52.3,"Total reserves in millions":"$2,141"},
-      {"State":"Iowa","Region":"Midwest","Days' worth GF reserves ":55.4,"Total reserves in millions":"$1,060"},
-      {"State":"Kansas","Region":"Midwest","Days' worth GF reserves ":4.4,"Total reserves in millions":"$76"},
-      {"State":"Kentucky","Region":"South","Days' worth GF reserves ":10.8,"Total reserves in millions":"$298"},
-      {"State":"Louisiana","Region":"South","Days' worth GF reserves ":19.7,"Total reserves in millions":"$470"},
-      {"State":"Maine","Region":"Northeast","Days' worth GF reserves ":17.8,"Total reserves in millions":"$154"},
-      {"State":"Maryland","Region":"South","Days' worth GF reserves ":24.8,"Total reserves in millions":"$1,086"},
-      {"State":"Massachusetts","Region":"Northeast","Days' worth GF reserves ":14.2,"Total reserves in millions":"$1,485"},
-      {"State":"Michigan","Region":"Midwest","Days' worth GF reserves ":26,"Total reserves in millions":"$668"},
-      {"State":"Minnesota","Region":"Midwest","Days' worth GF reserves ":25.4,"Total reserves in millions":"$1,421"},
-      {"State":"Mississippi","Region":"South","Days' worth GF reserves ":30.5,"Total reserves in millions":"$461"},
-      {"State":"Missouri","Region":"Midwest","Days' worth GF reserves ":22.9,"Total reserves in millions":"$548"},
-      {"State":"Montana","Region":"West","Days' worth GF reserves ":76.6,"Total reserves in millions":"$455"},
-      {"State":"Nebraska","Region":"Midwest","Days' worth GF reserves ":132.2,"Total reserves in millions":"$1,460"},
-      {"State":"Nevada","Region":"West","Days' worth GF reserves ":15.7,"Total reserves in millions":"$146"},
-      {"State":"New Hampshire","Region":"Northeast","Days' worth GF reserves ":24.1,"Total reserves in millions":"$83"},
-      {"State":"New Jersey","Region":"Northeast","Days' worth GF reserves ":7,"Total reserves in millions":"$627"},
-      {"State":"New Mexico","Region":"West","Days' worth GF reserves ":36.7,"Total reserves in millions":"$634"},
-      {"State":"New York","Region":"Northeast","Days' worth GF reserves ":42.4,"Total reserves in millions":"$7,300"},
-      {"State":"North Carolina","Region":"South","Days' worth GF reserves ":25.7,"Total reserves in millions":"$1,516"},
-      {"State":"North Dakota","Region":"Midwest","Days' worth GF reserves ":147.2,"Total reserves in millions":"$1,303"},
-      {"State":"Ohio","Region":"Midwest","Days' worth GF reserves ":37,"Total reserves in millions":"$3,190"},
-      {"State":"Oklahoma","Region":"South","Days' worth GF reserves ":24.7,"Total reserves in millions":"$434"},
-      {"State":"Oregon","Region":"West","Days' worth GF reserves ":38.5,"Total reserves in millions":"$868"},
-      {"State":"Pennsylvania","Region":"Northeast","Days' worth GF reserves ":0.1,"Total reserves in millions":"$9"},
-      {"State":"Rhode Island","Region":"Northeast","Days' worth GF reserves ":37.1,"Total reserves in millions":"$351"},
-      {"State":"South Carolina","Region":"South","Days' worth GF reserves ":63.3,"Total reserves in millions":"$1,182"},
-      {"State":"South Dakota","Region":"Midwest","Days' worth GF reserves ":45,"Total reserves in millions":"$171"},
-      {"State":"Tennessee","Region":"South","Days' worth GF reserves ":38.3,"Total reserves in millions":"$1,311"},
-      {"State":"Texas","Region":"South","Days' worth GF reserves ":119.4,"Total reserves in millions":"$15,838"},
-      {"State":"Utah","Region":"West","Days' worth GF reserves ":56.8,"Total reserves in millions":"$895"},
-      {"State":"Vermont","Region":"Northeast","Days' worth GF reserves ":19.4,"Total reserves in millions":"$76"},
-      {"State":"Virginia","Region":"South","Days' worth GF reserves ":14.3,"Total reserves in millions":"$715"},
-      {"State":"Washington","Region":"West","Days' worth GF reserves ":30.1,"Total reserves in millions":"$1,379"},
-      {"State":"West Virginia","Region":"South","Days' worth GF reserves ":111.1,"Total reserves in millions":"$1,289"},
-      {"State":"Wisconsin","Region":"Midwest","Days' worth GF reserves ":9.8,"Total reserves in millions":"$416"},
-      {"State":"Wyoming","Region":"West","Days' worth GF reserves ":197.5,"Total reserves in millions":"$960"}]
+{"state":"Alabama","region":"South","days":29.7,"reserves":"$627 "},
+{"state":"Alaska","region":"West","days":447,"reserves":"$7,365 "},
+{"state":"Arizona","region":"West","days":29.4,"reserves":"$748 "},
+{"state":"Arkansas","region":"South","days":0,"reserves":"$0 "},
+{"state":"California","region":"West","days":17.5,"reserves":"$5,481 "},
+{"state":"Colorado","region":"West","days":23,"reserves":"$612 "},
+{"state":"Connecticut","region":"Northeast","days":7.9,"reserves":"$377 "},
+{"state":"Delaware","region":"South","days":51.1,"reserves":"$537 "},
+{"state":"Florida","region":"South","days":45.2,"reserves":"$3,491 "},
+{"state":"Georgia","region":"South","days":26.4,"reserves":"$1,451 "},
+{"state":"Hawaii","region":"West","days":52.2,"reserves":"$918 "},
+{"state":"Idaho","region":"West","days":28.8,"reserves":"$232 "},
+{"state":"Illinois","region":"Midwest","days":4.1,"reserves":"$350 "},
+{"state":"Indiana","region":"Midwest","days":52.3,"reserves":"$2,141 "},
+{"state":"Iowa","region":"Midwest","days":55.4,"reserves":"$1,060 "},
+{"state":"Kansas","region":"Midwest","days":4.4,"reserves":"$76 "},
+{"state":"Kentucky","region":"South","days":10.8,"reserves":"$298 "},
+{"state":"Louisiana","region":"South","days":19.7,"reserves":"$470 "},
+{"state":"Maine","region":"Northeast","days":17.8,"reserves":"$154 "},
+{"state":"Maryland","region":"South","days":24.8,"reserves":"$1,086 "},
+{"state":"Massachusetts","region":"Northeast","days":14.2,"reserves":"$1,485 "},
+{"state":"Michigan","region":"Midwest","days":26,"reserves":"$668 "},
+{"state":"Minnesota","region":"Midwest","days":25.4,"reserves":"$1,421 "},
+{"state":"Mississippi","region":"South","days":30.5,"reserves":"$461 "},
+{"state":"Missouri","region":"Midwest","days":22.9,"reserves":"$548 "},
+{"state":"Montana","region":"West","days":76.6,"reserves":"$455 "},
+{"state":"Nebraska","region":"Midwest","days":132.2,"reserves":"$1,460 "},
+{"state":"Nevada","region":"West","days":15.7,"reserves":"$146 "},
+{"state":"New Hampshire","region":"Northeast","days":24.1,"reserves":"$83 "},
+{"state":"New Jersey","region":"Northeast","days":7,"reserves":"$627 "},
+{"state":"New Mexico","region":"West","days":36.7,"reserves":"$634 "},
+{"state":"New York","region":"Northeast","days":42.4,"reserves":"$7,300 "},
+{"state":"North Carolina","region":"South","days":25.7,"reserves":"$1,516 "},
+{"state":"North Dakota","region":"Midwest","days":147.2,"reserves":"$1,303 "},
+{"state":"Ohio","region":"Midwest","days":37,"reserves":"$3,190 "},
+{"state":"Oklahoma","region":"South","days":24.7,"reserves":"$434 "},
+{"state":"Oregon","region":"West","days":38.5,"reserves":"$868 "},
+{"state":"Pennsylvania","region":"Northeast","days":0.1,"reserves":"$9 "},
+{"state":"Rhode Island","region":"Northeast","days":37.1,"reserves":"$351 "},
+{"state":"South Carolina","region":"South","days":63.3,"reserves":"$1,182 "},
+{"state":"South Dakota","region":"Midwest","days":45,"reserves":"$171 "},
+{"state":"Tennessee","region":"South","days":38.3,"reserves":"$1,311 "},
+{"state":"Texas","region":"South","days":119.4,"reserves":"$15,838 "},
+{"state":"Utah","region":"West","days":56.8,"reserves":"$895 "},
+{"state":"Vermont","region":"Northeast","days":19.4,"reserves":"$76 "},
+{"state":"Virginia","region":"South","days":14.3,"reserves":"$715 "},
+{"state":"Washington","region":"West","days":30.1,"reserves":"$1,379 "},
+{"state":"West Virginia","region":"South","days":111.1,"reserves":"$1,289 "},
+{"state":"Wisconsin","region":"Midwest","days":9.8,"reserves":"$416 "},
+{"state":"Wyoming","region":"West","days":197.5,"reserves":"$960 "}
     ];
 
     var MAX_DAYS = 447
@@ -129,7 +129,7 @@
   
 
     function updateTable() {
-      var data = schools.slice();
+      var data = s.slice();
       if (options.sorted) {
        if (options.sorted === 'asc') {
           data.sort(function (a, b) { return a.enrollment - b.enrollment; });
