@@ -3,47 +3,259 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Week 1: HTML Tables</title><!-- Latest compiled and minified CSS -->
+  <title>Felony Disenfranchisement</title><!-- Latest compiled and minified CSS -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <link href='https://fonts.googleapis.com/css?family=Fjalla+One|Exo:400,600|Ropa+Sans' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=PT+Sans+Narrow|Arimo|Dosis|Lato' rel='stylesheet' type='text/css'>
+
   <style>
+    .section { padding: 1em 0; }
     .header {
-      text-align: center;
+      text-align: left;
     }
-  </style>
+    table {
+      border-collapse: collapse;
+      width: 100px;
+    }
+
+    th, td {
+      padding: 8px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    #data-table td {
+      width: 20%;
+      /* The table has 5 columns, so this rule makes them of equal width. */
+    }
+    .bar {
+      height: 20px;
+      /* Note that we'll set the width dynamically using Javascript. */
+      background: #F03B20;
+      border-radius: 24px;
+    }
+    .btn {
+      background: none;
+      color: #FFFFB2;
+      border: 2px solid #FFFFB2;
+      border-radius: 24px;
+    }
+
+    td:nth-child(1),th:nth-child(1) { width:200px; }
+    td:nth-child(2),th:nth-child(2) { text-align: center; }
+    td:nth-child(4),th:nth-child(4) { text-align: center; }
+    
+
+    tr:hover td{font-weight: bold;
+    }
+
+    body {
+      background-color: #4C4C4C;
+      font-family: 'Arimo', sans-serif;
+      color: #B7B7B7;
+          }
+
+    th {
+       font-family: 'Exo', sans-serif;
+        color: #FFFFFF;
+        width: 400px;
+                } 
+    h1,h3,h5,h4,h2{
+        font-family: 'Exo', sans-serif;
+        color: #FFFFFF;
+                }   
+     </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
-      <h1>Week 1: HTML Tables</h1>
-      <p>We'll add our data to this table.</p>
+      <h1>Felony Disenfranchisement</h1>
+      <p>The number of people disenfranchised due to a felony conviction has
+escalated dramatically in recent decades as the population under criminal
+justice supervision has increased. There were an estimated 1.17 million
+people disenfranchised in 1976, 3.34 million in 1996, and over 5.85 million in
+2010. The table below gives the states with the 15 highest rates of felony disenfranchisement, which is defined as the total percentage of the voting age population disenfranchised due to a felony conviction.</p>
+<br>
+
     </div>
-    <table class="table">
+  <div class ="controls section">
+    <div class="container">
+        <div class="btn-group" role="group" aria-label="Sort">
+          <h4>Sort</h4>
+          <button type="button" class="btn btn-default" id="sort-asc">Ascending</button>
+          <button type="button" class="btn btn-default" id="sort-desc">Descending</button>
+          </div>
+          <div class="btn-group" role="group" aria-label="Filter">
+            <h4>Filter</h4>
+          <button type="button" class="btn btn-default" id="filter-No">No Restrictions</button>
+          <button type="button" class="btn btn-default" id="filter-Prison">In Prison</button>
+          <button type="button" class="btn btn-default" id="filter-Parole">While on Parole</button>
+          <button type="button" class="btn btn-default" id="filter-Probation">While on Probation</button>
+          <button type="button" class="btn btn-default" id="filter-Post">Post-Sentence</button>
+          </div>
+    </div>
+    <br>
+  </div>
+  <div class="main section">
+    <div class="container">
+      <table class="table" id="data-table">
       <thead>
         <tr>
-          <th>Fruit</th>
-          <th>Price</th>
-          <th>Quantity</th>
+          <th>State</th>
+          <th>Abbreviation</th>
+          <th>Type of Restrictions</th>
+          <th>Percentage of Felons Disenfranchised</th>
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td>Apples</td>
-          <td>$0.55</td>
-          <td>5</td>
-        </tr>
-        <tr>
-          <td>Oranges</td>
-          <td>$0.80</td>
-          <td>10</td>
-        </tr>
-        <tr>
-          <td>Pears</td>
-          <td>$0.95</td>
-          <td>3</td>
-        </tr>
       </tbody>
     </table>
   </div>
+</div>
+    <p style="text-align: right; font-family: 'Exo', sans-serif;
+        color: #FFFFFF;">
+        Source: The Sentencing Project.<br>
+      <a href="http://sentencingproject.org/wp-content/uploads/2016/01/State-Level-Estimates-of-Felon-Disenfranchisement-in-the-United-States-2010.pdf">Full Methodology</a>
+    </p>
+  </div>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
+  <script>
+    var states = [{"State":"Florida","StateAbbr":"FL","felon":10.42,"vote":39,"Gerrymandering":"24.61","PEI":0.22,"Restrictions":"Restrictions Post-Sentence"},
+        {"State":"Mississippi","StateAbbr":"MS","felon":8.27,"vote":7,"Gerrymandering":"23.33","PEI":-8.44,"Restrictions":"Restrictions Post-Sentence"},
+        {"State":"Kentucky","StateAbbr":"KY","felon":7.35,"vote":8,"Gerrymandering":"19.21","PEI":-0.68,"Restrictions":"Restrictions Post-Sentence"},
+        {"State":"Virginia","StateAbbr":"VA","felon":7.34,"vote":25,"Gerrymandering":"14.42","PEI":0.22,"Restrictions":"Restrictions Post-Sentence"},
+        {"State":"Alabama","StateAbbr":"AL","felon":7.19,"vote":10,"Gerrymandering":"18.43","PEI":-5.06,"Restrictions":"Restrictions Post-Sentence"},
+        {"State":"Tennessee","StateAbbr":"TN","felon":7.05,"vote":13,"Gerrymandering":"20.48","PEI":-1.53,"Restrictions":"Restrictions Post-Sentence"},
+        {"State":"Wyoming","StateAbbr":"WY","felon":5.99,"vote":1.2,"Gerrymandering":"NA","PEI":-2.91,"Restrictions":"Restrictions Post-Sentence"},
+        {"State":"Nevada","StateAbbr":"NV","felon":4.24,"vote":8,"Gerrymandering":"52.44","PEI":-0.06,"Restrictions":"Restrictions Post-Sentence"},
+        {"State":"Arizona","StateAbbr":"AZ","felon":4.19,"vote":8,"Gerrymandering":"30.05","PEI":1.15,"Restrictions":"Restrictions Post-Sentence"},
+        {"State":"Georgia","StateAbbr":"GA","felon":3.83,"vote":16,"Gerrymandering":"25.83","PEI":-3.56,"Restrictions":"Restrictions While on Probation"},
+        {"State":"Delaware","StateAbbr":"DE","felon":3.7,"vote":4,"Gerrymandering":"NA","PEI":-1.85,"Restrictions":"Restrictions Post-Sentence"},
+        {"State":"Louisiana","StateAbbr":"LA","felon":3.28,"vote":16,"Gerrymandering":"11.1","PEI":-1.46,"Restrictions":"Restrictions While on Probation"},
+        {"State":"Arkansas","StateAbbr":"AR","felon":2.96,"vote":13,"Gerrymandering":"19.89","PEI":-2.47,"Restrictions":"Restrictions While on Probation"},
+        {"State":"Texas","StateAbbr":"TX","felon":2.91,"vote":11,"Gerrymandering":"19.17","PEI":0.01,"Restrictions":"Restrictions While on Probation"},
+        {"State":"Alaska","StateAbbr":"AK","felon":2.8,"vote":3,"Gerrymandering":"NA","PEI":"NA","Restrictions":"Restrictions While on Probation"},
+        {"State":"Missouri","StateAbbr":"MO","felon":2.32,"vote":11,"Gerrymandering":"27.08","PEI":1.14,"Restrictions":"Restrictions While on Probation"},
+        {"State":"Idaho","StateAbbr":"ID","felon":2.24,"vote":8,"Gerrymandering":"25.01","PEI":1.1,"Restrictions":"Restrictions While on Probation"},
+        {"State":"New Mexico","StateAbbr":"NM","felon":1.84,"vote":6,"Gerrymandering":"35.17","PEI":2.12,"Restrictions":"Restrictions While on Probation"},
+        {"State":"Oklahoma","StateAbbr":"OK","felon":1.82,"vote":17,"Gerrymandering":"24.98","PEI":-2.52,"Restrictions":"Restrictions While on Probation"},
+        {"State":"Wisconsin","StateAbbr":"WI","felon":1.52,"vote":1.4,"Gerrymandering":"21.85","PEI":1.64,"Restrictions":"Restrictions While on Probation"},
+        {"State":"New Jersey","StateAbbr":"NJ","felon":1.49,"vote":5,"Gerrymandering":"18.96","PEI":1.03,"Restrictions":"Restrictions While on Probation"},
+        {"State":"Minnesota","StateAbbr":"MN","felon":1.47,"vote":6,"Gerrymandering":"33.03","PEI":3.23,"Restrictions":"Restrictions While on Probation"},
+        {"State":"Maryland","StateAbbr":"MD","felon":1.44,"vote":36,"Gerrymandering":"8.08","PEI":-0.5,"Restrictions":"Restrictions While on Probation"},
+        {"State":"Nebraska","StateAbbr":"NE","felon":1.3,"vote":4,"Gerrymandering":"39.27","PEI":1.29,"Restrictions":"Restrictions Post-Sentence"},
+        {"State":"South Carolina","StateAbbr":"SC","felon":1.22,"vote":25,"Gerrymandering":"20.5","PEI":-1.79,"Restrictions":"Restrictions While on Probation"},
+        {"State":"North Carolina","StateAbbr":"NC","felon":1.14,"vote":13,"Gerrymandering":"11.51","PEI":-0.18,"Restrictions":"Restrictions While on Probation"},
+        {"State":"West Virginia","StateAbbr":"WV","felon":1.07,"vote":2,"Gerrymandering":"13.65","PEI":1.2,"Restrictions":"Restrictions While on Probation"},
+        {"State":"South Dakota","StateAbbr":"SD","felon":1.05,"vote":3,"Gerrymandering":"NA","PEI":2.6,"Restrictions":"Restrictions While on Probation"},
+        {"State":"Washington","StateAbbr":"WA","felon":1.03,"vote":"NA","Gerrymandering":"21.19","PEI":1.82,"Restrictions":"Restrictions While on Probation"},
+        {"State":"California","StateAbbr":"CA","felon":1,"vote":7,"Gerrymandering":"22.58","PEI":2.18,"Restrictions":"Restrictions While on Parole"},
+        {"State":"Iowa","StateAbbr":"IA","felon":0.94,"vote":6,"Gerrymandering":"39.97","PEI":1.24,"Restrictions":"Restrictions Post-Sentence"},
+        {"State":"Colorado","StateAbbr":"CO","felon":0.93,"vote":8,"Gerrymandering":"24.6","PEI":0.55,"Restrictions":"Restrictions While on Parole"},
+        {"State":"Connecticut","StateAbbr":"CT","felon":0.91,"vote":7,"Gerrymandering":"26.61","PEI":0.08,"Restrictions":"Restrictions While on Parole"},
+        {"State":"Kansas","StateAbbr":"KS","felon":0.87,"vote":11,"Gerrymandering":"40.52","PEI":-0.25,"Restrictions":"Restrictions While on Probation"},
+        {"State":"New York","StateAbbr":"NY","felon":0.72,"vote":12,"Gerrymandering":"31.81","PEI":-1.07,"Restrictions":"Restrictions While on Parole"},
+        {"State":"Michigan","StateAbbr":"MI","felon":0.61,"vote":19,"Gerrymandering":"26.03","PEI":1.94,"Restrictions":"Restrictions in Prison"},
+        {"State":"Ohio","StateAbbr":"OH","felon":0.61,"vote":10,"Gerrymandering":"17.22","PEI":1.54,"Restrictions":"Restrictions in Prison"},
+        {"State":"Indiana","StateAbbr":"IN","felon":0.6,"vote":13,"Gerrymandering":"41.03","PEI":-1.27,"Restrictions":"Restrictions in Prison"},
+        {"State":"Hawaii","StateAbbr":"HI","felon":0.56,"vote":7,"Gerrymandering":"8.56","PEI":"NA","Restrictions":"Restrictions in Prison"},
+        {"State":"Pennsylvania","StateAbbr":"PA","felon":0.55,"vote":8,"Gerrymandering":"17.14","PEI":1.23,"Restrictions":"Restrictions in Prison"},
+        {"State":"Illinois","StateAbbr":"IL","felon":0.52,"vote":12,"Gerrymandering":"16.64","PEI":0.4,"Restrictions":"Restrictions in Prison"},
+        {"State":"Montana","StateAbbr":"MT","felon":0.52,"vote":12,"Gerrymandering":"NA","PEI":4.51,"Restrictions":"Restrictions in Prison"},
+        {"State":"Oregon","StateAbbr":"OR","felon":0.5,"vote":"NA","Gerrymandering":"31.15","PEI":3.19,"Restrictions":"Restrictions in Prison"},
+        {"State":"Rhode Island","StateAbbr":"RI","felon":0.41,"vote":11,"Gerrymandering":"20.14","PEI":1.06,"Restrictions":"Restrictions in Prison"},
+        {"State":"Utah","StateAbbr":"UT","felon":0.4,"vote":10,"Gerrymandering":"27.66","PEI":0.34,"Restrictions":"Restrictions in Prison"},
+        {"State":"North Dakota","StateAbbr":"ND","felon":0.3,"vote":10,"Gerrymandering":"NA","PEI":-2.02,"Restrictions":"Restrictions in Prison"},
+        {"State":"New Hampshire","StateAbbr":"NH","felon":0.29,"vote":11,"Gerrymandering":"16.45","PEI":-2.36,"Restrictions":"Restrictions in Prison"},
+        {"State":"Massachusetts","StateAbbr":"MA","felon":0.25,"vote":7,"Gerrymandering":"18.45","PEI":0.19,"Restrictions":"Restrictions in Prison"},
+        {"State":"Maine","StateAbbr":"ME","felon":0,"vote":4,"Gerrymandering":"14.04","PEI":0.57,"Restrictions":"No Restrictions"},
+        {"State":"Vermont","StateAbbr":"VT","felon":0,"vote":2,"Gerrymandering":"NA","PEI":2.19,"Restrictions":"No Restrictions"}];
+
+      var MAX_DIS = 10.42;
+
+      var options = {
+        sorted: false,
+        filtered: false,
+        page: 0
+        };
+
+      function updateTable() {
+        var data = states.slice()
+
+        if(options.sorted) {
+          if (options.sorted ==='asc') {
+            data.sort(function (a,b) {return a.felon -b.felon; });
+          } else if (options.sorted==='desc') {
+            data.sort(function(a,b) {return b.felon - a.felon; });
+          }
+        }
+        //Set variables to build table
+        var table = document.getElementById('data-table');
+        var tbody = table.getElementsByTagName('tbody')[0];
+
+        tbody.innerHTML = '';
+
+        //add a new row for each row
+        data.forEach(function (d) {
+          var row=document.createElement('tr');
+
+          var State = document.createElement('td');
+          State.innerHTML = d.State;
+          row.appendChild(State);
+
+          var StateAbbr = document.createElement('td');
+          StateAbbr.innerHTML = d.StateAbbr;
+          row.appendChild(StateAbbr);
+
+          var Restrictions = document.createElement('td');
+          Restrictions.innerHTML = d.Restrictions;
+          row.appendChild(Restrictions);
+
+          var felon = document.createElement('td');
+          felon.innerHTML = d.felon;
+          row.appendChild(felon);
+
+          var barWrapper = document.createElement('td');
+          var bar = document.createElement('div');
+          bar.setAttribute('class','bar');  //setting the class to bar, which should be in styles
+
+          var felonPercentage = d.felon / MAX_DIS;
+          bar.setAttribute('style','width: ' + (felonPercentage * 100) + '%;');
+
+          barWrapper.appendChild(bar);
+          row.appendChild(barWrapper);
+
+          tbody.appendChild(row);
+
+        });
+      }
+      updateTable();
+
+      document.getElementById('sort-asc').addEventListener('click', function () {
+    // Disable the sort if 'asc' was previously selected, otherwise set the sort to 'asc'
+    if (options.sorted === 'asc') {
+      options.sorted = false;
+    } else {
+      options.sorted = 'asc';
+    }
+
+    // And now we need to re-run the function that populates the table. Note that the results will be
+    // different because we've change the options object.
+    updateTable();
+  });
+
+    document.getElementById('sort-desc').addEventListener('click', function () {
+    // Disable the sort if 'desc' was previously selected, otherwise set the sort to 'desc'
+    if (options.sorted === 'desc') {
+      options.sorted = false;
+    } else {
+      options.sorted = 'desc';
+    }
+
+    updateTable();
+  });
+
+      </script>
+
+
 </body>
 </html>
