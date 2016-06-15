@@ -139,7 +139,7 @@
     // Sort schools by enrollment
     if (options.sorted) {
       if (options.sorted === 'asc') {
-        data.sort(function (a, b) { return a.employment - b.employment; });
+          data.sort(function (a, b) { return a.employment - b.employment; });
         // This anonymous function is responsible for comparing two values a and b. If it returns a positive
         // number, we're saying that a should come after b in the array. A negative number means that b
         // should come after a. A zero means that the two are equal. This function is using the 'enrollment'
@@ -149,25 +149,27 @@
         // Also, note that we're sorting the data in place, changing, or mutating, the 'data' variable. See
         // the note in the README about how this compares to the filter() and slice() operations that we'll
         // use for the next two data transforms.
-      } else if (options.sorted === 'desc') {
-        data.sort(function (a, b) { return b.employment - a.employment; });
+        } else if (options.sorted === 'desc') {
+          data.sort(function (a, b) { return b.employment - a.employment; });
         // Note that this is just the opposite of the above.
-      }
+        }
+    }    
 
+      console.log("message here", options.sorted, options.filtered)
 
-      if (options.filtered) {
-      	if (options.filtered === 'northeast') {
-      		data = data.filter(function (d) {	return d.region === "Northeast" })
-        } else if (options.filtered === 'south') {
-          data = data.filter(function (d) { return d.region === "South"})
-        } else if (options.filtered === 'midwest') {
-          data = data.filter(function (d) { return d.region === "Midwest"})
-        } else if (options.filtered === 'west') {
-          data = data.filter(function (d) { return d.region === "West"})
-      	}
-      }
-
+    if (options.filtered) {
+    	if (options.filtered === 'northeast') {
+    		data = data.filter(function (d) {	return d.region === "Northeast" })
+          } else if (options.filtered === 'south') {
+            data = data.filter(function (d) { return d.region === "South"})
+          } else if (options.filtered === 'midwest') {
+            data = data.filter(function (d) { return d.region === "Midwest"})
+          } else if (options.filtered === 'west') {
+            data = data.filter(function (d) { return d.region === "West"})
+     	}
     }
+
+    
 
     // Filter schools by grade level
 
