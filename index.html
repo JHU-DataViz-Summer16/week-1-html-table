@@ -153,6 +153,20 @@
         data.sort(function (a, b) { return b.employment - a.employment; });
         // Note that this is just the opposite of the above.
       }
+
+
+      if (options.filtered) {
+      	if (options.filtered === 'northeast') {
+      		data = data.filter(function (d) {	return a.region === "Northeast" })
+        } else if (options.filtered === 'south') {
+          data = data.filter(function (d) {return a.region === "South"})
+        } else if (options.filtered === 'midwest') {
+          data = data.filter(function (d) {return a.region === "Midwest"})
+        } else if (options.filtered === 'west') {
+          data = data.filter(function (d) {return a.region === "West"})
+      	}
+      }
+
     }
 
     // Filter schools by grade level
@@ -238,10 +252,41 @@
   // They'll look very similar to the above, just listening to different elements, and perhaps performing
   // different actions when clicked.
 
+  document.getElementById('filter-ne').addEventListener('click', function () {
+    if (options.filtered === 'northeast') {
+      options.filtered = false;
+    } else {
+      options.filtered = 'northeast';
+    }
+    updateTable();
+  });
 
+  document.getElementById('filter-so').addEventListener('click', function () {
+    if (options.filtered === 'south') {
+      options.filtered = false;
+    } else {
+      options.filtered = 'south';
+    }
+    updateTable();
+  });
 
+  document.getElementById('filter-mw').addEventListener('click', function () {
+    if (options.filtered === 'midwest') {
+      options.filtered = false;
+    } else {
+      options.filtered = 'midwest';
+    }
+    updateTable();
+  });
 
-
+  document.getElementById('filter-we').addEventListener('click', function () {
+    if (options.filtered === 'west') {
+      options.filtered = false;
+    } else {
+      options.filtered = 'west';
+    }
+    updateTable();
+  });
 
 
 </script>
