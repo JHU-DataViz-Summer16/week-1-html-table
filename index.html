@@ -157,13 +157,13 @@
 
       if (options.filtered) {
       	if (options.filtered === 'northeast') {
-      		data = data.filter(function (d) {	return d.region = "Northeast" })
+      		data = data.filter(function (d) {	return d.region === "Northeast" })
         } else if (options.filtered === 'south') {
-          data = data.filter(function (d) { return d.region = "South"})
+          data = data.filter(function (d) { return d.region === "South"})
         } else if (options.filtered === 'midwest') {
-          data = data.filter(function (d) { return d.region = "Midwest"})
+          data = data.filter(function (d) { return d.region === "Midwest"})
         } else if (options.filtered === 'west') {
-          data = data.filter(function (d) { return d.region = "West"})
+          data = data.filter(function (d) { return d.region === "West"})
       	}
       }
 
