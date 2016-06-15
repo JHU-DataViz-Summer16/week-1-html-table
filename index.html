@@ -66,10 +66,12 @@
     <div class="controls section">
       <div class="container">
         <div class="btn-toolbar">
-          <div class="btn-group">
+          <div class="btn-group" role="group" aria-label="Sort">
             <button type="button" class="btn btn-default" id="sort-asc">Ascending</button>
             <button type="button" class="btn btn-default" id="sort-desc">Descending</button>
-            <button type="button" class="btn btn-default" id="filter-byrate">Filter by Rate</button>
+          <div class="btn-group" role="group" aria-label="Filter">
+            <button type="button" class="btn btn-default" id="filter-byrate">Filter by Rate > 15%</button>
+          </div>
           </div>
         </div>
       </div>
@@ -168,6 +170,13 @@
         	}
         }
 
+        if (options.filtered) { 
+            if (options.filtered === 'filter-r') { 
+              data = data.filter(function (a) { 
+                return a.rate > 15; });
+            }
+        }
+
         var table = document.getElementById('data-table'); 
         var tbody = table.getElementsByTagName('tbody')[0]; 
 
@@ -216,7 +225,17 @@
         	options.sorted = 'desc'; 
         }
         updateTable(); 
-      }); 
+      });
+
+      document.getElementById('filter-byrate').addEventListener('click', function ()
+       {
+       if (options.filtered === 'filter-r') {
+      	   options.filtered = false; 
+       }   else {
+           options.filtered = 'filter-r'; 
+       }
+       updateTable(); 
+     });
 
 </script> 
 </body>
