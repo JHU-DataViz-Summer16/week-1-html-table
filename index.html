@@ -3,82 +3,193 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Week 1: HTML Tables</title><!-- Latest compiled and minified CSS -->
+  <title>Homework</title><!-- Latest compiled and minified CSS -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
   <style>
+    .section { padding:1em 0; }
     .header {
       text-align: left;
+      background-color: #2980B9;
+      color:#ECF0F1;
+      padding: 2em;
+    }
+    #data-table td {
+      width: 25%;
+    }
+    .bar {
+      height: 20px;
+      background: #E74C3C;
     }
   </style>
 </head>
+
 <body>
-  <div class="container">
-    <div class="header">
-      <h1>Washington DC Ward 3 Voter Registration</h1>
-      <p>Organized by Precinct</p>
+  <div class="header section">
+    <div class="container">
+      <h1>2012 Presidential Election Voter Turnout</h1>
+      <!--Source: CQPress Voting and Elections Collection-->
+      <p>Organized by State</p>
     </div>
-    <table class="table table-hover">
-      <thead>
-        <tr>
-          <th>Precinct</th>
-          <th>Democrat</th>
-          <th>Republican</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>7</td>
-          <td>1195</td>
-          <td>376</td>
-        </tr>
-        <tr>
-          <td>8</td>
-          <td>2299</td>
-          <td>620</td>
-        </tr>
-        <tr>
-          <td>9</td>
-          <td>1092</td>
-          <td>503</td>
-        </tr>
-        <tr>
-          <td>10</td>
-          <td>1674</td>
-          <td>401</td>
-        </tr>
-        <tr>
-          <td>11</td>
-          <td>3127</td>
-          <td>903</td>
-        </tr>
-        <tr>
-          <td>12</td>
-          <td>434</td>
-          <td>180</td>
-        </tr>
-        <tr>
-          <td>27</td>
-          <td>2648</td>
-          <td>323</td>
-        </tr>
-        <tr>
-          <td>28</td>
-          <td>2367</td>
-          <td>246</td>
-        </tr>
-        <tr>
-          <td>29</td>
-          <td>2218</td>
-          <td>488</td>
-        </tr>
-        <tr>
-          <td>30</td>
-          <td>1250</td>
-          <td>205</td>
-        </tr>        
-      </tbody>
-    </table>
   </div>
+  <div class="controls sections">
+    <div class="container">
+      <div class="btn-toolbar">
+        <div class="btn-group">
+          <button type="button" class="btn btn-default" id="sort-asc">Ascending</button>
+          <button type="button" class="btn btn-default" id="sort-desc">Descending</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="main section">
+    <div class="container">
+      <table class="table" id="data-table">
+        <thead>
+          <tr>
+            <th>State</th>
+            <th>Region</th>
+            <th>Total Votes</th>
+            <th>Republican Votes</th>
+            <th>Chart</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
+
+  <script>
+  var voting = [
+    {"State":"Alabama","RepVotes":1255925.00,"TotalVotes":2074338.00,"Percentage":"60.55%"},
+    {"State":"Alaska","RepVotes":164676.00,"TotalVotes":300495.00,"Percentage":"54.80%"},
+    {"State":"Arizona","RepVotes":1233654.00,"TotalVotes":2299254.00,"Percentage":"53.65%"},
+    {"State":"Arkansas","RepVotes":647744.00,"TotalVotes":1069468.00,"Percentage":"60.57%"},
+    {"State":"California","RepVotes":4839958.00,"TotalVotes":13038547.00,"Percentage":"37.12%"},
+    {"State":"Colorado","RepVotes":1185243.00,"TotalVotes":2569528.00,"Percentage":"46.13%"},
+    {"State":"Connecticut","RepVotes":634892.00,"TotalVotes":1558960.00,"Percentage":"40.73%"},
+    {"State":"Delaware","RepVotes":165484.00,"TotalVotes":413921.00,"Percentage":"39.98%"},
+    {"State":"District of Columbia","RepVotes":21381.00,"TotalVotes":293764.00,"Percentage":"7.28%"},
+    {"State":"Florida","RepVotes":4163447.00,"TotalVotes":8474179.00,"Percentage":"49.13%"},
+    {"State":"Georgia","RepVotes":2078688.00,"TotalVotes":3900050.00,"Percentage":"53.30%"},
+    {"State":"Hawaii","RepVotes":121015.00,"TotalVotes":434697.00,"Percentage":"27.84%"},
+    {"State":"Idaho","RepVotes":420911.00,"TotalVotes":652346.00,"Percentage":"64.52%"},
+    {"State":"Illinois","RepVotes":2135216.00,"TotalVotes":5242014.00,"Percentage":"40.73%"},
+    {"State":"Indiana","RepVotes":1420543.00,"TotalVotes":2624534.00,"Percentage":"54.13%"},
+    {"State":"Iowa","RepVotes":730617.00,"TotalVotes":1582180.00,"Percentage":"46.18%"},
+    {"State":"Kansas","RepVotes":692634.00,"TotalVotes":1159971.00,"Percentage":"59.71%"},
+    {"State":"Maine","RepVotes":292276.00,"TotalVotes":713180.00,"Percentage":"40.98%"},
+    {"State":"Maryland","RepVotes":971869.00,"TotalVotes":2707327.00,"Percentage":"35.90%"},
+    {"State":"Massachusetts","RepVotes":1188314.00,"TotalVotes":3167767.00,"Percentage":"37.51%"},
+    {"State":"Mississippi","RepVotes":710746.00,"TotalVotes":1285584.00,"Percentage":"55.29%"},
+    {"State":"Kentucky","RepVotes":1087190.00,"TotalVotes":1797212.00,"Percentage":"60.49%"},
+    {"State":"Louisiana","RepVotes":1152262.00,"TotalVotes":1994065.00,"Percentage":"57.78%"},
+    {"State":"Michigan","RepVotes":2115256.00,"TotalVotes":4730961.00,"Percentage":"44.71%"},
+    {"State":"Minnesota","RepVotes":1320225.00,"TotalVotes":2936561.00,"Percentage":"44.96%"},
+    {"State":"Missouri","RepVotes":1482440.00,"TotalVotes":2757323.00,"Percentage":"53.76%"},
+    {"State":"Montana","RepVotes":267928.00,"TotalVotes":484048.00,"Percentage":"55.35%"},
+    {"State":"Nebraska","RepVotes":475064.00,"TotalVotes":794379.00,"Percentage":"59.80%"},
+    {"State":"Nevada","RepVotes":463567.00,"TotalVotes":1014918.00,"Percentage":"45.68%"},
+    {"State":"New Hampshire","RepVotes":329918.00,"TotalVotes":710972.00,"Percentage":"46.40%"},
+    {"State":"New Jersey","RepVotes":1477568.00,"TotalVotes":3640292.00,"Percentage":"40.59%"},
+    {"State":"New Mexico","RepVotes":335788.00,"TotalVotes":783758.00,"Percentage":"42.84%"},
+    {"State":"New York","RepVotes":2490431.00,"TotalVotes":7081434.00,"Percentage":"35.17%"},
+    {"State":"North Carolina","RepVotes":2270395.00,"TotalVotes":4505372.00,"Percentage":"50.39%"},
+    {"State":"North Dakota","RepVotes":188163.00,"TotalVotes":322645.00,"Percentage":"58.32%"},
+    {"State":"Ohio","RepVotes":2661407.00,"TotalVotes":5580822.00,"Percentage":"47.69%"},
+    {"State":"Oklahoma","RepVotes":891325.00,"TotalVotes":1334872.00,"Percentage":"66.77%"},
+    {"State":"Oregon","RepVotes":754175.00,"TotalVotes":1789270.00,"Percentage":"42.15%"},
+    {"State":"Pennsylvania","RepVotes":2680434.00,"TotalVotes":5753670.00,"Percentage":"46.59%"},
+    {"State":"Rhode Island","RepVotes":157204.00,"TotalVotes":446049.00,"Percentage":"35.24%"},
+    {"State":"South Carolina","RepVotes":1071645.00,"TotalVotes":1964118.00,"Percentage":"54.56%"},
+    {"State":"South Dakota","RepVotes":210610.00,"TotalVotes":363815.00,"Percentage":"57.89%"},
+    {"State":"Tennessee","RepVotes":1462330.00,"TotalVotes":2458577.00,"Percentage":"59.48%"},
+    {"State":"Texas","RepVotes":4569843.00,"TotalVotes":7993851.00,"Percentage":"57.17%"},
+    {"State":"Utah","RepVotes":740600.00,"TotalVotes":1017440.00,"Percentage":"72.79%"},
+    {"State":"Vermont","RepVotes":92698.00,"TotalVotes":299290.00,"Percentage":"30.97%"},
+    {"State":"Virginia","RepVotes":1822522.00,"TotalVotes":3854489.00,"Percentage":"47.28%"},
+    {"State":"Washington","RepVotes":1290670.00,"TotalVotes":3125516.00,"Percentage":"41.29%"},
+    {"State":"West Virginia","RepVotes":417655.00,"TotalVotes":670438.00,"Percentage":"62.30%"},
+    {"State":"Wisconsin","RepVotes":1407966.00,"TotalVotes":3068488.00,"Percentage":"45.88%"},
+    {"State":"Wyoming","RepVotes":170962.00,"TotalVotes":249061.00,"Percentage":"68.64%"}
+  ];
+
+  var MAX_PERCENT = 72.8; //Set the maximum value for bars
+
+  var options = {
+    sorted: false
+  };
+
+  function updateTable() {
+    var data = voting.slice();
+    if (options.sorted) {
+      if (options.sorted === 'asc') {
+        data.sort(function (a, b) { return a.RepVotes - b.RepVotes; });
+      } else if (option.sorted === 'desc') {
+        data.sort(function (a, b) { return b.RepVotes - a.RepVotes; });
+      }
+    }
+    var table = document.getElementById('data-table');
+    var tbody = table.getElementsByTagName('tbody')[0];
+    
+    tbody.innerHTML = '';
+
+    data.forEach(function (d) {
+      var row = document.createElement('tr');
+      
+      var vote = document.createElement('td');
+      vote.innerHTML = d.State; // possible fault
+      row.appendChild(vote);
+
+      var region = document.createElement('td');
+      region.innerHTML = d.Region;
+      row.appendChild(region);
+
+      var repVotes = document.createElement('td');
+      repVotes.innerHTML = d.RepVotes;
+      row.appendChild(repVotes);
+
+      var totalVotes = document.createElement('td');
+      totalVotes.innerHTML = d.TotalVotes;
+      row.appendChild(totalVotes);
+
+      var barWrapper = document.createElement('td');
+      var bar = document.createElement('div');
+      bar.setAttribute('class', 'bar');
+      
+      var repPercentage = d.RepVotes / d.TotalVotes;
+      bar.setAttribute('style', 'width: ' + (repPercentage * 100) + '%;');
+      barWrapper.appendChild(bar);
+      row.appendChild(barWrapper);
+
+      tbody.appendChild(row);
+
+      });
+  }
+
+  updateTable();
+
+  document.getElementById('sort-asc').addEventListener('click', function() {
+    if (options.sorted === 'asc') {
+      options.sorted = false;
+    } else {
+      options.sorted = 'asc';
+    }
+    updateTable();
+  });
+
+  document.getElementById('sort-desc').addEventListener('click', function () {
+    if (options.sorted === 'desc') {
+      options.sorted = false;
+    } else {
+      options.sorted = 'desc';
+    }
+    updateTable();
+  });
+
+  </script>
+
 </body>
 </html>
