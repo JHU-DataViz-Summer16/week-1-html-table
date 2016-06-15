@@ -17,7 +17,7 @@
 <div class="header section">
   <div class="container">
     <h1>Week 2: Javascript and the DOM</h1>
-    <p>This table shows employees on nonfarm payrolls by state, in thousands, for March 2016.</p>
+    <p>This table shows the total number of employees on nonfarm payrolls by state, in thousands, for March 2016.</p>
   </div>
 </div>
 <div class="controls section">
@@ -42,7 +42,7 @@
       <thead>
         <tr>
           <th>State</th>
-          <th>Employee s (thousands)</th>
+          <th>Employees (thousands)</th>
           <th>Region</th>
           <th>Chart</th>
         </tr>
@@ -157,13 +157,13 @@
 
       if (options.filtered) {
       	if (options.filtered === 'northeast') {
-      		data = data.filter(function (d) {	return a.region === "Northeast" })
+      		data = data.filter(function (d) {	return d.region = "Northeast" })
         } else if (options.filtered === 'south') {
-          data = data.filter(function (d) {return a.region === "South"})
+          data = data.filter(function (d) { return d.region = "South"})
         } else if (options.filtered === 'midwest') {
-          data = data.filter(function (d) {return a.region === "Midwest"})
+          data = data.filter(function (d) { return d.region = "Midwest"})
         } else if (options.filtered === 'west') {
-          data = data.filter(function (d) {return a.region === "West"})
+          data = data.filter(function (d) { return d.region = "West"})
       	}
       }
 
