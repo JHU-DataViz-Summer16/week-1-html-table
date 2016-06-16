@@ -175,6 +175,30 @@
       }
         }
     // Filter victims by region
+    // Filter: Step1 : Preparing data
+  
+    var data = conflict[0];
+    //putting region in a separate array 
+    // Filter: Step2: Creating the function
+    data = conflict.filter(function (a) { return d.Region > 0; });
+    // Filter: Step3: Creating the filters - How the function is going to work 
+   if (options.filtered === 'Region 1') {
+        data = conflict.filter(function (d) { return d.Region === "1" })
+        } else if (options.filtered === 'Region 2') {
+      data = conflict.filter(function (d) { 
+        return d.Region === "2"})
+    } else if (options.filtered === 'Region 3') {
+      data = conflict.filter(function (d) { 
+        return d.Region === "3"})
+    } else if (options.filtered === 'Region 4') {
+      data = conflict.filter(function (d) { 
+        return d.Region === "4"})
+    } else if (options.filtered === 'Region 5') {
+      data = conflict.filter(function (d) { 
+        return d.Region === "5"}
+  }
+  
+
     // Select only the Departments from the current page (slice)
     var table = document.getElementById('data-table');
     var tbody = table.getElementsByTagName('tbody')[0];
@@ -243,6 +267,26 @@
     updateTable();
   });
   // This is where we'll need to create new event listeners for our filter and next/previous page buttons.
+        document.getElementById('filter-r1').addEventListener('click', function () {
+      if (options.filtered === 'Region 1') {
+        data = conflict.filter(function (d) { return d.Region === "1" })
+    document.getElementById('filter-r2').addEventListener('click', function () {
+    } else if (options.filtered === 'Region 2') {
+      data = conflict.filter(function (d) { 
+        return d.Region === "2"})
+    } else if (options.filtered === 'Region 3') {
+      data = conflict.filter(function (d) { 
+        return d.Region === "3"})
+    } else if (options.filtered === 'Region 4') {
+      data = conflict.filter(function (d) { 
+        return d.Region === "4"})
+    } else if (options.filtered === 'Region 5') {
+      data = conflict.filter(function (d) { 
+        return d.Region === "5"}
+
+  }
+
+
   // They'll look very similar to the above, just listening to different elements, and perhaps performing
   // different actions when clicked.
 </script>
