@@ -14,7 +14,7 @@
       padding: 2em;
     }
     #data-table td {
-      width: 25%;
+      width: 12.5%;
     }
     .bar {
       height: 20px;
@@ -34,9 +34,16 @@
   <div class="controls sections">
     <div class="container">
       <div class="btn-toolbar">
-        <div class="btn-group">
-          <button type="button" class="btn btn-default" id="sort-asc">Ascending</button>
-          <button type="button" class="btn btn-default" id="sort-desc">Descending</button>
+          <div class="btn-group">
+            <button type="button" class="btn btn-default" id="sort-asc">Ascending</button>
+            <button type="button" class="btn btn-default" id="sort-desc">Descending</button>
+          </div>
+          <div class="btn-group">
+            <button type="button" class="btn btn-default" id="filter-w">West</button>
+            <button type="button" class="btn btn-default" id="filter-mw">Midwest</button>
+            <button type="button" class="btn btn-default" id="filter-s">South</button>
+            <button type="button" class="btn btn-default" id="filter-ne">Northeast</button>
+          </div>
         </div>
       </div>
     </div>
@@ -50,6 +57,7 @@
             <th>Region</th>
             <th>Total Votes</th>
             <th>Republican Votes</th>
+            <th>Percentage</th>
             <th>Chart</th>
           </tr>
         </thead>
@@ -63,74 +71,113 @@
 
   <script>
   var voting = [
-    {"State":"Alabama","RepVotes":1255925.00,"TotalVotes":2074338.00,"Percentage":"60.55%"},
-    {"State":"Alaska","RepVotes":164676.00,"TotalVotes":300495.00,"Percentage":"54.80%"},
-    {"State":"Arizona","RepVotes":1233654.00,"TotalVotes":2299254.00,"Percentage":"53.65%"},
-    {"State":"Arkansas","RepVotes":647744.00,"TotalVotes":1069468.00,"Percentage":"60.57%"},
-    {"State":"California","RepVotes":4839958.00,"TotalVotes":13038547.00,"Percentage":"37.12%"},
-    {"State":"Colorado","RepVotes":1185243.00,"TotalVotes":2569528.00,"Percentage":"46.13%"},
-    {"State":"Connecticut","RepVotes":634892.00,"TotalVotes":1558960.00,"Percentage":"40.73%"},
-    {"State":"Delaware","RepVotes":165484.00,"TotalVotes":413921.00,"Percentage":"39.98%"},
-    {"State":"District of Columbia","RepVotes":21381.00,"TotalVotes":293764.00,"Percentage":"7.28%"},
-    {"State":"Florida","RepVotes":4163447.00,"TotalVotes":8474179.00,"Percentage":"49.13%"},
-    {"State":"Georgia","RepVotes":2078688.00,"TotalVotes":3900050.00,"Percentage":"53.30%"},
-    {"State":"Hawaii","RepVotes":121015.00,"TotalVotes":434697.00,"Percentage":"27.84%"},
-    {"State":"Idaho","RepVotes":420911.00,"TotalVotes":652346.00,"Percentage":"64.52%"},
-    {"State":"Illinois","RepVotes":2135216.00,"TotalVotes":5242014.00,"Percentage":"40.73%"},
-    {"State":"Indiana","RepVotes":1420543.00,"TotalVotes":2624534.00,"Percentage":"54.13%"},
-    {"State":"Iowa","RepVotes":730617.00,"TotalVotes":1582180.00,"Percentage":"46.18%"},
-    {"State":"Kansas","RepVotes":692634.00,"TotalVotes":1159971.00,"Percentage":"59.71%"},
-    {"State":"Maine","RepVotes":292276.00,"TotalVotes":713180.00,"Percentage":"40.98%"},
-    {"State":"Maryland","RepVotes":971869.00,"TotalVotes":2707327.00,"Percentage":"35.90%"},
-    {"State":"Massachusetts","RepVotes":1188314.00,"TotalVotes":3167767.00,"Percentage":"37.51%"},
-    {"State":"Mississippi","RepVotes":710746.00,"TotalVotes":1285584.00,"Percentage":"55.29%"},
-    {"State":"Kentucky","RepVotes":1087190.00,"TotalVotes":1797212.00,"Percentage":"60.49%"},
-    {"State":"Louisiana","RepVotes":1152262.00,"TotalVotes":1994065.00,"Percentage":"57.78%"},
-    {"State":"Michigan","RepVotes":2115256.00,"TotalVotes":4730961.00,"Percentage":"44.71%"},
-    {"State":"Minnesota","RepVotes":1320225.00,"TotalVotes":2936561.00,"Percentage":"44.96%"},
-    {"State":"Missouri","RepVotes":1482440.00,"TotalVotes":2757323.00,"Percentage":"53.76%"},
-    {"State":"Montana","RepVotes":267928.00,"TotalVotes":484048.00,"Percentage":"55.35%"},
-    {"State":"Nebraska","RepVotes":475064.00,"TotalVotes":794379.00,"Percentage":"59.80%"},
-    {"State":"Nevada","RepVotes":463567.00,"TotalVotes":1014918.00,"Percentage":"45.68%"},
-    {"State":"New Hampshire","RepVotes":329918.00,"TotalVotes":710972.00,"Percentage":"46.40%"},
-    {"State":"New Jersey","RepVotes":1477568.00,"TotalVotes":3640292.00,"Percentage":"40.59%"},
-    {"State":"New Mexico","RepVotes":335788.00,"TotalVotes":783758.00,"Percentage":"42.84%"},
-    {"State":"New York","RepVotes":2490431.00,"TotalVotes":7081434.00,"Percentage":"35.17%"},
-    {"State":"North Carolina","RepVotes":2270395.00,"TotalVotes":4505372.00,"Percentage":"50.39%"},
-    {"State":"North Dakota","RepVotes":188163.00,"TotalVotes":322645.00,"Percentage":"58.32%"},
-    {"State":"Ohio","RepVotes":2661407.00,"TotalVotes":5580822.00,"Percentage":"47.69%"},
-    {"State":"Oklahoma","RepVotes":891325.00,"TotalVotes":1334872.00,"Percentage":"66.77%"},
-    {"State":"Oregon","RepVotes":754175.00,"TotalVotes":1789270.00,"Percentage":"42.15%"},
-    {"State":"Pennsylvania","RepVotes":2680434.00,"TotalVotes":5753670.00,"Percentage":"46.59%"},
-    {"State":"Rhode Island","RepVotes":157204.00,"TotalVotes":446049.00,"Percentage":"35.24%"},
-    {"State":"South Carolina","RepVotes":1071645.00,"TotalVotes":1964118.00,"Percentage":"54.56%"},
-    {"State":"South Dakota","RepVotes":210610.00,"TotalVotes":363815.00,"Percentage":"57.89%"},
-    {"State":"Tennessee","RepVotes":1462330.00,"TotalVotes":2458577.00,"Percentage":"59.48%"},
-    {"State":"Texas","RepVotes":4569843.00,"TotalVotes":7993851.00,"Percentage":"57.17%"},
-    {"State":"Utah","RepVotes":740600.00,"TotalVotes":1017440.00,"Percentage":"72.79%"},
-    {"State":"Vermont","RepVotes":92698.00,"TotalVotes":299290.00,"Percentage":"30.97%"},
-    {"State":"Virginia","RepVotes":1822522.00,"TotalVotes":3854489.00,"Percentage":"47.28%"},
-    {"State":"Washington","RepVotes":1290670.00,"TotalVotes":3125516.00,"Percentage":"41.29%"},
-    {"State":"West Virginia","RepVotes":417655.00,"TotalVotes":670438.00,"Percentage":"62.30%"},
-    {"State":"Wisconsin","RepVotes":1407966.00,"TotalVotes":3068488.00,"Percentage":"45.88%"},
-    {"State":"Wyoming","RepVotes":170962.00,"TotalVotes":249061.00,"Percentage":"68.64%"}
+    {"State":"Alabama","Region":"South","RepVotes":1255925.00,"TotalVotes":2074338.00,"perc":0.605458223,"Percentage":"60.54%"},
+    {"State":"Alaska","Region":"West","RepVotes":164676.00,"TotalVotes":300495.00,"perc":0.548015774,"Percentage":"54.80%"},
+    {"State":"Arizona","Region":"West","RepVotes":1233654.00,"TotalVotes":2299254.00,"perc":0.536545332,"Percentage":"53.65%"},
+    {"State":"Arkansas","Region":"South","RepVotes":647744.00,"TotalVotes":1069468.00,"perc":0.605669361,"Percentage":"60.56%"},
+    {"State":"California","Region":"West","RepVotes":4839958.00,"TotalVotes":13038547.00,"perc":0.371203785,"Percentage":"37.12%"},
+    {"State":"Colorado","Region":"West","RepVotes":1185243.00,"TotalVotes":2569528.00,"perc":0.461268762,"Percentage":"46.12%"},
+    {"State":"Connecticut","Region":"Northeast","RepVotes":634892.00,"TotalVotes":1558960.00,"perc":0.407253554,"Percentage":"40.72%"},
+    {"State":"Delaware","Region":"South","RepVotes":165484.00,"TotalVotes":413921.00,"perc":0.399796096,"Percentage":"39.97%"},
+    {"State":"District of Columbia","Region":"South","RepVotes":21381.00,"TotalVotes":293764.00,"perc":0.072782914,"Percentage":"7.278%"},
+    {"State":"Florida","Region":"South","RepVotes":4163447.00,"TotalVotes":8474179.00,"perc":0.491309778,"Percentage":"49.13%"},
+    {"State":"Georgia","Region":"South","RepVotes":2078688.00,"TotalVotes":3900050.00,"perc":0.53299009,"Percentage":"53.29%"},
+    {"State":"Hawaii","Region":"West","RepVotes":121015.00,"TotalVotes":434697.00,"perc":0.278389315,"Percentage":"27.83%"},
+    {"State":"Idaho","Region":"West","RepVotes":420911.00,"TotalVotes":652346.00,"perc":0.645226613,"Percentage":"64.52%"},
+    {"State":"Illinois","Region":"Midwest","RepVotes":2135216.00,"TotalVotes":5242014.00,"perc":0.407327413,"Percentage":"40.73%"},
+    {"State":"Indiana","Region":"Midwest","RepVotes":1420543.00,"TotalVotes":2624534.00,"perc":0.541255324,"Percentage":"54.12%"},
+    {"State":"Iowa","Region":"Midwest","RepVotes":730617.00,"TotalVotes":1582180.00,"perc":0.461778685,"Percentage":"46.17%"},
+    {"State":"Kansas","Region":"Midwest","RepVotes":692634.00,"TotalVotes":1159971.00,"perc":0.597113204,"Percentage":"59.71%"},
+    {"State":"Kentucky","Region":"South","RepVotes":1087190.00,"TotalVotes":1797212.00,"perc":0.604931416,"Percentage":"60.49%"},
+    {"State":"Louisiana","Region":"South","RepVotes":1152262.00,"TotalVotes":1994065.00,"perc":0.577845757,"Percentage":"57.78%"},
+    {"State":"Maine","Region":"Northeast","RepVotes":292276.00,"TotalVotes":713180.00,"perc":0.409820803,"Percentage":"40.98%"},
+    {"State":"Maryland","Region":"South","RepVotes":971869.00,"TotalVotes":2707327.00,"perc":0.358977323,"Percentage":"35.89%"},
+    {"State":"Massachusetts","Region":"Northeast","RepVotes":1188314.00,"TotalVotes":3167767.00,"perc":0.375126706,"Percentage":"37.51%"},
+    {"State":"Michigan","Region":"Midwest","RepVotes":2115256.00,"TotalVotes":4730961.00,"perc":0.44710916,"Percentage":"44.71%"},
+    {"State":"Minnesota","Region":"Midwest","RepVotes":1320225.00,"TotalVotes":2936561.00,"perc":0.449582011,"Percentage":"44.95%"},
+    {"State":"Mississippi","Region":"South","RepVotes":710746.00,"TotalVotes":1285584.00,"perc":0.552858467,"Percentage":"55.28%"},
+    {"State":"Missouri","Region":"Midwest","RepVotes":1482440.00,"TotalVotes":2757323.00,"perc":0.537637411,"Percentage":"53.76%"},
+    {"State":"Montana","Region":"West","RepVotes":267928.00,"TotalVotes":484048.00,"perc":0.553515354,"Percentage":"55.35%"},
+    {"State":"Nebraska","Region":"Midwest","RepVotes":475064.00,"TotalVotes":794379.00,"perc":0.598031922,"Percentage":"59.80%"},
+    {"State":"Nevada","Region":"West","RepVotes":463567.00,"TotalVotes":1014918.00,"perc":0.456753156,"Percentage":"45.67%"},
+    {"State":"New Hampshire","Region":"Northeast","RepVotes":329918.00,"TotalVotes":710972.00,"perc":0.464037965,"Percentage":"46.40%"},
+    {"State":"New Jersey","Region":"Northeast","RepVotes":1477568.00,"TotalVotes":3640292.00,"perc":0.405892714,"Percentage":"40.58%"},
+    {"State":"New Mexico","Region":"West","RepVotes":335788.00,"TotalVotes":783758.00,"perc":0.428433266,"Percentage":"42.84%"},
+    {"State":"New York","Region":"Northeast","RepVotes":2490431.00,"TotalVotes":7081434.00,"perc":0.35168456,"Percentage":"35.16%"},
+    {"State":"North Carolina","Region":"South","RepVotes":2270395.00,"TotalVotes":4505372.00,"perc":0.503930641,"Percentage":"50.39%"},
+    {"State":"North Dakota","Region":"Midwest","RepVotes":188163.00,"TotalVotes":322645.00,"perc":0.583188954,"Percentage":"58.31%"},
+    {"State":"Ohio","Region":"Midwest","RepVotes":2661407.00,"TotalVotes":5580822.00,"perc":0.476884409,"Percentage":"47.68%"},
+    {"State":"Oklahoma","Region":"South","RepVotes":891325.00,"TotalVotes":1334872.00,"perc":0.667723197,"Percentage":"66.77%"},
+    {"State":"Oregon","Region":"West","RepVotes":754175.00,"TotalVotes":1789270.00,"perc":0.421498712,"Percentage":"42.14%"},
+    {"State":"Pennsylvania","Region":"Northeast","RepVotes":2680434.00,"TotalVotes":5753670.00,"perc":0.465865091,"Percentage":"46.58%"},
+    {"State":"Rhode Island","Region":"Northeast","RepVotes":157204.00,"TotalVotes":446049.00,"perc":0.352436616,"Percentage":"35.24%"},
+    {"State":"South Carolina","Region":"South","RepVotes":1071645.00,"TotalVotes":1964118.00,"perc":0.545611313,"Percentage":"54.56%"},
+    {"State":"South Dakota","Region":"Midwest","RepVotes":210610.00,"TotalVotes":363815.00,"perc":0.578893119,"Percentage":"57.88%"},
+    {"State":"Tennessee","Region":"South","RepVotes":1462330.00,"TotalVotes":2458577.00,"perc":0.594787147,"Percentage":"59.47%"},
+    {"State":"Texas","Region":"South","RepVotes":4569843.00,"TotalVotes":7993851.00,"perc":0.571669775,"Percentage":"57.16%"},
+    {"State":"Utah","Region":"West","RepVotes":740600.00,"TotalVotes":1017440.00,"perc":0.727905331,"Percentage":"72.79%"},
+    {"State":"Vermont","Region":"Northeast","RepVotes":92698.00,"TotalVotes":299290.00,"perc":0.309726352,"Percentage":"30.97%"},
+    {"State":"Virginia","Region":"South","RepVotes":1822522.00,"TotalVotes":3854489.00,"perc":0.472831029,"Percentage":"47.28%"},
+    {"State":"Washington","Region":"West","RepVotes":1290670.00,"TotalVotes":3125516.00,"perc":0.412946214,"Percentage":"41.29%"},
+    {"State":"West Virginia","Region":"South","RepVotes":417655.00,"TotalVotes":670438.00,"perc":0.622958424,"Percentage":"62.29%"},
+    {"State":"Wisconsin","Region":"Midwest","RepVotes":1407966.00,"TotalVotes":3068488.00,"perc":0.458846833,"Percentage":"45.88%"},
+    {"State":"Wyoming","Region":"West","RepVotes":170962.00,"TotalVotes":249061.00,"perc":0.686426217,"Percentage":"68.64%"}
   ];
 
-  var MAX_PERCENT = 72.8; //Set the maximum value for bars
+  var MAX_PERCENT = 0.728; //Set the maximum value for bars
 
   var options = {
-    sorted: false
+    sorted: false,
+    filtered: false
   };
 
   function updateTable() {
     var data = voting.slice();
     if (options.sorted) {
       if (options.sorted === 'asc') {
-        data.sort(function (a, b) { return a.RepVotes - b.RepVotes; });
+        data.sort(function (a, b) { return a.perc - b.perc; });
       } else if (option.sorted === 'desc') {
-        data.sort(function (a, b) { return b.RepVotes - a.RepVotes; });
+        data.sort(function (a, b) { return b.perc - a.perc; });
       }
     }
+
+  // Filter by region of the country (west)
+      if(options.filtered) {    
+        if (options.filtered === 'region-w') {
+           data = data.filter(function (c) {
+              return c.Region === "West"; });
+        } 
+    }
+
+  // Filter by region of the country (mw)
+      if(options.filtered) {    
+        if (options.filtered === 'region-mw') {
+           data = data.filter(function (c) {
+              return c.Region === "Midwest"; });
+        } 
+    }    
+  
+    // Filter by region of the country (s)
+      if(options.filtered) {    
+        if (options.filtered === 'region-s') {
+           data = data.filter(function (c) {
+              return c.Region === "South"; });
+        } 
+    }    
+
+    // Filter by region of the country (ne)
+      if(options.filtered) {    
+        if (options.filtered === 'region-ne') {
+           data = data.filter(function (c) {
+              return c.Region === "Northeast"; });
+        } 
+    }    
+
+    // Select only the schools from the current page (slice)
+
+
+
+
     var table = document.getElementById('data-table');
     var tbody = table.getElementsByTagName('tbody')[0];
     
@@ -140,7 +187,7 @@
       var row = document.createElement('tr');
       
       var vote = document.createElement('td');
-      vote.innerHTML = d.State; // possible fault
+      vote.innerHTML = d.State;
       row.appendChild(vote);
 
       var region = document.createElement('td');
@@ -155,12 +202,16 @@
       totalVotes.innerHTML = d.TotalVotes;
       row.appendChild(totalVotes);
 
+      var repPercentage = document.createElement('td');
+      repPercentage.innerHTML = d.Percentage;
+      row.appendChild(repPercentage);
+
       var barWrapper = document.createElement('td');
       var bar = document.createElement('div');
       bar.setAttribute('class', 'bar');
       
-      var repPercentage = d.RepVotes / d.TotalVotes;
-      bar.setAttribute('style', 'width: ' + (repPercentage * 100) + '%;');
+      var repPerc = d.perc / MAX_PERCENT;
+      bar.setAttribute('style', 'width: ' + (repPerc * 100) + '%;');
       barWrapper.appendChild(bar);
       row.appendChild(barWrapper);
 
@@ -189,7 +240,42 @@
     updateTable();
   });
 
-  </script>
+  document.getElementById('filter-w').addEventListener('click', function () {
+    if (options.filtered === 'region-w') {
+      options.filtered = false;
+    } else {
+      options.filtered = 'region-w';
+    }
+    updateTable();
+  });
 
+  document.getElementById('filter-mw').addEventListener('click', function () {
+    if (options.filtered === 'region-mw') {
+      options.filtered = false;
+    } else {
+      options.filtered = 'region-mw';
+    }
+    updateTable();
+  });
+
+  document.getElementById('filter-s').addEventListener('click', function () {
+    if (options.filtered === 'region-s') {
+      options.filtered = false;
+    } else {
+      options.filtered = 'region-s';
+    }
+    updateTable();
+  });
+
+  document.getElementById('filter-ne').addEventListener('click', function () {
+    if (options.filtered === 'region-ne') {
+      options.filtered = false;
+    } else {
+      options.filtered = 'region-ne';
+    }
+    updateTable();
+  });
+
+</script>
 </body>
 </html>
