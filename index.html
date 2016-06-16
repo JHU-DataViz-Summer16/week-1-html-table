@@ -3,47 +3,294 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Week 1: HTML Tables</title><!-- Latest compiled and minified CSS -->
+  
+  <!-- STEP 1: 
+  Tittle and general styling (bootstrap, -->
+  <!-- BOOTSTRAP - Bootstrap is a free front-end framework for faster and easier web development
+  Bootstrap includes HTML and CSS based design templates for typography, forms, buttons, tables, navigation, modals, image carousels and many other, as well as optional JavaScript plugins. Bootstrap also gives you the ability to easily create responsive designs-->
+ 
+  <!-- Padding: properties are used to generate space around content.The padding properties set the size of the white 
+    space between the element content and the element border. http://www.w3schools.com/css/css_padding.asp 
+    An "em" is equal to the height of a line of text. */ -->
+
+  <!--/* Padding: properties are used to generate space around content.The padding properties set the size of the white 
+    space between the element content and the element border. http://www.w3schools.com/css/css_padding.asp */
+    /* An "em" is equal to the height of a line of text. */
+
+  <!--/* linear-gradient always has to have at least two colors http://www.w3schools.com/css/css3_gradients.asp */ -->
+
+  <title>Week 2: Armed Conflict in Colombia by Departments</title><!-- Latest compiled and minified CSS -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
   <style>
+      .section { padding: 1em 0; }
+    /* An "em" is equal to the height of a line of text. */
     .header {
-      text-align: center;
+      background: linear-gradient(to bottom, #337ab7 0%, #135a97 100%);
+      color: white;
+      padding: 1em 0 2em;
+    }
+    #data-table td {
+      width: 25%;
+      /* The table has four columns, so this rule makes them of equal width. */
+    }
+    .bar {
+      height: 20px;
+      /* Note that we'll set the width dynamically using Javascript. */
+      background: #337ab7;
+    }
+ .auxparagraph {
+      text-align: right;                 
+      font-size: 10px;
+      font-style: oblique;
+      color: #333;
     }
   </style>
 </head>
+
+<!-- STEP 2: 
+  Body and the DOM  -->
+
 <body>
+<div class="header section">
   <div class="container">
-    <div class="header">
-      <h1>Week 1: HTML Tables</h1>
-      <p>We'll add our data to this table.</p>
+    <h1>Week 2: Armed Conflict in Colombia by Departments</h1>
+    <p>Colombia has been facing guerrilla-related conflicts for over six decades. The conflict, just in the last decade, has left more than  3 million victims.</p>
+  </div>
+</div>
+<div class="controls section">
+  <div class="container">
+    <div class="btn-toolbar">
+      <div class="btn-group">
+        <button type="button" class="btn btn-default" id="sort-asc">Ascending</button>
+        <button type="button" class="btn btn-default" id="sort-desc">Descending</button>
+      </div>
+      <div class="btn-group">
+        <button type="button" class="btn btn-default" id="filter-r1">Region 1</button>
+        <button type="button" class="btn btn-default" id="filter-r2">Region 2</button>
+        <button type="button" class="btn btn-default" id="filter-r3">Region 3</button>
+        <button type="button" class="btn btn-default" id="filter-r4">Region 4</button>
+        <button type="button" class="btn btn-default" id="filter-r5">Region 5</button>
+      </div>
     </div>
-    <table class="table">
+  </div>
+</div>
+<div class="main section">
+  <div class="container">
+    <table class="table" id="data-table">
       <thead>
         <tr>
-          <th>Fruit</th>
-          <th>Price</th>
-          <th>Quantity</th>
+          <th>Department</th>
+          <th>Region</th>
+          <th>Victims</th>
+          <th>Chart</th>
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td>Apples</td>
-          <td>$0.55</td>
-          <td>5</td>
-        </tr>
-        <tr>
-          <td>Oranges</td>
-          <td>$0.80</td>
-          <td>10</td>
-        </tr>
-        <tr>
-          <td>Pears</td>
-          <td>$0.95</td>
-          <td>3</td>
-        </tr>
       </tbody>
     </table>
+    <nav>
+      <ul class="pager">
+        <li class="previous"><a href="#" id="page-prev">Previous</a></li>
+        <li class="next"><a href="#" id="page-next">Next</a></li>
+      </ul>
+    </nav>
   </div>
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
+</div>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
+<script>
+  var conflict = [
+  {"Department":"Amazonas","Region":1,"Victims":2472},
+  {"Department":"Antioquia","Region":2,"Victims":1749491},
+  {"Department":"Arauca","Region":3,"Victims":96513},
+  {"Department":"Archipielago De San Andres, Providencia Y Santa Catalina","Region":4,"Victims":251},
+  {"Department":"Atlantico","Region":5,"Victims":216665},
+  {"Department":"Bogota, D.C.","Region":1,"Victims":592279},
+  {"Department":"Bolivar","Region":2,"Victims":465250},
+  {"Department":"Boyaca","Region":3,"Victims":38576},
+  {"Department":"Caldas","Region":4,"Victims":118833},
+  {"Department":"Caqueta","Region":5,"Victims":227055},
+  {"Department":"Casanare","Region":1,"Victims":67693},
+  {"Department":"Cauca","Region":2,"Victims":330533},
+  {"Department":"Cesar","Region":3,"Victims":384157},
+  {"Department":"Choco","Region":4,"Victims":255782},
+  {"Department":"Cordoba","Region":5,"Victims":328949},
+  {"Department":"Cundinamarca","Region":1,"Victims":166382},
+  {"Department":"Guainia","Region":2,"Victims":9545},
+  {"Department":"Guaviare","Region":3,"Victims":45683},
+  {"Department":"Huila","Region":4,"Victims":192869},
+  {"Department":"La Guajira","Region":5,"Victims":157370},
+  {"Department":"Magdalena","Region":1,"Victims":452400},
+  {"Department":"Meta","Region":2,"Victims":256106},
+  {"Department":"Nariño","Region":3,"Victims":408275},
+  {"Department":"Norte De Santander","Region":4,"Victims":251132},
+  {"Department":"Putumayo","Region":5,"Victims":160640},
+  {"Department":"Quindio","Region":1,"Victims":59835},
+  {"Department":"Risaralda","Region":2,"Victims":114474},
+  {"Department":"Santander","Region":3,"Victims":251436},
+  {"Department":"Sucre","Region":4,"Victims":335825},
+  {"Department":"Tolima","Region":5,"Victims":190575},
+  {"Department":"Valle Del Cauca","Region":1,"Victims":528749},
+  {"Department":"Vaupes","Region":2,"Victims":6648},
+  {"Department":"Vichada","Region":3,"Victims":7380}];
+     // The ALL_CAPS treatment here is signalling that this variable is a constant - it should never change.
+  var MAX_VICTIMS = 1749491;
+  // This is where we'll store the data representing user interaction; event handlers (the functions that
+  // are called when a user clicks a button) work by updating the properties of this object. An alternative
+  // approach, where each event handler directly updates the table, would quickly become messy. Imagine,
+  // for example, that I've filtered the table to just show elementary schools. Next, I sort the table to
+  // be in descending order. Finally, I unfilter the table to show all schools. If I'm not careful, the
+  // newly revealed schools will not be sorted, because the filter operation doesn't know how to sort.
+  // Instead, updateTable() will sort, filter, and paginate based on whatever the options object contains,
+  // always starting from a fresh copy of the data, and we can count on the result to be consistent
+  // given the same values in options.
+  var options = {
+    sorted: false,
+    filtered: false,
+    page: 0
+  };
+  function updateTable() {
+    // Make a copy of the data
+    var data = conflict.slice();
+    // Sort conflict by victims
+    // 
+    // descending: points.sort(function(a, b){return b-a});
+
+    if (options.sorted) {
+      if (options.sorted === 'asc') {
+        
+        data.sort(function (a, b) { return a.Victims - b.Victims; });
+        // This anonymous function is responsible for comparing two values a and b. If it returns a positive
+        // number, we're saying that a should come after b in the array. A negative number means that b
+        // should come after a. A zero means that the two are equal. This function is using the 'enrollment'
+        // property of each observation of data for this comparison. You'll need to change 'enrollment' to
+        // whatever property you want to sort your data on.
+        //
+        // Also, note that we're sorting the data in place, changing, or mutating, the 'data' variable. See
+        // the note in the README about how this compares to the filter() and slice() operations that we'll
+        // use for the next two data transforms.
+      } 
+      else if (options.sorted === 'desc') {
+        data.sort(function (a, b) { return  b.Victims- a.Victims; });
+        // Note that this is just the opposite of the above.
+      }
+        }
+    // Filter victims by region
+    // Filter: Step1 : Preparing data
+  
+    var data = conflict[0];
+    //putting region in a separate array 
+    // Filter: Step2: Creating the function
+    data = conflict.filter(function (a) { return d.Region > 0; });
+    // Filter: Step3: Creating the filters - How the function is going to work 
+   if (options.filtered === 'Region 1') {
+        data = conflict.filter(function (d) { return d.Region === "1" })
+        } else if (options.filtered === 'Region 2') {
+      data = conflict.filter(function (d) { 
+        return d.Region === "2"})
+    } else if (options.filtered === 'Region 3') {
+      data = conflict.filter(function (d) { 
+        return d.Region === "3"})
+    } else if (options.filtered === 'Region 4') {
+      data = conflict.filter(function (d) { 
+        return d.Region === "4"})
+    } else if (options.filtered === 'Region 5') {
+      data = conflict.filter(function (d) { 
+        return d.Region === "5"}
+  }
+  
+
+    // Select only the Departments from the current page (slice)
+    var table = document.getElementById('data-table');
+    var tbody = table.getElementsByTagName('tbody')[0];
+    // Because getElementsByTagName returns an array of DOM nodes (technically, it's an HTMLCollection),
+    // we need to select the first item in the array with the [0].
+    // Remove any existing rows
+    tbody.innerHTML = '';
+    // Add a new row for each datum (item in the 'data' array)
+    data.forEach(function (d) {
+      var row = document.createElement('tr');
+      // This is like create a new <tr></tr> in HTML, but it doesn't yet exist in the DOM, so we can't
+      // see it. At the bottom of this forEach() loop, we append it to an element that is in the DOM,
+      // at which point it appears. We'll follow this same pattern for each of the <td></td> elements
+      // we create below.
+      
+
+      var Department = document.createElement('td');
+      Department.innerHTML = d.Department;
+      row.appendChild(Department);
+      var Region = document.createElement('td');
+      Region.innerHTML = d.Region;
+      row.appendChild(Region);
+      var Victims = document.createElement('td');
+      Victims.innerHTML = d.Victims;
+      row.appendChild(Victims);
+      var barWrapper = document.createElement('td');
+      var bar = document.createElement('div');
+      bar.setAttribute('class', 'bar');
+
+      // We set the class to 'bar' so we can use the .bar class we have in our styles. This gives it a
+      // consistent height and a color.
+      var VictimsPercentage = d.Victims / MAX_VICTIMS;
+      bar.setAttribute('style', 'width: ' + (VictimsPercentage * 100) + '%;');
+      // I've broken this operation up into two steps, which is a little different than we did in class.
+      // The end result is the same, though. If 'enrollmentPercentage' equals 0.75, this set the style
+      // attribute of our DIV so that it looks something like <div style="width: 75%;"></div>
+      barWrapper.appendChild(bar);
+      row.appendChild(barWrapper);
+      tbody.appendChild(row);
+    });
+  }
+  // The function declaration above just creates the function, it doesn't yet run it. That's what we
+  // do here, to make sure that the table is populated prior to the user clicking anything.
+ 
+  updateTable();
+  // This is creating an event listener, a function that the browser will call every time the specified
+  // event is "fired" by the selected element (here the button with the id 'sort-asc').
+  document.getElementById('sort-asc').addEventListener('click', function () {
+    // Disable the sort if 'asc' was previously selected, otherwise set the sort to 'asc'
+    if (options.sorted === 'asc') {
+      options.sorted = false;
+    } else {
+      options.sorted = 'asc';
+    }
+    // And now we need to re-run the function that populates the table. Note that the results will be
+    // different because we've change the options object.
+    updateTable();
+  });
+  document.getElementById('sort-desc').addEventListener('click', function () {
+    // Disable the sort if 'desc' was previously selected, otherwise set the sort to 'desc'
+    if (options.sorted === 'desc') {
+      options.sorted = false;
+    } else {
+      options.sorted = 'desc';
+    }
+    updateTable();
+  });
+  // This is where we'll need to create new event listeners for our filter and next/previous page buttons.
+        document.getElementById('filter-r1').addEventListener('click', function () {
+      if (options.filtered === 'Region 1') {
+        data = conflict.filter(function (d) { return d.Region === "1" })
+    document.getElementById('filter-r2').addEventListener('click', function () {
+    } else if (options.filtered === 'Region 2') {
+      data = conflict.filter(function (d) { 
+        return d.Region === "2"})
+    } else if (options.filtered === 'Region 3') {
+      data = conflict.filter(function (d) { 
+        return d.Region === "3"})
+    } else if (options.filtered === 'Region 4') {
+      data = conflict.filter(function (d) { 
+        return d.Region === "4"})
+    } else if (options.filtered === 'Region 5') {
+      data = conflict.filter(function (d) { 
+        return d.Region === "5"}
+
+  }
+
+
+  // They'll look very similar to the above, just listening to different elements, and perhaps performing
+  // different actions when clicked.
+</script>
+<div class="auxparagraph">
+             <p> Source: Special Unit of Victims - Colombian Presidency </p>
 </body>
 </html>
