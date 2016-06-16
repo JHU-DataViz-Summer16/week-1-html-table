@@ -118,18 +118,15 @@
       {"state":"Wisconsin","region":"Midwest","days":9.8,"reserves":"$416 "},
       {"state":"Wyoming","region":"West","days":197.5,"reserves":"$960 "}
     ];
-
     var MAX_DAYS = 447
-
     var options = {
       sorted: false,
       filtered: false,
       page: 0
     };
   
-
     function updateTable() {
-      var data = s.slice();
+      var data = states.slice();
       if (options.sorted) {
        if (options.sorted === 'asc') {
           data.sort(function (a, b) { return a.days - b.days; });
@@ -137,18 +134,15 @@
           data.sort(function (a, b) { return b.days - a.days; });
         }
       }
-
       var table = document.getElementById('data-table');
       var tbody = table.getElementsByTagName('tbody')[0];
       tbody.innerHTML = '';
   
       data.forEach(function (d) {
         var row = document.createElement('tr');
-
         var state = document.createElement('td');
         state.innerHTML = d.state;
         row.appendChild(state);
-
         var region = document.createElement('td');
         region.innerHTML = d.region;
         row.appendChild(region);
@@ -156,11 +150,9 @@
         var days = document.createElement('td');
         days.innerHTML = d.days;
         row.appendChild(days);
-
         var reserves = document.createElement('td');
         reserves.innerHTML = d.reserves;
         row.appendChild(reserves);
-
         var barWrapper = document.createElement('td');
         var bar = document.createElement('div');
         bar.setAttribute('class', 'bar');
@@ -174,7 +166,6 @@
     }
   
     updateTable();
-
     document.getElementById('sort-asc').addEventListener('click', function () {
       if (options.sorted === 'asc') {
         options.sorted = false;
