@@ -186,23 +186,45 @@
       updateTable();
     });
 
-    document.getElementById('filter-n').addEventListener('click', states = states.filter(function(region) { return region === ‘Northeast’ })
+      document.getElementById('filter-w').addEventListener('click', function () {
+      if (options.filtered === 'West') {
+        options.filtered = false;
+      } else {
+        options.filtered = 'West'
+      }
+  
+      updateTable();
+    });
+        
+    document.getElementById('filter-s').addEventListener('click', function () {
+      if (options.filtered === 'South') {
+        options.filtered = false;
+      } else {
+        options.filtered = 'South'
+      }
+        
+      updateTable();
+    });
 
-    updateTable();
-  });
+document.getElementById('filter-n').addEventListener('click', function () {
+      if (options.filtered === 'Northeast') {
+        options.filtered = false;
+      } else {
+        options.filtered = 'Northeast'
+      }
+        
+      updateTable();
+    });
 
-    document.getElementById('filter-s').addEventListener('click', states = states.filter(function(region) { return region === ‘South’ })
-
-    updateTable();
-  });
-
-    document.getElementById('filter-w').addEventListener('click', states = states.filter(function(region) { return region === ‘West’ })
-    updateTable();
-  });
-
-    document.getElementById('filter-mw').addEventListener('click', states = states.filter(function(region) { return region === ‘Midwest’ })
-    updateTable();
-  });
+document.getElementById('filter-mw').addEventListener('click', function () {
+      if (options.filtered === 'Midwest') {
+        options.filtered = false;
+      } else {
+        options.filtered = 'Midwest'
+      }
+        
+      updateTable();
+    });
 
   </script> 
 </body>
