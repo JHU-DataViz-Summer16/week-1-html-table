@@ -13,7 +13,7 @@
       padding: 1em 0 2em;
     }
     #data-table td {
-      width: 25%;
+      width: 20%;
     }
     .bar {
       height: 20px;
@@ -185,6 +185,25 @@
   
       updateTable();
     });
+
+    document.getElementById('filter-n').addEventListener('click', states = states.filter(function(region) { return region === ‘Northeast’ })
+
+    updateTable();
+  });
+
+    document.getElementById('filter-s').addEventListener('click', states = states.filter(function(region) { return region === ‘South’ })
+
+    updateTable();
+  });
+
+    document.getElementById('filter-w').addEventListener('click', states = states.filter(function(region) { return region === ‘West’ })
+    updateTable();
+  });
+
+    document.getElementById('filter-mw').addEventListener('click', states = states.filter(function(region) { return region === ‘Midwest’ })
+    updateTable();
+  });
+
   </script> 
 </body>
 </html>
