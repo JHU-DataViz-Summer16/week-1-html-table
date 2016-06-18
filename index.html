@@ -236,34 +236,14 @@ function updateTable() {
 
     // Filter Occupations to Major Group Types
     if (options.filtered) {
-        if (options.filtered === 'Mgt') {
-            data = data.filter(function (d) {return d.Group === 'Mgt'})
-        } else if (options.filtered === 'Sr') {
-            data = data.filter(function (d) {return d.Group === 'Sr'})
-        } else if (options.filtered === 'Drs') {
-            data = data.filter(function (d) {return d.Group === 'Drs'})
-        } else if (options.filtered === 'Admin') {
-            data = data.filter(function (d) {return d.Group === 'Admin'})
-        }
-    }
+        data = data.filter(function (d) { return d.Group === options.filtered; })
+    } 
 
-    // Select only the schools from the current page (slice)
+    // Select only the occupations from the current page (slice)
     if (options.page) {
-        if (options.page === 0) {
-            data = data.slice(0, 21)
-        } else if (options.page === 1) {
-            data = data.slice(21,41)
-        } else if (options.page === 2) {
-            data = data.slice(41, 61)
-        } else if (options.page === 3) {
-            data = data.slice(61,81)
-        } else if (options.page === 4) {
-            data = data.slice(81,101)
-        } else if (options.page === 5) {
-            data = data.slice(101, 121)
-        } else if (options.page === 6) {
-            data = data.slice(121, 141)
-        }
+      data = data.slice(options.page*20+1,options.page*20+21 )
+    } else {
+       data = data.slice(0,21)
     }
 
     var table = document.getElementById('data-table');
@@ -389,44 +369,27 @@ function updateTable() {
     updateTable();
   });
 
-  document.getElementById('page-next').addEventListener('click', function () {
-    // Disable the sort if 'desc' was previously selected, otherwise set the sort to 'desc'
-    if (options.page === 0) {
-      options.page = 1;
-    } else if (options.page === 1) {
-      options.page = 2;
-    } else if (options.page === 2) {
-      options.page = 3
-    } else if (options.page === 3) {
-      options.page = 4;
-    } else if (options.page === 4) {
-      options.page = 5;
-    } else if (options.page === 5) {
-      options.page = 6;
-    }
+
+ document.getElementById('page-next').addEventListener('click', function () {
+   if (options.page === 0) {
+    options.page = options.page + 1;
+   } else {
+    options.page = options.page + 1;
+   }
 
     updateTable();
   });
 
-  document.getElementById('page-prev').addEventListener('click', function () {
-    // Disable the sort if 'desc' was previously selected, otherwise set the sort to 'desc'
-    if (options.page === 6) {
-      options.page = 5;
-    } else if (options.page === 5) {
-      options.page = 4;
-    } else if (options.page === 4) {
-      options.page = 3;
-    } else if (options.page === 3) {
-      options.page = 2
-    } else if (options.page === 2) {
-      options.page = 1;
-    } else if (options.page === 1) {
-      options.page = 0;
-    }
+
+ document.getElementById('page-prev').addEventListener('click', function () {
+   if (options.page === 0) {
+    options.page = options.page - 1;
+   } else {
+    options.page = options.page - 1;
+   }
 
     updateTable();
   });
-
 
 
 
