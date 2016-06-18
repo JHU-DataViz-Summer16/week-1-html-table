@@ -11,26 +11,44 @@
       text-align: center;
       padding: 1em 0 2em;
     }
-     #data-table td {
-      width: 20%;
-      /* The table has five columns, so this rule makes them of equal width. */
+     #data-table td:nth-child(1) {
+      width: 35%;
+    }
+     #data-table td:nth-child(2) {
+      width: 15%;
+    }
+     #data-table td:nth-child(3) {
+      width: 15%;
+    }
+     #data-table td:nth-child(4) {
+      width: 15%;
+    }
+     #data-table td:nth-child(5) {
+      width: 25%;
     }
     .bar {
       height: 20px;
-      /* Note that we'll set the width dynamically using Javascript. */
+      /* Note that we'll set the width dynamically using Javascript */
       background: #216C2A;
+    }
+    .centered {
+      text-align: center;
     }
     th {
     background-color: #216C2A;
     color: white;
-	}
+	   }
     table {border-collapse:collapse;}
     table, th, td{
-            border-style:solid;
-            border-width:1px;
-            border-color:#000000; 
+            border-bottom: 1px solid #000000;
             padding: 10px;
          }
+    td:nth-child(3) {
+      text-align: center;
+    }
+    td:nth-child(4) {
+      text-align: center;
+    }
    </style>
 </head>
 <body>
@@ -63,8 +81,8 @@
         <tr>
           <th>Occupation</th>
           <th>Group Name</th>
-          <th>Men's Earnings</th>
-          <th>Women's Earnings</th>
+          <th class="centered">Men's Earnings</th>
+          <th class="centered">Women's Earnings</th>
           <th>Women's Earnings as Percentage of Men's</th>
         </tr>
       </thead>
@@ -281,7 +299,7 @@ function updateTable() {
       var barWrapper = document.createElement('td');
       var bar = document.createElement('div');
       bar.setAttribute('class', 'bar');
-      var FemPercent = d.WE / d.ME;
+      var FemPercent = d.WE / d.ME;  
       bar.setAttribute('style', 'width: ' + (FemPercent * 100) + '%;');
       barWrapper.appendChild(bar);
       row.appendChild(barWrapper);
