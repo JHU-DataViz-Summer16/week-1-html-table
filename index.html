@@ -134,6 +134,36 @@
           data.sort(function (a, b) { return b.days - a.days; });
         }
       }
+
+      if(options.filtered) {
+        if (options.filtered === 'filter-w'){
+            data = data.filter(function (c) {
+                return c.region === "West"; });
+
+            }
+        }
+    if(options.filtered) {
+        if (options.filtered === 'filter-n'){
+            data = data.filter(function (c) {
+                return c.region === "Northeast"; });
+
+            }
+        }
+    if(options.filtered) {
+        if (options.filtered === 'filter-s'){
+            data = data.filter(function (c) {
+                return c.region === "South"; });
+
+            }
+        }        
+    if(options.filtered) {
+        if (options.filtered === 'filter-mw'){
+            data = data.filter(function (c) {
+                return c.region === "Midwest"; });
+
+            }
+        }            
+
       var table = document.getElementById('data-table');
       var tbody = table.getElementsByTagName('tbody')[0];
       tbody.innerHTML = '';
@@ -187,40 +217,40 @@
     });
 
       document.getElementById('filter-w').addEventListener('click', function () {
-      if (options.filtered === 'West') {
+      if (options.filtered === 'filter-w') {
         options.filtered = false;
       } else {
-        options.filtered = 'West'
+        options.filtered = 'filter-w'
       }
   
       updateTable();
     });
         
     document.getElementById('filter-s').addEventListener('click', function () {
-      if (options.filtered === 'South') {
+      if (options.filtered === 'filter-s') {
         options.filtered = false;
       } else {
-        options.filtered = 'South'
+        options.filtered = 'filter-s'
       }
         
       updateTable();
     });
 
 document.getElementById('filter-n').addEventListener('click', function () {
-      if (options.filtered === 'Northeast') {
+      if (options.filtered === 'filter-n') {
         options.filtered = false;
       } else {
-        options.filtered = 'Northeast'
+        options.filtered = 'filter-n'
       }
         
       updateTable();
     });
 
 document.getElementById('filter-mw').addEventListener('click', function () {
-      if (options.filtered === 'Midwest') {
+      if (options.filtered === 'filter-mw') {
         options.filtered = false;
       } else {
-        options.filtered = 'Midwest'
+        options.filtered = 'filter-mw'
       }
         
       updateTable();
