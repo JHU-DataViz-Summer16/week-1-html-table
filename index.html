@@ -118,144 +118,55 @@
       {"state":"Wisconsin","region":"Midwest","days":9.8,"reserves":"$416 "},
       {"state":"Wyoming","region":"West","days":197.5,"reserves":"$960 "}
     ];
-    var MAX_DAYS = 447
-    var options = {
-      sorted: false,
-      filtered: false,
-      page: 0
-    };
-  
-    function updateTable() {
-      var data = states.slice();
-      if (options.sorted) {
-       if (options.sorted === 'asc') {
-          data.sort(function (a, b) { return a.days - b.days; });
-        } else if (options.sorted === 'desc') {
-          data.sort(function (a, b) { return b.days - a.days; });
-        }
-      }
-
-      if(options.filtered) {
-        if (options.filtered === 'filter-w'){
-            data = data.filter(function (c) {
-                return c.region === "West"; });
-
-            }
-        }
-    if(options.filtered) {
-        if (options.filtered === 'filter-n'){
-            data = data.filter(function (c) {
-                return c.region === "Northeast"; });
-
-            }
-        }
-    if(options.filtered) {
-        if (options.filtered === 'filter-s'){
-            data = data.filter(function (c) {
-                return c.region === "South"; });
-
-            }
-        }        
-    if(options.filtered) {
-        if (options.filtered === 'filter-mw'){
-            data = data.filter(function (c) {
-                return c.region === "Midwest"; });
-
-            }
-        }            
-
-      var table = document.getElementById('data-table');
-      var tbody = table.getElementsByTagName('tbody')[0];
-      tbody.innerHTML = '';
-  
-      data.forEach(function (d) {
-        var row = document.createElement('tr');
-        var state = document.createElement('td');
-        state.innerHTML = d.state;
-        row.appendChild(state);
-        var region = document.createElement('td');
-        region.innerHTML = d.region;
-        row.appendChild(region);
-  
-        var days = document.createElement('td');
-        days.innerHTML = d.days;
-        row.appendChild(days);
-        var reserves = document.createElement('td');
-        reserves.innerHTML = d.reserves;
-        row.appendChild(reserves);
-        var barWrapper = document.createElement('td');
-        var bar = document.createElement('div');
-        bar.setAttribute('class', 'bar');
-        bar.setAttribute('style', 'width: ' + (d.days / MAX_DAYS * 100) + '%;');
-        barWrapper.appendChild(bar);
-        row.appendChild(barWrapper);
-  
     
-        tbody.appendChild(row);
-      });
-    }
+var options = {
+    sorted: false,
+    filtered: false,
+  };
+  var MAX_DAYS = 447;
+  // Select the first table body element within the DOM and save that selection as a new variable, tbody.
+  var tbody = d3.select("tbody");
+  function updateTable(){
+    // Erase any existing html code within tbody by replacing it with a blank string "".
+    tbody.html("");
+    // Binding data - this will be a very common task in our use of D3. Start by making a selectAll of <tr> elements that do not yet exist (they will soon!).
+    // Then we bind our data (schools) with .data and .enter()
+    // Lastly, we append the <tr> elements, which are become our current selection because of the prior selectAll("tr")
+    var rows = tbody.selectAll("tr")
+      .data(states)
+      .enter()
+      .append("tr");
+    // If you run, console.log(rows), you should now see an array of <tr> elements printed out to the console, each of which should contain a __data__ property containing one object from our JSON array.
+    // console.log(rows);
+    // Take the rows variable and append a <td> elements containing d.name - the name of each schools for each bound data element.
+    rows.append("td")
+      .html(function(d) { return d.state });
+    // Same as above, except for level of the school.
+    rows.append("td")
+      .html(function(d) { return d.region });
+    // Same as above, except for the number of students enrolled in the school.
+    rows.append("td")
+      .html(function(d) { return d.days + ' Days' });
+    // Same as above, calculating a percent of the space allowed that the div should fill:
+    rows.append("td")
+      .append("div")
+      .classed("bar", true)
+      .style("width", function(d) { return ((d.days / MAX_DAYS) * 100) + '%' })
+  };
+  updateTable();
+  // We can use d3.on to trigger events - note that these just change the class of the buttons when clicked, they do not trigger any other events. Still, you should be able to click on the buttons and see them change (become darker as through depressed).
   
-    updateTable();
-    document.getElementById('sort-asc').addEventListener('click', function () {
-      if (options.sorted === 'asc') {
-        options.sorted = false;
-      } else {
-        options.sorted = 'asc';
-      }
-  
-      updateTable();
+  d3.select("#sort-asc")
+    .on("click", function(){
+      d3.select('#sort-desc').classed('active', false);
+      d3.select('#sort-asc').classed('active', true);
     });
-  
-    document.getElementById('sort-desc').addEventListener('click', function () {
-      if (options.sorted === 'desc') {
-        options.sorted = false;
-      } else {
-        options.sorted = 'desc';
-      }
-  
-      updateTable();
+  d3.select("#sort-desc")
+    .on("click", function(){
+      d3.select('#sort-asc').classed('active', false);
+      d3.select('#sort-desc').classed('active', true);
     });
-
-      document.getElementById('filter-w').addEventListener('click', function () {
-      if (options.filtered === 'filter-w') {
-        options.filtered = false;
-      } else {
-        options.filtered = 'filter-w'
-      }
-  
-      updateTable();
-    });
-        
-    document.getElementById('filter-s').addEventListener('click', function () {
-      if (options.filtered === 'filter-s') {
-        options.filtered = false;
-      } else {
-        options.filtered = 'filter-s'
-      }
-        
-      updateTable();
-    });
-
-document.getElementById('filter-n').addEventListener('click', function () {
-      if (options.filtered === 'filter-n') {
-        options.filtered = false;
-      } else {
-        options.filtered = 'filter-n'
-      }
-        
-      updateTable();
-    });
-
-document.getElementById('filter-mw').addEventListener('click', function () {
-      if (options.filtered === 'filter-mw') {
-        options.filtered = false;
-      } else {
-        options.filtered = 'filter-mw'
-      }
-        
-      updateTable();
-    });
-
-  </script> 
+</script>
 </body>
 </html>
+
