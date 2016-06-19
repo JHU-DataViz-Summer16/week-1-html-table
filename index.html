@@ -19,17 +19,19 @@
     }
      #data-table td:nth-child(3) {
       width: 15%;
+      text-align: center;
     }
      #data-table td:nth-child(4) {
       width: 15%;
+      text-align: center;
     }
      #data-table td:nth-child(5) {
       width: 25%;
     }
     .bar {
       height: 20px;
-      /* Note that we'll set the width dynamically using Javascript */
-      background: #216C2A;
+      /* Note that we'll set the width dynamically using Javascript background: #216C2A*/
+      ;
     }
     .centered {
       text-align: center;
@@ -43,12 +45,6 @@
             border-bottom: 1px solid #000000;
             padding: 10px;
          }
-    td:nth-child(3) {
-      text-align: center;
-    }
-    td:nth-child(4) {
-      text-align: center;
-    }
    </style>
 </head>
 <body>
@@ -238,176 +234,101 @@ var options = {
     page: 0
   };
 
+var tbody = d3.select("tbody");
+
 function updateTable() {
-    // Make a copy of the data
-    var data = occupations.slice();
+
+   tbody.html("");
+  
+   var rows = tbody.selectAll("tr")
+      .data(occupations)
+      .enter()
+      .append("tr");
 
     // Sort occupations by women's earnings as a percent of men's
     if (options.sorted) {
       if (options.sorted === 'asc') {
-        data.sort(function (a, b) { return a.Women_Percent - b.Women_Percent; });
+        rows.sort(function (a, b) { return a.Women_Percent - b.Women_Percent; });
       } else if (options.sorted === 'desc') {
-        data.sort(function (a, b) { return b.Women_Percent - a.Women_Percent; });
+        rows.sort(function (a, b) { return b.Women_Percent - a.Women_Percent; });
         // Note that this is just the opposite of the above.
       }
     }
 
     // Filter Occupations to Major Group Types
     if (options.filtered) {
-        data = data.filter(function (d) { return d.Group === options.filtered; })
+        rows = rows.filter(function (d) { return d.Group === options.filtered; })
     } 
 
-    // Select only the occupations from the current page (slice)
-    if (options.page) {
-      data = data.slice(options.page*20+1,options.page*20+21 )
-    } else {
-       data = data.slice(0,21)
-    }
+    // page slicing was working prior to d3
+   // if (options.page) {
+  //    data = data.slice(options.page*20+1,options.page*20+21 )
+  //  } else {
+  //     data = data.slice(0,21)
+  //  }
 
-    var table = document.getElementById('data-table');
-    var tbody = table.getElementsByTagName('tbody')[0];
-    // Because getElementsByTagName returns an array of DOM nodes (technically, it's an HTMLCollection),
-    // we need to select the first item in the array with the [0].
+    rows.append("td")
+      .html(function(d) { return d.Occupation_name });
 
-    // Remove any existing rows
-    tbody.innerHTML = '';
+    rows.append("td")
+      .html(function(d) { return d.Group_Name });
 
-    // Add a new row for each datum (item in the 'data' array)
-    data.forEach(function (d) {
-      var row = document.createElement('tr');
-      // This is like create a new <tr></tr> in HTML, but it doesn't yet exist in the DOM, so we can't
-      // see it. At the bottom of this forEach() loop, we append it to an element that is in the DOM,
-      // at which point it appears. We'll follow this same pattern for each of the <td></td> elements
-      // we create below.
+    rows.append("td")
+      .html(function(d) { return d.Men_Earn });
 
-      var Occupation_name = document.createElement('td');
-      Occupation_name.innerHTML = d.Occupation_name;
-      row.appendChild(Occupation_name);
+    rows.append("td")
+      .html(function(d) { return d.Women_Earn });
 
-      var Group_Name = document.createElement('td');
-      Group_Name.innerHTML = d.Group_Name;
-      row.appendChild(Group_Name);
+    // Same as above, calculating a percent of the space allowed that the div should fill:
+    rows.append("td")
+      .append("div")
+      .classed("bar", true)
+      .style("width", function(d) { return ((d.WE / d.ME) * 100) + '%' })
+      .style("background", function(d) {
+          if ((d.WE / d.ME) >= 1) {
+            return '#FF5733';
+          } else {
+            return '#216C2A';
+          }
+        });
 
-      var Men_Earn = document.createElement('td');
-      Men_Earn.innerHTML = d.Men_Earn;
-      row.appendChild(Men_Earn);
+  };
 
-      var Women_Earn = document.createElement('td');
-      Women_Earn.innerHTML = d.Women_Earn;
-      row.appendChild(Women_Earn);
-
-      var barWrapper = document.createElement('td');
-      var bar = document.createElement('div');
-      bar.setAttribute('class', 'bar');
-      var FemPercent = d.WE / d.ME;  
-      bar.setAttribute('style', 'width: ' + (FemPercent * 100) + '%;');
-      barWrapper.appendChild(bar);
-      row.appendChild(barWrapper);
-
-      tbody.appendChild(row);
-    });
-  }
-
-  // The function declaration above just creates the function, it doesn't yet run it. That's what we
-  // do here, to make sure that the table is populated prior to the user clicking anything.
   updateTable();
 
-  // This is creating an event listener, a function that the browser will call every time the specified
-  // event is "fired" by the selected element (here the button with the id 'sort-asc').
-  document.getElementById('sort-asc').addEventListener('click', function () {
-    // Disable the sort if 'asc' was previously selected, otherwise set the sort to 'asc'
-    if (options.sorted === 'asc') {
-      options.sorted = false;
-    } else {
-      options.sorted = 'asc';
-    }
 
-    // And now we need to re-run the function that populates the table. Note that the results will be
-    // different because we've change the options object.
-    updateTable();
-  });
+  d3.select("#sort-asc")
+      .on("click", function(){
+        d3.selectAll('#sorting-buttons button').classed('active', false);
+         
+          if (options.sorted === 'asc') {
+            options.sorted === false;
+          } else {
+            options.sorted ==='asc';
 
-  document.getElementById('sort-desc').addEventListener('click', function () {
-    // Disable the sort if 'desc' was previously selected, otherwise set the sort to 'desc'
-    if (options.sorted === 'desc') {
-      options.sorted = false;
-    } else {
-      options.sorted = 'desc';
-    }
+          d3.select('#sort-asc').classed('active',true);
+          }
 
-    updateTable();
-  });
-
-  // This is where we'll need to create new event listeners for our filter and next/previous page buttons.
-  // They'll look very similar to the above, just listening to different elements, and perhaps performing
-  // different actions when clicked.
-
-  document.getElementById('filter-Mgt').addEventListener('click', function () {
-    // Disable the sort if 'desc' was previously selected, otherwise set the sort to 'desc'
-    if (options.filtered === 'Mgt') {
-      options.filtered = false;
-    } else {
-      options.filtered = 'Mgt';
-    }
-
-    updateTable();
-  });
+          updateTable();
+      });
 
 
-  document.getElementById('filter-Sr').addEventListener('click', function () {
-    // Disable the sort if 'desc' was previously selected, otherwise set the sort to 'desc'
-    if (options.filtered === 'Sr') {
-      options.filtered = false;
-    } else {
-      options.filtered = 'Sr';
-    }
+  d3.select("#sort-desc")
+      .on("click", function(){
+        d3.selectAll('#sorting-buttons button').classed('active', false);
+         
+          if (options.sorted === 'desc') {
+            options.sorted === false;
+          } else {
+            options.sorted ==='desc';
 
-    updateTable();
-  });
+            
+          d3.select('#sort-desc').classed('active',true);
+          }
 
-  document.getElementById('filter-Drs').addEventListener('click', function () {
-    // Disable the sort if 'desc' was previously selected, otherwise set the sort to 'desc'
-    if (options.filtered === 'Drs') {
-      options.filtered = false;
-    } else {
-      options.filtered = 'Drs';
-    }
+          updateTable();
+      });
 
-    updateTable();
-  });
-
-  document.getElementById('filter-Admin').addEventListener('click', function () {
-    // Disable the sort if 'desc' was previously selected, otherwise set the sort to 'desc'
-    if (options.filtered === 'Admin') {
-      options.filtered = false;
-    } else {
-      options.filtered = 'Admin';
-    }
-
-    updateTable();
-  });
-
-
- document.getElementById('page-next').addEventListener('click', function () {
-   if (options.page === 0) {
-    options.page = options.page + 1;
-   } else {
-    options.page = options.page + 1;
-   }
-
-    updateTable();
-  });
-
-
- document.getElementById('page-prev').addEventListener('click', function () {
-   if (options.page === 0) {
-    options.page = options.page - 1;
-   } else {
-    options.page = options.page - 1;
-   }
-
-    updateTable();
-  });
 
 
 
