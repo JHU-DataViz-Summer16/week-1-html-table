@@ -238,34 +238,37 @@ var tbody = d3.select("tbody");
 
 function updateTable() {
 
-   tbody.html("");
-  
-   var rows = tbody.selectAll("tr")
-      .data(occupations)
-      .enter()
-      .append("tr");
+    var data = occupations.slice();
 
     // Sort occupations by women's earnings as a percent of men's
     if (options.sorted) {
       if (options.sorted === 'asc') {
-        rows.sort(function (a, b) { return a.Women_Percent - b.Women_Percent; });
+        data.sort(function (a, b) { return a.Women_Percent - b.Women_Percent; });
       } else if (options.sorted === 'desc') {
-        rows.sort(function (a, b) { return b.Women_Percent - a.Women_Percent; });
+        data.sort(function (a, b) { return b.Women_Percent - a.Women_Percent; });
         // Note that this is just the opposite of the above.
       }
     }
 
     // Filter Occupations to Major Group Types
     if (options.filtered) {
-        rows = rows.filter(function (d) { return d.Group === options.filtered; })
+        data = data.filter(function (d) { return d.Group === options.filtered; })
     } 
 
-    // page slicing was working prior to d3
-   // if (options.page) {
-  //    rows = rows.slice(options.page*20+1,options.page*20+21 )
-  //  } else {
-  //     rows = rows.slice(0,21)
-  //  }
+    // Select only the occupations from the current page (slice)
+    if (options.page) {
+      data = data.slice(options.page*20+1,options.page*20+21 )
+    } else {
+       data = data.slice(0,21)
+    }
+
+
+   tbody.html("");
+  
+   var rows = tbody.selectAll("tr")
+      .data(data)
+      .enter()
+      .append("tr");
 
     rows.append("td")
       .html(function(d) { return d.Occupation_name });
@@ -298,39 +301,36 @@ function updateTable() {
 
 
   d3.select("#sort-asc")
-      .on("click", function(){
-        d3.selectAll('#sorting-buttons button').classed('active', false);
-         
-          if (options.sorted === 'asc') {
-            options.sorted === false;
-          } else {
-            options.sorted ==='asc';
-
-          d3.select('#sort-asc').classed('active',true);
-          }
+      .on("click", function(d){
+           	 
+		    if (options.sorted === 'asc') {
+ 	      	 d3.select('#sort-asc').classed('active', false);
+		     return options.sorted = false;
+		    } else {
+		      d3.select('#sort-asc').classed('active', true);
+		      d3.select('#sort-desc').classed('active', false);
+		      return options.sorted = 'asc';
+		    }
 
           updateTable();
+
       });
 
 
   d3.select("#sort-desc")
-      .on("click", function(){
-        d3.selectAll('#sorting-buttons button').classed('active', false);
-         
-          if (options.sorted === 'desc') {
-            options.sorted === false;
-          } else {
-            options.sorted ==='desc';
+      .on("click", function(d){
 
-            
-          d3.select('#sort-desc').classed('active',true);
-          }
+    if (options.sorted === 'desc') {
+      d3.select('#sort-desc').classed('active', false);
+      return options.sorted = false;
+    } else {
+      d3.select('#sort-asc').classed('active', false);
+      d3.select('#sort-desc').classed('active', true);
+      return options.sorted = 'desc';
+    }
 
-          updateTable();
+        updateTable();
       });
-
-
-
 
 
 </script>
