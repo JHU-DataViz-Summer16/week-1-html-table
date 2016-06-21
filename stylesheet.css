@@ -25,16 +25,19 @@ th, td {
 
 .section { padding: 1em 0; }
 /* An "em" is equal to the height of a line of text. */
+
 .header {
   background: linear-gradient(to bottom, #337ab7 0%, #135a97 100%);
   color: white;
   padding: 1em 0 2em;
   text-align: center;
 }
+
 #data-table td {
   width: 25%;
   /* The table has four columns, so this rule makes them of equal width. */
 }
+
 .bar {
   height: 20px;
   /* Note that we'll set the width dynamically using Javascript. */
