@@ -62,10 +62,12 @@
         <button type="button" class="btn btn-default" id="sort-desc">Descending</button>
       </div>
       <div class="btn-group">
-        <button type="button" class="btn btn-default" id="filter-Mgt">Management</button>
-        <button type="button" class="btn btn-default" id="filter-Sr">Sales And Related</button>
-        <button type="button" class="btn btn-default" id="filter-Drs">Healthcare Practitioners</button>
-        <button type="button" class="btn btn-default" id="filter-Admin">Office and Administrative Support</button>
+      <div class="filter">
+        <button type="button" class="btn btn-default filter" id="filter-Mgt">Management</button>
+        <button type="button" class="btn btn-default filter" id="filter-Sr">Sales And Related</button>
+        <button type="button" class="btn btn-default filter" id="filter-Drs">Healthcare Practitioners</button>
+        <button type="button" class="btn btn-default filter" id="filter-Admin">Office and Administrative Support</button>
+      </div>
       </div>
     </div>
   </div>
@@ -234,6 +236,8 @@ var options = {
     page: 0
   };
 
+
+
 var tbody = d3.select("tbody");
 
 function updateTable() {
@@ -252,14 +256,27 @@ function updateTable() {
 
     // Filter Occupations to Major Group Types
     if (options.filtered) {
-        data = data.filter(function (d) { return d.Group === options.filtered; })
+        data = data.filter(function (d) { return d.Group === options.filtered; });
     } 
 
     // Select only the occupations from the current page (slice)
     if (options.page) {
-      data = data.slice(options.page*20+1,options.page*20+21 )
+      data = data.slice(options.page*20+1,options.page*20+21 );
+      	if (data[options.page*20+22] ===null) {
+      		d3.selectAll('.next').classed('disabled', true);
+      		d3.selectAll('.previous').classed('disabled', false);
+      	} else {
+      		d3.selectAll('.next').classed('disabled', false);
+      		d3.selectAll('.previous').classed('disabled', false);
+      	}
     } else {
        data = data.slice(0,21)
+       d3.selectAll('.previous').classed('disabled', true);
+        if (data[22] ===null) {
+      		d3.selectAll('.next').classed('disabled', true);
+      	} else {
+      		d3.selectAll('.next').classed('disabled', false);
+      	}
     }
 
 
@@ -300,37 +317,96 @@ function updateTable() {
   updateTable();
 
 
-  d3.select("#sort-asc")
-      .on("click", function(d){
-           	 
-		    if (options.sorted === 'asc') {
- 	      	 d3.select('#sort-asc').classed('active', false);
-		     return options.sorted = false;
-		    } else {
-		      d3.select('#sort-asc').classed('active', true);
-		      d3.select('#sort-desc').classed('active', false);
-		      return options.sorted = 'asc';
-		    }
-
-          updateTable();
-
-      });
-
-
-  d3.select("#sort-desc")
-      .on("click", function(d){
-
-    if (options.sorted === 'desc') {
-      d3.select('#sort-desc').classed('active', false);
-      return options.sorted = false;
-    } else {
+d3.select('#sort-asc').on('click', function () {
+    if (options.sorted === 'asc') {
+      options.sorted = false;
       d3.select('#sort-asc').classed('active', false);
-      d3.select('#sort-desc').classed('active', true);
-      return options.sorted = 'desc';
+    } else {
+      options.sorted = 'asc';
+      d3.select('#sort-asc').classed('active', true);
+      d3.select('#sort-desc').classed('active', false);
     }
+  updateTable();
+});
 
-        updateTable();
-      });
+d3.select('#sort-desc').on('click', function () {
+    if (options.sorted === 'desc') {
+      options.sorted = false;
+      d3.select('#sort-desc').classed('active', false);
+    } else {
+      options.sorted = 'desc';
+      d3.select('#sort-desc').classed('active', true);
+      d3.select('#sort-asc').classed('active', false);
+    }
+  updateTable();
+});
+
+d3.select('#filter-Mgt').on('click', function () {
+  if (options.filtered === 'Mgt') {
+    options.filtered = false;
+    d3.select('#filter-Mgt').classed('active', false);
+  } else {
+    options.filtered = 'Mgt';
+    d3.selectAll('.filter').classed('active', false);
+    d3.select('#filter-Mgt').classed('active', true);
+  }
+  updateTable();
+});
+
+d3.select('#filter-Sr').on('click', function () {
+  if (options.filtered === 'Sr') {
+    options.filtered = false;
+    d3.select('#filter-Sr').classed('active', false);
+  } else {
+    options.filtered = 'Sr';
+    d3.selectAll('.filter').classed('active', false);
+    d3.select('#filter-Sr').classed('active', true);
+  }
+  updateTable();
+});
+
+d3.select('#filter-Drs').on('click', function () {
+  if (options.filtered === 'Drs') {
+    options.filtered = false;
+    d3.select('#filter-Drs').classed('active', false);
+  } else {
+    options.filtered = 'Drs';
+    d3.selectAll('.filter').classed('active', false);
+    d3.select('#filter-Drs').classed('active', true);
+  }
+  updateTable();
+});
+
+d3.select('#filter-Admin').on('click', function () {
+  if (options.filtered === 'Admin') {
+    options.filtered = false;
+    d3.select('#filter-Admin').classed('active', false);
+  } else {
+    options.filtered = 'Admin';
+    d3.selectAll('.filter').classed('active', false);
+    d3.select('#filter-Admin').classed('active', true);
+  }
+  updateTable();
+});
+
+d3.select('#page-next').on('click', function () {
+   if (options.page === 0) {
+    options.page = options.page + 1;
+   } else {
+    options.page = options.page + 1;
+   }
+  updateTable();
+});
+
+d3.select('#page-prev').on('click', function () {
+   if (options.page === 0) {
+    options.page = options.page - 1;
+   } else {
+    options.page = options.page - 1;
+   }
+  updateTable();
+});
+
 
 
 </script>
