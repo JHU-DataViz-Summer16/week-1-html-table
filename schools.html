@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Week 2: Javascript and the DOM</title><!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <style>
+    .section { padding: 1em 0; }
+    /* An "em" is equal to the height of a line of text. */
+    .header {
+      background: linear-gradient(to bottom, #337ab7 0%, #135a97 100%);
+      color: white;
+      padding: 1em 0 2em;
+    }
+    #data-table td {
+      width: 25%;
+      /* The table has four columns, so this rule makes them of equal width. */
+    }
+    .bar {
+      height: 20px;
+      /* Note that we'll set the width dynamically using Javascript. */
+      background: #337ab7;
+    }
+  </style>
+</head>
+<body>
+<div class="header section">
+  <div class="container">
+    <h1>Week 2: Javascript and the DOM</h1>
+    <p>Let's wire up some buttons.</p>
+  </div>
+</div>
+<div class="controls section">
+  <div class="container">
+    <div class="btn-toolbar">
+      <div class="btn-group">
+        <button type="button" class="btn btn-default" id="sort-asc">Ascending</button>
+        <button type="button" class="btn btn-default" id="sort-desc">Descending</button>
+      </div>
+      <div class="btn-group">
+        <button type="button" class="btn btn-default" id="filter-es">Elementary</button>
+        <button type="button" class="btn btn-default" id="filter-ms">Middle</button>
+        <button type="button" class="btn btn-default" id="filter-hs">High</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="main section">
+  <div class="container">
+    <table class="table" id="data-table">
+      <thead>
+        <tr>
+          <th>School</th>
+          <th>Type</th>
+          <th>Enrollment</th>
+          <th>Chart</th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+    <nav>
+      <ul class="pager">
+        <li class="previous"><a href="#" id="page-prev">Previous</a></li>
+        <li class="next"><a href="#" id="page-next">Next</a></li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
+<script>
+  var schools = [
+    {"code":202,"name":"Aiton ES","level_text":"Elementary","level":"es","enrollment":268},
+    {"code":203,"name":"Amidon-Bowen ES","level_text":"Elementary","level":"es","enrollment":355},
+    {"code":450,"name":"Anacostia HS","level_text":"High","level":"hs","enrollment":573},
+    {"code":452,"name":"Ballou HS","level_text":"High","level":"hs","enrollment":1058},
+    {"code":462,"name":"Ballou STAY","level_text":"STAY","level":"other","enrollment":575},
+    {"code":204,"name":"Bancroft ES","level_text":"Elementary","level":"es","enrollment":521},
+    {"code":205,"name":"Barnard ES","level_text":"Elementary","level":"es","enrollment":642},
+    {"code":206,"name":"Beers ES","level_text":"Elementary","level":"es","enrollment":434},
+    {"code":402,"name":"Benjamin Banneker HS","level_text":"High","level":"hs","enrollment":496},
+    {"code":212,"name":"Brent ES","level_text":"Elementary","level":"es","enrollment":404},
+    {"code":213,"name":"Brightwood EC","level_text":"Education Campus","level":"campus","enrollment":728},
+    {"code":404,"name":"Browne EC","level_text":"Education Campus","level":"campus","enrollment":331},
+    {"code":296,"name":"Bruce-Monroe ES @ Park View","level_text":"Elementary","level":"es","enrollment":475},
+    {"code":221,"name":"Burrville ES","level_text":"Elementary","level":"es","enrollment":331},
+    {"code":247,"name":"C.W. Harris ES","level_text":"Elementary","level":"es","enrollment":300},
+    {"code":360,"name":"Capitol Hill Montessori","level_text":"Education Campus","level":"campus","enrollment":373},
+    {"code":454,"name":"Cardozo EC","level_text":"Education Campus","level":"campus","enrollment":778},
+    {"code":947,"name":"CHOICE Academy","level_text":"Alternative","level":"other","enrollment":100},
+    {"code":224,"name":"Cleveland ES","level_text":"Elementary","level":"es","enrollment":326},
+    {"code":442,"name":"Columbia Heights EC (CHEC)","level_text":"Education Campus","level":"campus","enrollment":1418},
+    {"code":455,"name":"Coolidge HS","level_text":"High","level":"hs","enrollment":385},
+    {"code":405,"name":"Deal MS","level_text":"Middle","level":"ms","enrollment":1380},
+    {"code":231,"name":"Drew ES","level_text":"Elementary","level":"es","enrollment":263},
+    {"code":467,"name":"Dunbar HS","level_text":"High","level":"hs","enrollment":662},
+    {"code":457,"name":"Eastern HS","level_text":"High","level":"hs","enrollment":995},
+    {"code":232,"name":"Eaton ES","level_text":"Elementary","level":"es","enrollment":477},
+    {"code":471,"name":"Ellington School of the Arts","level_text":"Art","level":"hs","enrollment":534},
+    {"code":407,"name":"Eliot-Hine MS","level_text":"Middle","level":"ms","enrollment":188},
+    {"code":238,"name":"Garfield ES","level_text":"Elementary","level":"es","enrollment":312},
+    {"code":239,"name":"Garrison ES","level_text":"Elementary","level":"es","enrollment":237},
+    {"code":227,"name":"H.D. Cooke ES","level_text":"Elementary","level":"es","enrollment":403},
+    {"code":246,"name":"Hardy MS","level_text":"Middle","level":"ms","enrollment":403},
+    {"code":413,"name":"Hart MS","level_text":"Middle","level":"ms","enrollment":340},
+    {"code":258,"name":"Hearst ES","level_text":"Elementary","level":"es","enrollment":315},
+    {"code":249,"name":"Hendley ES","level_text":"Elementary","level":"es","enrollment":479},
+    {"code":251,"name":"Houston ES","level_text":"Elementary","level":"es","enrollment":280},
+    {"code":252,"name":"Hyde-Addison ES","level_text":"Elementary","level":"es","enrollment":336},
+    {"code":950,"name":"Incarcerated Youth Program","level_text":"Alternative","level":"other","enrollment":28},
+    {"code":339,"name":"J.O. Wilson ES","level_text":"Elementary","level":"es","enrollment":518},
+    {"code":254,"name":"Janney ES","level_text":"Elementary","level":"es","enrollment":734},
+    {"code":433,"name":"Jefferson MS","level_text":"Middle","level":"ms","enrollment":277},
+    {"code":416,"name":"Johnson MS","level_text":"Middle","level":"ms","enrollment":282},
+    {"code":421,"name":"Kelly Miller MS","level_text":"Middle","level":"ms","enrollment":436},
+    {"code":257,"name":"Ketcham ES","level_text":"Elementary","level":"es","enrollment":317},
+    {"code":272,"name":"Key ES","level_text":"Elementary","level":"es","enrollment":407},
+    {"code":259,"name":"Kimball ES","level_text":"Elementary","level":"es","enrollment":354},
+    {"code":344,"name":"King, M.L. ES","level_text":"Elementary","level":"es","enrollment":411},
+    {"code":417,"name":"Kramer MS","level_text":"Middle","level":"ms","enrollment":244},
+    {"code":261,"name":"Lafayette ES","level_text":"Elementary","level":"es","enrollment":707},
+    {"code":370,"name":"Langley ES","level_text":"Elementary","level":"es","enrollment":296},
+    {"code":264,"name":"LaSalle-Backus EC","level_text":"Education Campus","level":"campus","enrollment":347},
+    {"code":266,"name":"Leckie ES","level_text":"Elementary","level":"es","enrollment":537},
+    {"code":271,"name":"Ludlow-Taylor ES","level_text":"Elementary","level":"es","enrollment":404},
+    {"code":884,"name":"Luke Moore HS","level_text":"High","level":"hs","enrollment":342},
+    {"code":308,"name":"Malcolm X ES","level_text":"Elementary","level":"es","enrollment":250},
+    {"code":273,"name":"Mann ES","level_text":"Elementary","level":"es","enrollment":380},
+    {"code":284,"name":"Marie Reed ES","level_text":"Elementary","level":"es","enrollment":402},
+    {"code":274,"name":"Maury ES","level_text":"Elementary","level":"es","enrollment":400},
+    {"code":280,"name":"Miner ES","level_text":"Elementary","level":"es","enrollment":398},
+    {"code":285,"name":"Moten ES","level_text":"Elementary","level":"es","enrollment":421},
+    {"code":287,"name":"Murch ES","level_text":"Elementary","level":"es","enrollment":600},
+    {"code":288,"name":"Nalle ES","level_text":"Elementary","level":"es","enrollment":392},
+    {"code":291,"name":"Orr ES","level_text":"Elementary","level":"es","enrollment":433},
+    {"code":292,"name":"Oyster-Adams Bilingual School","level_text":"Education Campus","level":"campus","enrollment":681},
+    {"code":294,"name":"Patterson ES","level_text":"Elementary","level":"es","enrollment":411},
+    {"code":295,"name":"Payne ES","level_text":"Elementary","level":"es","enrollment":295},
+    {"code":301,"name":"Peabody ES","level_text":"Elementary","level":"es","enrollment":230},
+    {"code":478,"name":"Phelps ACE HS","level_text":"High","level":"hs","enrollment":280},
+    {"code":299,"name":"Plummer ES","level_text":"Elementary","level":"es","enrollment":408},
+    {"code":300,"name":"Powell ES","level_text":"Elementary","level":"es","enrollment":525},
+    {"code":316,"name":"Randle Highlands ES","level_text":"Elementary","level":"es","enrollment":345},
+    {"code":302,"name":"Raymond EC","level_text":"Education Campus","level":"campus","enrollment":578},
+    {"code":459,"name":"Roosevelt HS","level_text":"High","level":"hs","enrollment":600},
+    {"code":456,"name":"Roosevelt STAY","level_text":"STAY","level":"other","enrollment":575},
+    {"code":305,"name":"Ross ES","level_text":"Elementary","level":"es","enrollment":174},
+    {"code":307,"name":"Savoy ES","level_text":"Elementary","level":"es","enrollment":345},
+    {"code":175,"name":"School-Within-School","level_text":"Elementary","level":"es","enrollment":315},
+    {"code":466,"name":"School Without Walls HS","level_text":"High","level":"hs","enrollment":585},
+    {"code":409,"name":"School Without Walls @ Francis-Stevens EC","level_text":"Education Campus","level":"campus","enrollment":454},
+    {"code":309,"name":"Seaton ES","level_text":"Elementary","level":"es","enrollment":341},
+    {"code":313,"name":"Shepherd ES","level_text":"Elementary","level":"es","enrollment":354},
+    {"code":315,"name":"Simon ES","level_text":"Elementary","level":"es","enrollment":292},
+    {"code":322,"name":"Smothers ES","level_text":"Elementary","level":"es","enrollment":280},
+    {"code":427,"name":"Sousa MS","level_text":"Middle","level":"ms","enrollment":255},
+    {"code":319,"name":"Stanton ES","level_text":"Elementary","level":"es","enrollment":513},
+    {"code":321,"name":"Stoddert ES","level_text":"Elementary","level":"es","enrollment":435},
+    {"code":428,"name":"Stuart-Hobson MS","level_text":"Middle","level":"ms","enrollment":424},
+    {"code":324,"name":"Takoma EC","level_text":"Education Campus","level":"campus","enrollment":465},
+    {"code":325,"name":"Thomas ES","level_text":"Elementary","level":"es","enrollment":422},
+    {"code":326,"name":"Thomson ES","level_text":"Elementary","level":"es","enrollment":297},
+    {"code":327,"name":"Truesdell EC","level_text":"Education Campus","level":"campus","enrollment":628},
+    {"code":328,"name":"Tubman ES","level_text":"Elementary","level":"es","enrollment":560},
+    {"code":329,"name":"Turner ES","level_text":"Elementary","level":"es","enrollment":499},
+    {"code":330,"name":"Tyler ES","level_text":"Elementary","level":"es","enrollment":533},
+    {"code":332,"name":"Walker-Jones EC","level_text":"Education Campus","level":"campus","enrollment":473},
+    {"code":474,"name":"Washington Metropolitan HS","level_text":"High","level":"hs","enrollment":275},
+    {"code":333,"name":"Watkins ES","level_text":"Elementary","level":"es","enrollment":435},
+    {"code":336,"name":"West EC","level_text":"Education Campus","level":"campus","enrollment":314},
+    {"code":335,"name":"Wheatley EC","level_text":"Education Campus","level":"campus","enrollment":346},
+    {"code":338,"name":"Whittier EC","level_text":"Education Campus","level":"campus","enrollment":367},
+    {"code":463,"name":"Wilson HS","level_text":"High","level":"hs","enrollment":1783},
+    {"code":464,"name":"Woodson, H.D. HS","level_text":"High","level":"hs","enrollment":637},
+    {"code":861,"name":"Youth Services Center","level_text":"Alternative","level":"other","enrollment":81},
+    {"code":304,"name":"River Terrace Special Education Center","level_text":"Special Education Center","level":"other","enrollment":132},
+    {"code":331,"name":"Van Ness ES","level_text":"Elementary","level":"es","enrollment":129},
+    {"code":347,"name":"Brookland MS","level_text":"Middle","level":"ms","enrollment":311},
+    {"code":349,"name":"Dorothy Height ES","level_text":"Elementary","level":"es","enrollment":513},
+    {"code":220,"name":"Burroughs ES","level_text":"Elementary","level":"es","enrollment":291},
+    {"code":262,"name":"Langdon ES","level_text":"Elementary","level":"es","enrollment":311},
+    {"code":219,"name":"Bunker Hill ES","level_text":"Elementary","level":"es","enrollment":167},
+    {"code":290,"name":"Noyes ES","level_text":"Elementary","level":"es","enrollment":196},
+    {"code":458,"name":"McKinley Technology HS","level_text":"High","level":"hs","enrollment":672},
+    {"code":435,"name":"McKinley MS","level_text":"Middle","level":"ms","enrollment":209},
+    {"code":420,"name":"MacFarland MS","level_text":"Middle","level":"ms","enrollment":72},
+    {"code":425,"name":"Empowering Males HS","level_text":"High","level":"hs","enrollment":150}
+  ];
+  // The ALL_CAPS treatment here is signalling that this variable is a constant - it should never change.
+  var MAX_ENROLLMENT = 1783;
+  // This is where we'll store the data representing user interaction; event handlers (the functions that
+  // are called when a user clicks a button) work by updating the properties of this object. An alternative
+  // approach, where each event handler directly updates the table, would quickly become messy. Imagine,
+  // for example, that I've filtered the table to just show elementary schools. Next, I sort the table to
+  // be in descending order. Finally, I unfilter the table to show all schools. If I'm not careful, the
+  // newly revealed schools will not be sorted, because the filter operation doesn't know how to sort.
+  // Instead, updateTable() will sort, filter, and paginate based on whatever the options object contains,
+  // always starting from a fresh copy of the data, and we can count on the result to be consistent
+  // given the same values in options.
+  var options = {
+    sorted: false,
+    filtered: false,
+    page: 0
+  };
+  function updateTable() {
+    // Make a copy of the data
+    var data = schools.slice();
+    // Sort schools by enrollment
+    if (options.sorted) {
+      if (options.sorted === 'asc') {
+        data.sort(function (a, b) { return a.enrollment - b.enrollment; });
+        // This anonymous function is responsible for comparing two values a and b. If it returns a positive
+        // number, we're saying that a should come after b in the array. A negative number means that b
+        // should come after a. A zero means that the two are equal. This function is using the 'enrollment'
+        // property of each observation of data for this comparison. You'll need to change 'enrollment' to
+        // whatever property you want to sort your data on.
+        //
+        // Also, note that we're sorting the data in place, changing, or mutating, the 'data' variable. See
+        // the note in the README about how this compares to the filter() and slice() operations that we'll
+        // use for the next two data transforms.
+      } else if (options.sorted === 'desc') {
+        data.sort(function (a, b) { return b.enrollment - a.enrollment; });
+        // Note that this is just the opposite of the above.
+      }
+    }
+    // Filter schools by grade level
+    // Select only the schools from the current page (slice)
+    var table = document.getElementById('data-table');
+    var tbody = table.getElementsByTagName('tbody')[0];
+    // Because getElementsByTagName returns an array of DOM nodes (technically, it's an HTMLCollection),
+    // we need to select the first item in the array with the [0].
+    // Remove any existing rows
+    tbody.innerHTML = '';
+    // Add a new row for each datum (item in the 'data' array)
+    data.forEach(function (d) {
+      var row = document.createElement('tr');
+      // This is like create a new <tr></tr> in HTML, but it doesn't yet exist in the DOM, so we can't
+      // see it. At the bottom of this forEach() loop, we append it to an element that is in the DOM,
+      // at which point it appears. We'll follow this same pattern for each of the <td></td> elements
+      // we create below.
+      var school = document.createElement('td');
+      school.innerHTML = d.name;
+      row.appendChild(school);
+      var level = document.createElement('td');
+      level.innerHTML = d.level_text;
+      row.appendChild(level);
+      var enrollment = document.createElement('td');
+      enrollment.innerHTML = d.enrollment + ' students';
+      row.appendChild(enrollment);
+      var barWrapper = document.createElement('td');
+      var bar = document.createElement('div');
+      bar.setAttribute('class', 'bar');
+      // We set the class to 'bar' so we can use the .bar class we have in our styles. This gives it a
+      // consistent height and a color.
+      var enrollmentPercentage = d.enrollment / MAX_ENROLLMENT;
+      bar.setAttribute('style', 'width: ' + (enrollmentPercentage * 100) + '%;');
+      // I've broken this operation up into two steps, which is a little different than we did in class.
+      // The end result is the same, though. If 'enrollmentPercentage' equals 0.75, this set the style
+      // attribute of our DIV so that it looks something like <div style="width: 75%;"></div>
+      barWrapper.appendChild(bar);
+      row.appendChild(barWrapper);
+      tbody.appendChild(row);
+    });
+  }
+  // The function declaration above just creates the function, it doesn't yet run it. That's what we
+  // do here, to make sure that the table is populated prior to the user clicking anything.
+  updateTable();
+  // This is creating an event listener, a function that the browser will call every time the specified
+  // event is "fired" by the selected element (here the button with the id 'sort-asc').
+  document.getElementById('sort-asc').addEventListener('click', function () {
+    // Disable the sort if 'asc' was previously selected, otherwise set the sort to 'asc'
+    if (options.sorted === 'asc') {
+      options.sorted = false;
+    } else {
+      options.sorted = 'asc';
+    }
+    // And now we need to re-run the function that populates the table. Note that the results will be
+    // different because we've change the options object.
+    updateTable();
+  });
+  document.getElementById('sort-desc').addEventListener('click', function () {
+    // Disable the sort if 'desc' was previously selected, otherwise set the sort to 'desc'
+    if (options.sorted === 'desc') {
+      options.sorted = false;
+    } else {
+      options.sorted = 'desc';
+    }
+    updateTable();
+  });
+  // This is where we'll need to create new event listeners for our filter and next/previous page buttons.
+  // They'll look very similar to the above, just listening to different elements, and perhaps performing
+  // different actions when clicked.
+</script>
+</body>
+</html>
