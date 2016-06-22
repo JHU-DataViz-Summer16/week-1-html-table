@@ -168,83 +168,31 @@
       	page: 0
       }; 
 
+      var tbody = d3.select("tbody"); 
+
       function updateTable() {
 
-        var data = states.slice();
-        if (options.sorted) {
-        	if (options.sorted === 'asc') { 
-        		data.sort(function (a,b) { return a.rate - b.rate; });
-        	} else if (options.sorted === 'desc') {
-        		data.sort(function (a,b) {return b.rate - a.rate; }); 
-        	}
-        }
+        tbody.html(""); 
 
-        if (options.filtered) { 
-            if (options.filtered === 'above-fifteen') { 
-              data = data.filter(function (a) { 
-                return a.rate > 15; });
-            }
-        }
+        var rows = tbody.selectAll("tr")
+          .data(states)
+          .enter()
+          .append("tr"); 
 
-        var table = document.getElementById('data-table'); 
-        var tbody = table.getElementsByTagName('tbody')[0]; 
+        rows.append("td")
+          .html(function(d) {return d.state}); 
+        
+        rows.append("td")
+          .html(function (d) {return d.rate}); 
 
-        tbody.innerHTML = ''; 
+        rows.append("td")
+          .append("div")
+          .classed("bar", true)
+          .style("width", function (d) {return ((d.rate / MAX_RATE) *100) + '%'})
 
-        data.forEach(function (d) {
-          var row = document.createElement('tr'); 
+        }; 
 
-          var state = document.createElement('td'); 
-          state.innerHTML = d.state; 
-          row.appendChild(state); 
-
-          var rate = document.createElement('td'); 
-          rate.innerHTML = d.rate; 
-          row.appendChild(rate); 
-
-          var barWrapper = document.createElement('td'); 
-          var bar = document.createElement('div'); 
-          bar.setAttribute('class', 'bar'); 
-          var rateComparison = d.rate / MAX_RATE; 
-          bar.setAttribute('style', 'width: ' + (rateComparison * 100) + '%;'); 
-          barWrapper.appendChild(bar); 
-          row.appendChild(barWrapper); 
-
-          tbody.appendChild(row); 
-        }); 
-      }
-
-      updateTable(); 
-
-      document.getElementById('sort-asc').addEventListener('click', function ()
-        {
-        if (options.sorted === 'asc') {
-      	    options.sorted = false; 
-        }   else {
-        	options.sorted = 'asc'; 
-        }
         updateTable(); 
-      }); 
-
-      document.getElementById('sort-desc').addEventListener('click', function ()
-        {
-        if (options.sorted === 'desc') {
-      	    options.sorted = false; 
-        }   else {
-        	options.sorted = 'desc'; 
-        }
-        updateTable(); 
-      });
-
-      document.getElementById('filter-byrate').addEventListener('click', function ()
-       {
-       if (options.filtered === 'above-fifteen') {
-      	   options.filtered = false; 
-       }   else {
-           options.filtered = 'above-fifteen'; 
-       }
-       updateTable(); 
-     });
 
 </script> 
 </body>
