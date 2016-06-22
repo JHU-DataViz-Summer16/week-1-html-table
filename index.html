@@ -194,6 +194,18 @@
 
         updateTable(); 
 
+        d3.select("#sort-asc")
+          .on("click", function(){
+            d3.select('#sort-desc').classed('active', false); 
+            d3.select('#sort-asc').classed('active', true); 
+          }); 
+
+         d3.select("#sort-desc")
+          .on("click", function(){
+            d3.select('#sort-asc').classed('active', false); 
+            d3.select('#sort-desc').classed('active', true); 
+          }); 
+
 </script> 
 </body>
 </html>
