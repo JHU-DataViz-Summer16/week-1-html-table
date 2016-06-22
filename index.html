@@ -194,8 +194,9 @@
 
         updateTable(); 
 
-        d3.select("#sort-asc")
+        d3.select('#sort-asc')
           .on("click", function() {
+
             if (d3.select('#sort-asc').classed('active') === false) {
               d3.select('#sort-asc').classed('active', true);
               d3.select('#sort-desc').classed('active', false); 
@@ -204,12 +205,15 @@
               }); 
             } else { 
               d3.select('#sort-asc').classed('active', false); 
+
             updateTable(); 
             }
+
           }); 
 
-        d3.select("#sort-desc")
+        d3.select('#sort-desc')
           .on("click", function() {
+
             if (d3.select('#sort-desc').classed('active') === false) {
               d3.select('#sort-desc').classed('active', true);
               d3.select('#sort-asc').classed('active', false); 
@@ -218,8 +222,25 @@
               }); 
             } else { 
               d3.select('#sort-desc').classed('active', false); 
+
             updateTable(); 
             }
+
+          }); 
+
+        d3.select('#filter-byrate')
+          .on("click", function() {
+
+            if (d3.select('#filter-byrate').classed('active') === false) {
+              d3.selectAll("tbody tr").sort(function (d) { 
+                return d3.filtered((d.rate / MAX_RATE) *100) + '%'; 
+              }); 
+            } else { 
+              d3.select('#filter-byrate').classed('active', false); 
+
+            updateTable(); 
+            }
+
           }); 
 
 </script> 
