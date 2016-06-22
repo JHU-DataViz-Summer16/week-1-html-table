@@ -64,6 +64,8 @@
       <div class="container">
         <h1>Homelessness in the United States</h1>
         <p>Data Source: National Alliance to End Homelessness</p>
+        <p>*Note: Rate of homelessness in DC is an outlier at 120 people for every 10K, and has 
+           therefore been removed from the below table</p>
       </div>
     </div>
     
@@ -187,6 +189,13 @@
           .classed("bar", true)
           .style("width", function (d) {return ((d.rate / MAX_RATE) *100) + '%'})
 
+        if (options.filtered) { 
+            if (options.filtered === 'filter-r') { 
+              data = data.filter(function (a) { 
+                return a.rate > 15; });
+            }
+        }
+
         }; 
 
         updateTable(); 
@@ -228,15 +237,15 @@
         d3.select('#filter-byrate')
           .on("click", function() {
 
-            if (d3.select('#filter-byrate').classed('active') === false) {
-              d3.selectAll("tbody tr").sort(function (d) { 
-                return d3.filtered((d.rate / MAX_RATE) *100) + '%'; 
-              }); 
-            } else { 
-              d3.select('#filter-byrate').classed('active', false); 
+            if (options.filtered === 'filter-r') {
+                d3.select('#filter-byrate').classed('active', false); 
+                options.filtered = false;
+            }  else {
+               options.filtered = 'filter-r'; 
+               d3.select('#filter-byrate').classed('active', true); 
+            }
 
             updateTable(); 
-            }
 
           }); 
 
