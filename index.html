@@ -120,20 +120,48 @@
     
     
     var tbody = d3.select("tbody");
+    var data = states.slice();
+    
+//    console.log("tbod", tbody);
 
 
   function updateTable(){
       
     // Erase any existing html code within tbody by replacing it with a blank string "".
     tbody.html("");
+      
+    if (options.sorted) {
+      if (options.sorted === 'asc') {
+          data.sort(function (a, b) { return a.employment - b.employment; });
+          console.log("am here");
+        } else if (options.sorted === 'desc') {
+          data.sort(function (a, b) { return b.employment - a.employment; });
+        }
+    }        
+
+//      console.log("message here", data[0], data['state'], options.sorted, options.filtered)
+
+    if (options.filtered) {
+    	if (options.filtered === 'northeast') {
+    		data = data.filter(function (d) {	return d.region === "Northeast" })
+          } else if (options.filtered === 'south') {
+            data = data.filter(function (d) { return d.region === "South"})
+          } else if (options.filtered === 'midwest') {
+            data = data.filter(function (d) { return d.region === "Midwest"})
+          } else if (options.filtered === 'west') {
+            data = data.filter(function (d) { return d.region === "West"})
+     	}
+    }      
 
     // Binding data - this will be a very common task in our use of D3. Start by making a selectAll of <tr> elements that do not yet exist (they will soon!).
     // Then we bind our data (schools) with .data and .enter()
     // Lastly, we append the <tr> elements, which are become our current selection because of the prior selectAll("tr")
     var rows = tbody.selectAll("tr")
-      .data(states)
+      .data(data)
       .enter()
-      .append("tr");
+        .append("tr");
+//      .append("tr").filter( function(d) { 
+//                return (d.region === "Northeast")});
 
     // If you run, console.log(rows), you should now see an array of <tr> elements printed out to the console, each of which should contain a __data__ property containing one object from our JSON array.
 //    console.log(rows);
@@ -159,42 +187,42 @@
   };   
     
     
-
+//    console.log("tbod 2", tbody);    
 
   updateTable();
+
     
 
 
-
-    d3.select("#sort-asc").on("click", function(k) {
-        if (d3.select('#sort-asc').classed('active') === false) {
-            console.log("here", d3.select('#sort-asc').classed('active'));
+// sort ascending 
+    d3.select("#sort-asc").on("click", function() {
+        if (options.sorted === 'asc') {
+        options.sorted = false;
+        d3.select('#sort-asc').classed('active', false);    
+        } else {
+            options.sorted = 'asc';
             d3.select('#sort-asc').classed('active', true);
             d3.select('#sort-desc').classed('active', false);
-            d3.selectAll("tbody tr").sort(function(a, b) { 
-                return d3.ascending(a.employment, b.employment); 
-                });    
-            } else {
-                console.log("here 2");
-                d3.select('#sort-asc').classed('active', false);
-                updateTable();
-            }            
+            console.log("here asc");
+        }
+        updateTable();
     });
 
-
-    
-    d3.select("#sort-desc").on("click", function(k) {
-        if (d3.select('#sort-desc').classed('active') === false) {
+// sort descending    
+    d3.select("#sort-desc").on("click", function() {
+        if (options.sorted === 'desc') {
+        options.sorted = false;
+        d3.select('#sort-desc').classed('active', false);    
+        } else {
+            options.sorted = 'desc';
             d3.select('#sort-desc').classed('active', true);
             d3.select('#sort-asc').classed('active', false);
-            d3.selectAll("tbody tr").sort(function(a, b) { 
-                return d3.descending(a.employment, b.employment); 
-                });    
-            } else {
-                d3.select('#sort-desc').classed('active', false);
-                updateTable();
-            }        
-    });
+            console.log("now here desc");
+        }
+        updateTable();
+    });    
+    
+   
 
 
 
