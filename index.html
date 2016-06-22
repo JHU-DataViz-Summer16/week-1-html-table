@@ -130,13 +130,18 @@
     // Erase any existing html code within tbody by replacing it with a blank string "".
     tbody.html("");
       
+console.log("what is opt", options.sorted);      
+      
     if (options.sorted) {
       if (options.sorted === 'asc') {
           data.sort(function (a, b) { return a.employment - b.employment; });
-          console.log("am here");
-        } else if (options.sorted === 'desc') {
+//          console.log("am here");
+      } else if (options.sorted === 'desc') {
           data.sort(function (a, b) { return b.employment - a.employment; });
-        }
+      } } else {
+          data = states.slice();
+          console.log("damn it"); 
+        
     }        
 
 //      console.log("message here", data[0], data['state'], options.sorted, options.filtered)
@@ -203,8 +208,9 @@
             options.sorted = 'asc';
             d3.select('#sort-asc').classed('active', true);
             d3.select('#sort-desc').classed('active', false);
-            console.log("here asc");
+//            console.log("asc button is now set to ");
         }
+        console.log("asc button is now set to ", options.sorted);
         updateTable();
     });
 
@@ -217,8 +223,9 @@
             options.sorted = 'desc';
             d3.select('#sort-desc').classed('active', true);
             d3.select('#sort-asc').classed('active', false);
-            console.log("now here desc");
+//            console.log("now here desc");
         }
+        console.log("desc button is now set to ", options.sorted);        
         updateTable();
     });    
     
