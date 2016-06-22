@@ -16,16 +16,22 @@
 
     #data-table td {width: 25%;}
 
-    .bar {height: 20px; background: #F67280;}
+    .bar {height: 20px; background: #F6903D;}
 
     h1 {
-      color:#355C7D;
+      color:#F69053;
       font-family: 'Open Sans Condensed', Helvetica, sans-serif;
       font-size: 300%;
     } 
 
+    h2 {
+      color:#F05053;
+      font-family: 'Open Sans Condensed', Helvetica, sans-serif;
+      font-size: 110%;
+    } 
+
     p {
-      color:#355C7D;
+      color:#F69053;
       font-family: 'Open Sans Condensed', Helvetica, sans-serif;
       font-size: 90%;
     }
@@ -36,7 +42,7 @@
       white-space: nowrap; 
       font-family: 'Open Sans Condensed', Helevetica, sans-serif;
       font-weight: 500;
-      color: #F67280;
+      color: #F6903D;
     }
 
     th { 
@@ -45,11 +51,11 @@
       color: white;
     }
     
-    tr:nth-child(even) {background-color:#6C5B7B}
+    tr:nth-child(even) {background-color:#ECE473}
 
     tr:hover td{font-weight: bold;}
 
-    body {background-color: #F8B195;}
+    body {background-color: #E1F5C4;}
    </style>
 
 </head>
@@ -66,9 +72,12 @@
     <div class="controls section">
       <div class="container">
         <div class="btn-toolbar">
+
+          <h2>Sort by Rate</h2>
           <div class="btn-group" role="group" aria-label="Sort">
             <button type="button" class="btn btn-default" id="sort-asc">Ascending</button>
             <button type="button" class="btn btn-default" id="sort-desc">Descending</button>
+          <h2>Filter by Rate</h2>
           <div class="btn-group" role="group" aria-label="Filter">
             <button type="button" class="btn btn-default" id="filter-byrate">Filter by Rate > 15%</button>
           </div>
@@ -171,7 +180,7 @@
         }
 
         if (options.filtered) { 
-            if (options.filtered === 'filter-r') { 
+            if (options.filtered === 'above-fifteen') { 
               data = data.filter(function (a) { 
                 return a.rate > 15; });
             }
@@ -229,10 +238,10 @@
 
       document.getElementById('filter-byrate').addEventListener('click', function ()
        {
-       if (options.filtered === 'filter-r') {
+       if (options.filtered === 'above-fifteen') {
       	   options.filtered = false; 
        }   else {
-           options.filtered = 'filter-r'; 
+           options.filtered = 'above-fifteen'; 
        }
        updateTable(); 
      });
