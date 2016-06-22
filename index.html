@@ -133,10 +133,10 @@
 console.log("what is opt", options.sorted);      
       
     if (options.sorted) {
-      if (options.sorted === 'asc') {
+      if (options.sorted === "asc") {
           data.sort(function (a, b) { return a.employment - b.employment; });
 //          console.log("am here");
-      } else if (options.sorted === 'desc') {
+      } else if (options.sorted === "desc") {
           data.sort(function (a, b) { return b.employment - a.employment; });
       } } else {
           data = states.slice();
@@ -144,18 +144,18 @@ console.log("what is opt", options.sorted);
         
     }        
 
-//      console.log("message here", data[0], data['state'], options.sorted, options.filtered)
+//      console.log("message here", data[0], data["state"], options.sorted, options.filtered)
 
     if (options.filtered) {
-    	if (options.filtered === 'northeast') {
+    	if (options.filtered === "northeast") {
     		data = data.filter(function (d) {	return d.region === "Northeast" })
-          } else if (options.filtered === 'south') {
+          } else if (options.filtered === "south") {
             data = data.filter(function (d) { return d.region === "South"})
-          } else if (options.filtered === 'midwest') {
+          } else if (options.filtered === "midwest") {
             data = data.filter(function (d) { return d.region === "Midwest"})
-          } else if (options.filtered === 'west') {
+          } else if (options.filtered === "west") {
             data = data.filter(function (d) { return d.region === "West"})
-     	}
+     	} 
     }      
 
     // Binding data - this will be a very common task in our use of D3. Start by making a selectAll of <tr> elements that do not yet exist (they will soon!).
@@ -187,7 +187,7 @@ console.log("what is opt", options.sorted);
     rows.append("td")
       .append("div")
       .classed("bar", true)
-      .style("width", function(d) { return ((d.employment / MAX_EMPLOYMENT) * 100) + '%' })
+      .style("width", function(d) { return ((d.employment / MAX_EMPLOYMENT) * 100) + "%" })
 
   };   
     
@@ -201,38 +201,91 @@ console.log("what is opt", options.sorted);
 
 // sort ascending 
     d3.select("#sort-asc").on("click", function() {
-        if (options.sorted === 'asc') {
+        if (options.sorted === "asc") {
         options.sorted = false;
-        d3.select('#sort-asc').classed('active', false);    
+        d3.select("#sort-asc").classed("active", false);    
         } else {
-            options.sorted = 'asc';
-            d3.select('#sort-asc').classed('active', true);
-            d3.select('#sort-desc').classed('active', false);
+            options.sorted = "asc";
+            d3.select("#sort-asc").classed("active", true);
+            d3.select("#sort-desc").classed("active", false);
 //            console.log("asc button is now set to ");
         }
-        console.log("asc button is now set to ", options.sorted);
+//        console.log("asc button is now set to ", options.sorted);
         updateTable();
     });
 
 // sort descending    
     d3.select("#sort-desc").on("click", function() {
-        if (options.sorted === 'desc') {
+        if (options.sorted === "desc") {
         options.sorted = false;
-        d3.select('#sort-desc').classed('active', false);    
+        d3.select("#sort-desc").classed("active", false);    
         } else {
-            options.sorted = 'desc';
-            d3.select('#sort-desc').classed('active', true);
-            d3.select('#sort-asc').classed('active', false);
+            options.sorted = "desc";
+            d3.select("#sort-desc").classed("active", true);
+            d3.select("#sort-asc").classed("active", false);
 //            console.log("now here desc");
         }
-        console.log("desc button is now set to ", options.sorted);        
+//        console.log("desc button is now set to ", options.sorted);        
         updateTable();
     });    
     
-   
+// filter for the 4 regions
+    d3.select("#filter-ne").on("click", function() {
+        if (options.filtered === "northeast") {
+            d3.select("#filter-ne").classed("active", false);                
+            options.filtered = false;
+        } else {
+            options.filtered = "northeast";
+            d3.select("#filter-so").classed("active", false);                            
+            d3.select("#filter-mw").classed("active", false);                                        
+            d3.select("#filter-we").classed("active", false);                                        
+            d3.select("#filter-ne").classed("active", true);                            
+        }
+        updateTable();
+  });   
 
+    d3.select("#filter-so").on("click", function() {
+        if (options.filtered === "south") {
+            d3.select("#filter-so").classed("active", false);                
+            options.filtered = false;
+        } else {
+            options.filtered = "south";
+            d3.select("#filter-mw").classed("active", false);                                        
+            d3.select("#filter-we").classed("active", false);                                        
+            d3.select("#filter-ne").classed("active", false);             
+            d3.select("#filter-so").classed("active", true);                                        
+        }
+        updateTable();
+  });   
 
-
+    d3.select("#filter-mw").on("click", function() {
+        if (options.filtered === "midwest") {
+            d3.select("#filter-mw").classed("active", false);                
+            options.filtered = false;
+        } else {
+            options.filtered = "midwest";
+            d3.select("#filter-so").classed("active", false);                                        
+            d3.select("#filter-we").classed("active", false);                                        
+            d3.select("#filter-ne").classed("active", false);             
+            d3.select("#filter-mw").classed("active", true);                                        
+        }
+        updateTable();
+  });  
+    
+    d3.select("#filter-we").on("click", function() {
+        if (options.filtered === "west") {
+            d3.select("#filter-we").classed("active", false);                
+            options.filtered = false;
+        } else {
+            options.filtered = "west";
+            d3.select("#filter-mw").classed("active", false);                                        
+            d3.select("#filter-so").classed("active", false);                                        
+            d3.select("#filter-ne").classed("active", false);             
+            d3.select("#filter-we").classed("active", true);                                        
+        }
+        updateTable();
+  });  
+    
 </script>
 
   <p>Source: <a href="http://www.bls.gov/home.htm">Bureau of Labor Statistics</a></p>
