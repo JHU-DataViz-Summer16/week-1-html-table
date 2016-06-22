@@ -136,7 +136,7 @@
       .append("tr");
 
     // If you run, console.log(rows), you should now see an array of <tr> elements printed out to the console, each of which should contain a __data__ property containing one object from our JSON array.
-    console.log(rows);
+//    console.log(rows);
 
     // Take the rows variable and append a <td> elements containing d.name - the name of each schools for each bound data element.
     rows.append("td")
@@ -165,22 +165,36 @@
     
 
 
-//        d3.select("#sort-asc")
-//    .on("click", function(){
-//
-//    console.log("msg asc");
-//    options.sorted = 'asc';
+
     d3.select("#sort-asc").on("click", function(k) {
-        d3.select('#sort-desc').classed('active', false);
-        d3.select('#sort-asc').classed('active', true);    
-    d3.selectAll("tbody tr").sort(function(a, b) { return d3.ascending(a.employment, b.employment); });    
+        if (d3.select('#sort-asc').classed('active') === false) {
+            console.log("here", d3.select('#sort-asc').classed('active'));
+            d3.select('#sort-asc').classed('active', true);
+            d3.select('#sort-desc').classed('active', false);
+            d3.selectAll("tbody tr").sort(function(a, b) { 
+                return d3.ascending(a.employment, b.employment); 
+                });    
+            } else {
+                console.log("here 2");
+                d3.select('#sort-asc').classed('active', false);
+                updateTable();
+            }            
     });
 
-    d3.select("#desc-asc").on("click", function(k) {
-    d3.selectAll("tbody tr").sort(function(a, b) { return d3.descending(a.employment, b.employment); });    
-    });
+
     
-
+    d3.select("#sort-desc").on("click", function(k) {
+        if (d3.select('#sort-desc').classed('active') === false) {
+            d3.select('#sort-desc').classed('active', true);
+            d3.select('#sort-asc').classed('active', false);
+            d3.selectAll("tbody tr").sort(function(a, b) { 
+                return d3.descending(a.employment, b.employment); 
+                });    
+            } else {
+                d3.select('#sort-desc').classed('active', false);
+                updateTable();
+            }        
+    });
 
 
 
