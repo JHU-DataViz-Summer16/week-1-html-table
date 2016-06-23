@@ -54,6 +54,9 @@
     </nav>
   </div>
 </div>
+    
+  <p>Source: <a href="http://www.bls.gov/home.htm">Bureau of Labor Statistics</a></p>    
+    
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
 <script>
   var states = [
@@ -126,11 +129,11 @@
 
 
   function updateTable(){
-      
-    // Erase any existing html code within tbody by replacing it with a blank string "".
-    tbody.html("");
-      
-console.log("what is opt", options.sorted);      
+      var rows = "";
+      console.log("rows", rows);
+      tbody.html("");
+  
+console.log("what is opt", options.sorted, options.filtered);      
       
     if (options.sorted) {
       if (options.sorted === "asc") {
@@ -138,35 +141,34 @@ console.log("what is opt", options.sorted);
 //          console.log("am here");
       } else if (options.sorted === "desc") {
           data.sort(function (a, b) { return b.employment - a.employment; });
-      } } else {
-          data = states.slice();
+      } 
+    } else {
+          data = states.slice();            // get back the original order
+
           console.log("damn it"); 
         
     }        
 
-//      console.log("message here", data[0], data["state"], options.sorted, options.filtered)
+    
 
     if (options.filtered) {
-    	if (options.filtered === "northeast") {
-    		data = data.filter(function (d) {	return d.region === "Northeast" })
-          } else if (options.filtered === "south") {
-            data = data.filter(function (d) { return d.region === "South"})
-          } else if (options.filtered === "midwest") {
-            data = data.filter(function (d) { return d.region === "Midwest"})
-          } else if (options.filtered === "west") {
-            data = data.filter(function (d) { return d.region === "West"})
-     	} 
+      data = data.filter(function (d) { 
+          return d.region === options.filtered; 
+          });
+        console.log("new", options.filtered);
     }      
-
+      
+      
+//    tbody.html("");      
+      
     // Binding data - this will be a very common task in our use of D3. Start by making a selectAll of <tr> elements that do not yet exist (they will soon!).
     // Then we bind our data (schools) with .data and .enter()
     // Lastly, we append the <tr> elements, which are become our current selection because of the prior selectAll("tr")
-    var rows = tbody.selectAll("tr")
-      .data(data)
-      .enter()
+    rows = tbody.selectAll("tr")
+        .data(data)
+        .enter()
         .append("tr");
-//      .append("tr").filter( function(d) { 
-//                return (d.region === "Northeast")});
+
 
     // If you run, console.log(rows), you should now see an array of <tr> elements printed out to the console, each of which should contain a __data__ property containing one object from our JSON array.
 //    console.log(rows);
@@ -191,12 +193,7 @@ console.log("what is opt", options.sorted);
 
   };   
     
-    
-//    console.log("tbod 2", tbody);    
-
   updateTable();
-
-    
 
 
 // sort ascending 
@@ -231,11 +228,11 @@ console.log("what is opt", options.sorted);
     
 // filter for the 4 regions
     d3.select("#filter-ne").on("click", function() {
-        if (options.filtered === "northeast") {
-            d3.select("#filter-ne").classed("active", false);                
+        if (options.filtered === "Northeast") {
             options.filtered = false;
+            d3.select("#filter-ne").classed("active", false);                
         } else {
-            options.filtered = "northeast";
+            options.filtered = "Northeast";
             d3.select("#filter-so").classed("active", false);                            
             d3.select("#filter-mw").classed("active", false);                                        
             d3.select("#filter-we").classed("active", false);                                        
@@ -245,11 +242,11 @@ console.log("what is opt", options.sorted);
   });   
 
     d3.select("#filter-so").on("click", function() {
-        if (options.filtered === "south") {
-            d3.select("#filter-so").classed("active", false);                
+        if (options.filtered === "South") {
             options.filtered = false;
+            d3.select("#filter-so").classed("active", false);                
         } else {
-            options.filtered = "south";
+            options.filtered = "South";
             d3.select("#filter-mw").classed("active", false);                                        
             d3.select("#filter-we").classed("active", false);                                        
             d3.select("#filter-ne").classed("active", false);             
@@ -259,11 +256,11 @@ console.log("what is opt", options.sorted);
   });   
 
     d3.select("#filter-mw").on("click", function() {
-        if (options.filtered === "midwest") {
+        if (options.filtered === "Midwest") {
+            options.filtered = false;            
             d3.select("#filter-mw").classed("active", false);                
-            options.filtered = false;
         } else {
-            options.filtered = "midwest";
+            options.filtered = "Midwest";
             d3.select("#filter-so").classed("active", false);                                        
             d3.select("#filter-we").classed("active", false);                                        
             d3.select("#filter-ne").classed("active", false);             
@@ -273,11 +270,11 @@ console.log("what is opt", options.sorted);
   });  
     
     d3.select("#filter-we").on("click", function() {
-        if (options.filtered === "west") {
+        if (options.filtered === "West") {
+            options.filtered = false;            
             d3.select("#filter-we").classed("active", false);                
-            options.filtered = false;
         } else {
-            options.filtered = "west";
+            options.filtered = "West";
             d3.select("#filter-mw").classed("active", false);                                        
             d3.select("#filter-so").classed("active", false);                                        
             d3.select("#filter-ne").classed("active", false);             
@@ -288,6 +285,6 @@ console.log("what is opt", options.sorted);
     
 </script>
 
-  <p>Source: <a href="http://www.bls.gov/home.htm">Bureau of Labor Statistics</a></p>
+
 </body>
 </html>
