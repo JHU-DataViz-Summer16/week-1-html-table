@@ -5,45 +5,510 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Week 1: HTML Tables</title><!-- Latest compiled and minified CSS -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+   <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Lato">
+
   <style>
     .header {
-      text-align: center;
+      text-align: left;
+      margin-top: 70px;
+     
     }
+
+    .income {
+      font-color: #F2998F;
+    }
+
+    .bar {
+          height: 20px;
+          background: #F2998F;
+        }
+      
+    .pager>li.previous>a {
+      color: #000000;
+    }
+
+    .pager>li.next>a {
+      color: #000000;
+    }
+
+   table {
+      color:  #ffffff;
+      margin-top: 50px;
+   
+    }
+
+    th {
+      font-size: 16px;
+    }
+
+    body {
+      background: #357C8D;
+      color: #ffffff;
+      font-family: "Lato", sans-serif;
+
+    }
+
+    h1 {
+      font-size: 30px;
+      margin-bottom: 20px;
+    }
+    img {margin: 50px 50px;}
+  
+    h2 {
+      font-size: 20px;
+      
+    }
+
+    .table-hover tbody tr:hover td {
+      background-color: #5a5858;
+    
+    }
+
+    a {
+      color: #ffffff;
+
+    }
+
+    .btn.outline {
+      background: none;
+      padding: 6px 6px;
+      margin: 6px 12px;
+
+    }
+
+    .btn-primary.outline {
+      border: 2px solid #ffffff;
+      color: #ffffff;
+    
+    } 
+    
+    .btn-primary:hover {
+      color: #fff;
+    background-color: #5a5858;
+    border-color: #ffffff; 
+    }
+
+    img {
+      max-width: 100%;
+    }
+ 
+   
+
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
-      <h1>Week 1: HTML Tables</h1>
-      <p>We'll add our data to this table.</p>
+      <div class = "col-sm-7">
+        <h1>A Glance at D.C. Neighborhoods</h1>
+        <br />
+        <p>Washington D.C.has changed rapidly in the past decade, with more young professionals moving in certain parts of the District. Using data from <a href="http://www.neighborhoodinfodc.org" target="_blank"><u><b>Neighborhood Info DC</b></u></a>, we can examine exactly how average family income and poverty rates vary among neighborhoods within the District.</p>
+        <div class="controls section">
+          <h2>filter:</h2>
+          <div class="btn-group" role="group" aria-label="Filter">
+            <button type="button" class="btn btn-primary outline" id="filter-poverty">Poverty Rate>20%</button> 
+            <button type="button" class="btn btn-primary outline" id="filter-income">6-figure income</button> 
+          </div>
+          <h2>sort:</h2> 
+          <div class="btn-group" role="group" aria-label="Sort">
+            <button type="button" class="btn btn-primary outline" id="sort-desc-poverty">Poverty Rate</button>
+            <button type="button" class="btn btn-primary outline" id="sort-desc-income">Average Family Income</button>    
+          </div>
+          <h2></h2>
+        </div>
+      </div>
+        
+      <div class = "col-sm-5">
+        <img src = "map_washington-dc.gif" alt="D.C. neighborhood map" width= "300" height= "330">
+
+      </div>
     </div>
-    <table class="table">
+  </div>
+  
+
+
+
+<div class = "main section">
+  <div class = "container">
+    <table class="table table-hover" id = "data-table"> 
       <thead>
         <tr>
-          <th>Fruit</th>
-          <th>Price</th>
-          <th>Quantity</th>
+          <th>Neighborhood</th>
+          <th class = "col-sm-2">Average Family Income</th>
+          <th class = "col-sm-3"></th>
+          <th class = "col-sm-2">Poverty Rate</th>
+          <th class = "col-sm-2"></th>
+          
+          
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td>Apples</td>
-          <td>$0.55</td>
-          <td>5</td>
-        </tr>
-        <tr>
-          <td>Oranges</td>
-          <td>$0.80</td>
-          <td>10</td>
-        </tr>
-        <tr>
-          <td>Pears</td>
-          <td>$0.95</td>
-          <td>3</td>
-        </tr>
       </tbody>
     </table>
-  </div>
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
+    <nav>
+      <ul class="pager">
+        <li class="previous"><a href="#" id="page-prev"><span aria-hidden="true">&larr;</span>Previous</a></li>
+        <li class="next"><a href="#" id="page-next">Next<span aria-hidden="true">&rarr;</span></a></li>
+      </ul>
+    </nav>
+  </div>         
+</div>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
+<script>
+var dc_info = [{"num":5,"neighborhood":"Foggy Bottom","poverty_rate":29,"avg_family_income":211064},
+{"num":4,"neighborhood":"Georgetown","poverty_rate":11,"avg_family_income":304995},
+{"num":13,"neighborhood":"Palisades","poverty_rate":8.3,"avg_family_income":297054},
+{"num":11,"neighborhood":"Friendship Heights","poverty_rate":5.8,"avg_family_income":215289},
+{"num":15,"neighborhood":"Cleveland Park","poverty_rate":8.9,"avg_family_income":291000},
+{"num":10,"neighborhood":"Chevy Chase","poverty_rate":3.7,"avg_family_income":254541},
+{"num":26,"neighborhood":"South Capitol Hill","poverty_rate":6,"avg_family_income":186314},
+{"num":19,"neighborhood":"Lamond Riggs","poverty_rate":14,"avg_family_income":75912},
+{"num":14,"neighborhood":"Glover Park","poverty_rate":7.9,"avg_family_income":157349},
+{"num":17,"neighborhood":"Takoma","poverty_rate":13,"avg_family_income":81956},
+{"num":16,"neighborhood":"Shepherd Park","poverty_rate":3.8,"avg_family_income":180800},
+{"num":36,"neighborhood":"Garfield Heights","poverty_rate":45,"avg_family_income":45220},
+{"num":31,"neighborhood":"Deanwood","poverty_rate":34,"avg_family_income":51670},
+{"num":32,"neighborhood":"Fort DuPont","poverty_rate":24,"avg_family_income":57825},
+{"num":12,"neighborhood":"Van Ness","poverty_rate":8.7,"avg_family_income":217847},
+{"num":30,"neighborhood":"Mayfair","poverty_rate":32,"avg_family_income":37659},
+{"num":24,"neighborhood":"Woodridge","poverty_rate":13,"avg_family_income":97305},
+{"num":29,"neighborhood":"Kenilworth","poverty_rate":41,"avg_family_income":42821},
+{"num":18,"neighborhood":"Petworth","poverty_rate":14,"avg_family_income":88437},
+{"num":25,"neighborhood":"Kingman Park","poverty_rate":14,"avg_family_income":129089},
+{"num":28,"neighborhood":"Anacostia","poverty_rate":44,"avg_family_income":34195},
+{"num":34,"neighborhood":"Fairlawn","poverty_rate":21,"avg_family_income":70274},
+{"num":38,"neighborhood":"Shipley Terrace","poverty_rate":38,"avg_family_income":38427},
+{"num":33,"neighborhood":"Capitol View","poverty_rate":22,"avg_family_income":53239},
+{"num":23,"neighborhood":"Ivy City","poverty_rate":32,"avg_family_income":48388},
+{"num":39,"neighborhood":"Bellevue","poverty_rate":36,"avg_family_income":41605},
+{"num":9,"neighborhood":"Southwest","poverty_rate":19,"avg_family_income":94339},
+{"num":22,"neighborhood":"Brookland","poverty_rate":23,"avg_family_income":81931},
+{"num":1,"neighborhood":"Adams Morgan","poverty_rate":5.6,"avg_family_income":162891},
+{"num":37,"neighborhood":"Barry Farm","poverty_rate":41,"avg_family_income":38015},
+{"num":8,"neighborhood":"Downtown","poverty_rate":26,"avg_family_income":142881},
+{"num":35,"neighborhood":"Naylor Gardens","poverty_rate":17,"avg_family_income":72747},
+{"num":6,"neighborhood":"DuPont Circle","poverty_rate":13,"avg_family_income":177893},
+{"num":20,"neighborhood":"Michigan Park","poverty_rate":11,"avg_family_income":87062},
+{"num":21,"neighborhood":"Edgewood","poverty_rate":17,"avg_family_income":91520},
+{"num":2,"neighborhood":"Columbia Heights","poverty_rate":17,"avg_family_income":87204},
+{"num":7,"neighborhood":"Logan Circle","poverty_rate":12,"avg_family_income":123697},
+{"num":3,"neighborhood":"Shaw","poverty_rate":17,"avg_family_income":101583},
+{"num":27,"neighborhood":"Navy Yard","poverty_rate":34,"avg_family_income":77952}];
+
+
+
+var MAX_INCOME = 304995;
+var MAX_POVERTY = 45;
+
+var options = {
+  sorted: false,
+  filtered: false,
+  page:0,
+  reset: false
+};
+
+var tbody = d3.select("tbody");
+
+
+
+function updateTable(){
+  tbody.html("");
+
+var data = dc_info.slice()
+
+  
+
+  
+
+  //Alphabetize table by neighborhood name
+
+
+function compareStrings (a,b) {
+  a = a.toLowerCase();
+  b = b.toLowerCase();
+  return (a < b) ? -1 : (a > b) ? 1: 0;
+} 
+
+
+    if (options.sorted) {
+      if (options.sorted === 'desc-income') {
+        console.log("sorted")
+        data.sort(function (a,b) {
+          return d3.descending(a.avg_family_income, b.avg_family_income); });
+      }  
+    } else if (options.filtered) {
+      if (options.filtered === 'filter-high-poverty') {
+        data = data.filter(function (a) { return a.poverty_rate > 20; });
+      } else if (options.filtered === 'filter-high-income') {
+      data = data.filter(function (a) { return a.avg_family_income > 99000; });
+    }   
+  }
+    else { 
+        data.sort(function (a,b) { return compareStrings(a.neighborhood, b.neighborhood); });
+      }
+
+ var rows = tbody.selectAll("tr")
+    .data(data)
+    .enter().append("tr")
+
+  //rows.append("tr")
+  
+
+/*
+ var rows = tbody.selectAll("tr")
+  .data(dc_info)
+  .enter()
+  .append("tr")
+  if (options.sorted) {
+    if (options.sorted === 'desc-income') {
+      rows.sort(function (a,b) { return d3.descending (a.avg_family_income, b.avg_family_income); });
+    } else if (options.sorted === 'desc-poverty') {
+      rows.sort(function (a,b) { return d3.descending (a.poverty_rate, b.poverty_rate); });
+    } 
+  } else if (options.filtered) {
+      if (options.filtered === 'filter-high-poverty') {
+        rows.filter(function (a) { return a.poverty_rate > 20; });
+      } else if (options.filtered === 'filter-high-income') {
+      rows.filter(function (a) { return a.avg_family_income > 99000; });
+    }   
+  } else {
+      rows.sort(function (a,b) { return compareStrings (a.neighborhood, b.neighborhood);});
+    }
+
+  */
+
+
+  rows.append("td")
+    .html(function(d) { return d.neighborhood});
+
+  rows.append("td")
+    .html(function(d) { return "$" + d3.format(",")(d.avg_family_income)});
+
+  rows.append("td")
+    .append("div")
+    .classed("bar", true)
+    .style("width", function(d) { return ((d.avg_family_income / MAX_INCOME) * 100 + '%')});
+
+  rows.append("td")
+    .html(function(d) { return d.poverty_rate + "%"});
+
+  rows.append("td")
+    .append("div")
+    .classed("bar", true)
+    .style("width", function(d) { return ((d.poverty_rate / MAX_POVERTY) * 100 + '%')})
+
+
+
+/*
+  dc_info.select("#sort-desc-income")
+    .data(dc_info)
+    .on("click", function(){
+    rows.sort(function(a, b) { return b.avg_family_income - a.avg_family_income; });
+    });
+    */
+};
+
+
+updateTable();
+
+
+
+
+d3.select("#sort-desc-income")
+  .on("click", function() {
+    if (options.sorted === 'desc-income') {
+    options.sorted = false;
+  } else {
+    options.sorted = 'desc-income';
+  }
+    updateTable();
+    d3.select('#sort-desc-income').classed('active', true);
+    d3.select('#sort-desc-poverty').classed('active', false);
+    d3.select('#filter-poverty').classed('active', false);
+    d3.select('#filter-income').classed('active', false);
+  })
+  
+  d3.select("#sort-desc-poverty")
+  .on("click", function() {
+    if (options.sorted === 'desc-poverty') {
+    options.sorted = false;
+  } else {
+    options.sorted = 'desc-poverty';
+  }
+    updateTable();
+    d3.select('#sort-desc-income').classed('active', false);
+    d3.select('#sort-desc-poverty').classed('active', true);
+    d3.select('#filter-poverty').classed('active', false);
+    d3.select('#filter-income').classed('active', false);
+  })
+
+ 
+
+d3.select("#filter-poverty")
+  .on("click", function() {
+    if (options.filtered === 'filter-high-poverty') {
+    options.filtered = false;
+  } else {
+    options.filtered = 'filter-high-poverty';
+  }
+    updateTable();
+    d3.select('#sort-desc-income').classed('active', false);
+    d3.select('#sort-desc-poverty').classed('active', false);
+    d3.select('#filter-poverty').classed('active', true);
+    d3.select('#filter-income').classed('active', false);
+  })
+
+d3.select("#filter-income")
+  .on("click", function() {
+    if (options.filtered === 'filter-high-income') {
+    options.filtered = false;
+  } else {
+    options.filtered = 'filter-high-income';
+  }
+    updateTable();
+    d3.select('#sort-desc-income').classed('active', false);
+    d3.select('#sort-desc-poverty').classed('active', false);
+    d3.select('#filter-poverty').classed('active', false);
+    d3.select('#filter-income').classed('active', true);
+  })
+
+  
+
+/*d3.select("#sort-desc-income")
+  .on("click", function(){
+    sortTable();
+    d3.select('#sort-desc-income').classed('active', true);
+    d3.select('#sort-desc-poverty').classed('active', false);
+  });
+
+
+var sortTable = function() {
+ d3.selectAll("tbody")
+  .sort(function (a,b) { 
+    if (options.sorted) {
+    options.sorted = false;
+    }
+  updateTable();
+  })
+};
+
+
+
+
+
+
+
+
+//Sort by neighborhood name and poverty rate in descending order
+
+/*function compareStrings (a,b) {
+  a = a.toLowerCase();
+  b = b.toLowerCase();
+  return (a < b) ? -1 : (a > b) ? 1: 0;
+}
+dc_info.sort(function (a, b) {
+  return compareStrings(a.neighborhood, b.neighborhood);
+});
+
+//Sort by income and poverty rate
+
+
+function updateTable() {
+
+  var data = dc_info.slice()
+
+
+//Filter by Poverty>20%
+  if (options.filtered) {
+     if (options.filtered === 'high-poverty') {
+        data = data.filter(function (a) { 
+          return a.poverty_rate > 20; });
+      }
+}
+//Filter by 6 figure income
+  if (options.filtered) {
+    if (options.filtered === '6-figure-income'){
+      data = data.filter(function (a) {
+        return a.avg_family_income > 99999; });
+    }
+}
+
+//Sort
+
+if (options.sorted) {
+    if (options.sorted === 'desc') {
+      data.sort(function (a, b) { return b.avg_family_income - a.avg_family_income; });
+    } else if (options.sorted === 'desc-poverty') {
+      data.sort(function (a, b) { return b.poverty_rate - a.poverty_rate; });
+    }
+ }
+
+//My attempt at Pagination for Next button, not working though
+
+
+
+  if (options.page) {
+    if (options.page === 'next-page'){
+      
+      data = data.slice(function (pageno, max_num) {
+        console.log('3');
+        var pageno = 2;
+        var rows = 10;
+        
+        return data.slice((pageno - 1) * rows, pageno * rows); });
+    }
+  } 
+
+  
+  
+
+
+document.getElementById('sort-desc-income').addEventListener('click', function() {
+  if (options.sorted === 'desc') {
+    options.sorted = false;
+  } else {
+    options.sorted = 'desc';
+  }
+  updateTable();
+});
+
+document.getElementById('sort-desc-poverty').addEventListener('click', function() {
+  if (options.sorted === 'desc-poverty') {
+    options.sorted = false;
+  } else {
+    options.sorted = 'desc-poverty';
+  }
+  updateTable();
+});
+
+document.getElementById('filter-poverty').addEventListener('click', function() {
+  if (options.filtered === 'high-poverty') {
+    options.filtered = false;
+  } else {
+    options.filtered = 'high-poverty';
+  }
+  updateTable();
+});
+
+document.getElementById('filter-income').addEventListener('click', function() {
+  if (options.filtered === '6-figure-income') {
+    options.filtered = false;
+  } else {
+    options.filtered = '6-figure-income';
+  }
+  updateTable();
+});
+
+document.getElementById('page-next').addEventListener('click', function() {
+  if (options.page === 'next-page') {
+    options.page = 0;
+  } else {
+    options.page = 'next-page';
+  }
+  updateTable();
+});
+*/
+
+</script>
 </body>
 </html>
