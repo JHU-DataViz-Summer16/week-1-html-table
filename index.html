@@ -261,8 +261,8 @@ function updateTable() {
 
     // Select only the occupations from the current page (slice)
     if (options.page) {
-      data = data.slice(options.page*20+1,options.page*20+21 );
-      	if (data[options.page*20+22] ===null) {
+      data2 = data.slice(options.page*20+1,options.page*20+21 );
+      	if (typeof data[options.page*20+22] === 'undefined') {
       		d3.selectAll('.next').classed('disabled', true);
       		d3.selectAll('.previous').classed('disabled', false);
       	} else {
@@ -270,12 +270,14 @@ function updateTable() {
       		d3.selectAll('.previous').classed('disabled', false);
       	}
     } else {
-       data = data.slice(0,21)
+       data2 = data.slice(0,21)
        d3.selectAll('.previous').classed('disabled', true);
-        if (data[22] ===null) {
+        if (typeof data[22] === 'undefined') {
       		d3.selectAll('.next').classed('disabled', true);
+      		console.log('Yes');
       	} else {
       		d3.selectAll('.next').classed('disabled', false);
+      		console.log('No');
       	}
     }
 
@@ -283,7 +285,7 @@ function updateTable() {
    tbody.html("");
   
    var rows = tbody.selectAll("tr")
-      .data(data)
+      .data(data2)
       .enter()
       .append("tr");
 
