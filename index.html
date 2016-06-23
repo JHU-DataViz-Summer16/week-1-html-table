@@ -123,69 +123,41 @@
     
     
     var tbody = d3.select("tbody");
-    var data = states.slice();
-    
-//    console.log("tbod", tbody);
-
 
   function updateTable(){
-      var rows = "";
-      console.log("rows", rows);
-      tbody.html("");
-  
-console.log("what is opt", options.sorted, options.filtered);      
+    var rows = "";
+    tbody.html("");
+    var data = states.slice();
       
     if (options.sorted) {
       if (options.sorted === "asc") {
           data.sort(function (a, b) { return a.employment - b.employment; });
-//          console.log("am here");
       } else if (options.sorted === "desc") {
           data.sort(function (a, b) { return b.employment - a.employment; });
       } 
-    } else {
-          data = states.slice();            // get back the original order
-
-          console.log("damn it"); 
-        
     }        
-
     
 
     if (options.filtered) {
       data = data.filter(function (d) { 
           return d.region === options.filtered; 
           });
-        console.log("new", options.filtered);
     }      
-      
-      
-//    tbody.html("");      
-      
-    // Binding data - this will be a very common task in our use of D3. Start by making a selectAll of <tr> elements that do not yet exist (they will soon!).
-    // Then we bind our data (schools) with .data and .enter()
-    // Lastly, we append the <tr> elements, which are become our current selection because of the prior selectAll("tr")
+            
     rows = tbody.selectAll("tr")
         .data(data)
         .enter()
         .append("tr");
 
-
-    // If you run, console.log(rows), you should now see an array of <tr> elements printed out to the console, each of which should contain a __data__ property containing one object from our JSON array.
-//    console.log(rows);
-
-    // Take the rows variable and append a <td> elements containing d.name - the name of each schools for each bound data element.
     rows.append("td")
       .html(function(d) { return d.state });
       
-//    console.log(rows.append("td").html());
-
     rows.append("td")
         .html(function(d) { return d.employment });
 
     rows.append("td")
       .html(function(d) { return d.region });
 
-    // Same as above, calculating a percent of the space allowed that the div should fill:
     rows.append("td")
       .append("div")
       .classed("bar", true)
@@ -205,9 +177,7 @@ console.log("what is opt", options.sorted, options.filtered);
             options.sorted = "asc";
             d3.select("#sort-asc").classed("active", true);
             d3.select("#sort-desc").classed("active", false);
-//            console.log("asc button is now set to ");
         }
-//        console.log("asc button is now set to ", options.sorted);
         updateTable();
     });
 
@@ -220,9 +190,7 @@ console.log("what is opt", options.sorted, options.filtered);
             options.sorted = "desc";
             d3.select("#sort-desc").classed("active", true);
             d3.select("#sort-asc").classed("active", false);
-//            console.log("now here desc");
         }
-//        console.log("desc button is now set to ", options.sorted);        
         updateTable();
     });    
     
