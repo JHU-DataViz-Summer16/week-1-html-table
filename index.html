@@ -175,12 +175,10 @@
 
         var data = states.slice()
 
-        if (options.filtered) { 
-          if (options.filtered === 'filter-r') { 
-              data = data.filter(function (k) { 
-              return k.rate > 15})
-          }
-        }
+        if (options.filtered === 'filter-r') { 
+            data = data.filter(function (a) { 
+            return a.rate > 15}) 
+        }; 
 
         var rows = tbody.selectAll("tr")
           .data(states)
@@ -244,9 +242,10 @@
             }  else {
                options.filtered = 'filter-r'; 
                d3.select('#filter-byrate').classed('active', true); 
+               console.log("check"); 
 
-            updateTable(); 
             }
+            updateTable(); 
             
           }); 
 
