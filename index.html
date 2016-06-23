@@ -184,17 +184,17 @@
         rows.append("td")
           .html(function (d) {return d.rate}); 
 
+        if (options.filtered) { 
+          if (options.filtered === 'filter-r') { 
+              data = data.filter(function (a) { 
+              return a.rate > 15})
+          }
+        }
+
         rows.append("td")
           .append("div")
           .classed("bar", true)
           .style("width", function (d) {return ((d.rate / MAX_RATE) *100) + '%'})
-
-        if (options.filtered) { 
-            if (options.filtered === 'filter-r') { 
-              data = data.filter(function (a) { 
-                return a.rate > 15; });
-            }
-        }
 
         }; 
 
