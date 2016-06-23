@@ -12,9 +12,9 @@
       color: white;
       padding: 1em 0 2em;
     }
-    #data-table td {
-      width: 25%
-    }
+    #data-table { table-layout: fixed; }
+    #data-table th:last child {width: 200px}
+
     .bar {
       height: 20px;
       /* Note that we'll set the width dynamically using Javascript. */
@@ -37,9 +37,9 @@
         <button type="button" class="btn btn-default" id="sort-desc">Descending</button>
       </div>
       <div class="btn-group">
-        <button type="button" class="btn btn-default" id="filter-State">State</button>
-        <button type="button" class="btn btn-default" id="filter-Agency">Agency Name</button>
-        <button type="button" class="btn btn-default" id="filter-Congressional_District">Congressional District</button>
+        <button type="button" class="btn btn-default" id="filter-MARYLAND">Maryland</button>
+        <button type="button" class="btn btn-default" id="filter-VIRGINIA">Virginia</button>
+        <button type="button" class="btn btn-default" id="filter-CALIFORNIA">California</button>
       </div>
     </div>
   </div>
@@ -59,6 +59,7 @@
           <th>DUNS</th>
           <th>Contract Date</th>
           <th>Vendor Name</th>
+          <th>Chart</th>
         </tr> 
       </thead>
       <tbody>
@@ -3153,7 +3154,7 @@ var contracts = [{"Agency":"AGENCY FOR INTERNATIONAL DEVELOPMENT","Annual_Contra
 {"Agency":"IMMEDIATE OFFICE OF THE SECRETARY OF TRANSPORTATION","Annual_Contract_Revenue":1000000000,"State":"CALIFORNIA","Country":"USA","Congressional_District":29,"Contracting_Agency":"IMMEDIATE OFFICE OF THE SECRETARY OF TRANSPORTATION","Contracting_Office":"DOT-OR&T 00057","DUNS":45224250,"Contract_Date":2012,"Vendor":"TETRA TECH INCORPORATED"},
 {"Agency":"IMMEDIATE OFFICE OF THE SECRETARY OF TRANSPORTATION","Annual_Contract_Revenue":107300000,"State":"NEW YORK","Country":"USA","Congressional_District":25,"Contracting_Agency":"IMMEDIATE OFFICE OF THE SECRETARY OF TRANSPORTATION","Contracting_Office":"DOT-OR&T 00057","DUNS":151375359,"Contract_Date":2011,"Vendor":"SENSIS CORPORATION"},
 {"Agency":"IMMEDIATE OFFICE OF THE SECRETARY OF TRANSPORTATION","Annual_Contract_Revenue":130000,"State":"CALIFORNIA","Country":"USA","Congressional_District":15,"Contracting_Agency":"IMMEDIATE OFFICE OF THE SECRETARY OF TRANSPORTATION","Contracting_Office":"DOT-OR&T 00057","DUNS":826394657,"Contract_Date":2011,"Vendor":"SAVARI, INC."},
-{"Agency":"INTERNAL REVENUE SERVICE","Annual_Contract_Revenue":8.9E+11,"State":"MARYLAND","Country":"USA","Congressional_District":null,"Contracting_Agency":"INTERNAL REVENUE SERVICE","Contracting_Office":"DEPT OF TREAS/INTERNAL REVENUE SERVICE","DUNS":835130485,"Contract_Date":2012,"Vendor":"INTERNATIONAL BUSINESS MACHINES CORPORATION"},
+{"Agency":"INTERNAL REVENUE SERVICE","Annual_Contract_Revenue":890000000000,"State":"MARYLAND","Country":"USA","Congressional_District":null,"Contracting_Agency":"INTERNAL REVENUE SERVICE","Contracting_Office":"DEPT OF TREAS/INTERNAL REVENUE SERVICE","DUNS":835130485,"Contract_Date":2012,"Vendor":"INTERNATIONAL BUSINESS MACHINES CORPORATION"},
 {"Agency":"INTERNAL REVENUE SERVICE","Annual_Contract_Revenue":10000000000,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"INTERNAL REVENUE SERVICE","Contracting_Office":"DEPT OF TREAS/INTERNAL REVENUE SERVICE","DUNS":116194192,"Contract_Date":2012,"Vendor":"CANON U.S.A., INC."},
 {"Agency":"INTERNAL REVENUE SERVICE","Annual_Contract_Revenue":5000000000,"State":"VIRGINIA","Country":"USA","Congressional_District":null,"Contracting_Agency":"INTERNAL REVENUE SERVICE","Contracting_Office":"DEPT OF TREAS/INTERNAL REVENUE SERVICE","DUNS":858485758,"Contract_Date":2012,"Vendor":"ACCENTURE LLP"},
 {"Agency":"INTERNAL REVENUE SERVICE","Annual_Contract_Revenue":5000000000,"State":"VIRGINIA","Country":"USA","Congressional_District":null,"Contracting_Agency":"INTERNAL REVENUE SERVICE","Contracting_Office":"DEPT OF TREAS/INTERNAL REVENUE SERVICE","DUNS":858485758,"Contract_Date":2012,"Vendor":"ACCENTURE LLP"},
@@ -4036,7 +4037,7 @@ var contracts = [{"Agency":"AGENCY FOR INTERNATIONAL DEVELOPMENT","Annual_Contra
 {"Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Annual_Contract_Revenue":150000,"State":"CALIFORNIA","Country":"USA","Congressional_District":26,"Contracting_Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Contracting_Office":"257-NETWORK CONTRACT OFFICE 17","DUNS":113785385,"Contract_Date":2012,"Vendor":"FRANKLIN YOUNG INTERNATIONAL, INCORPORATED"},
 {"Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Annual_Contract_Revenue":144000,"State":"DISTRICT OF COLUMBIA","Country":"USA","Congressional_District":0,"Contracting_Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Contracting_Office":"242-NETWORK CONTRACT OFFICE 02","DUNS":3255213,"Contract_Date":2012,"Vendor":"AMERICAN NATIONAL RED CROSS"},
 {"Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Annual_Contract_Revenue":125000,"State":"PENNSYLVANIA","Country":"USA","Congressional_District":3,"Contracting_Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Contracting_Office":"562-ERIE","DUNS":101492929,"Contract_Date":2012,"Vendor":"BELLE DENTAL LAB"},
-{"Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Annual_Contract_Revenue":100000,"State":"MICHIGAN","Country":"USA","Congressional_District":3,"Contracting_Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Contracting_Office":"VBA FIELD CONTRACTING","DUNS":962344151,"Contract_Date":2012,"Vendor":"QUESTERGO, INC."}]
+{"Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Annual_Contract_Revenue":100000,"State":"MICHIGAN","Country":"USA","Congressional_District":3,"Contracting_Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Contracting_Office":"VBA FIELD CONTRACTING","DUNS":962344151,"Contract_Date":2012,"Vendor":"QUESTERGO, INC."}];
 var MAX_ANNUAL_CONTRACT_REVENUE = 890000000000;
 var options = {
     sorted: false,
@@ -4134,27 +4135,27 @@ function updateTable() {
   }
   updateTable();
   });
-  document.getElementById('filter-State').addEventListener('click', function () {
-  if (options.filtered === 'State') {
+  document.getElementById('filter-MARYLAND').addEventListener('click', function () {
+  if (options.filtered === 'MARYLAND') {
     options.filtered = false;
   } else {
-    options.filtered = 'State';
+    options.filtered = 'MARYLAND';
   }
   updateTable();
   });
-  document.getElementById('filter-Agency').addEventListener('click', function () {
-  if (options.filtered === 'Agency') {
+  document.getElementById('filter-VIRGINIA').addEventListener('click', function () {
+  if (options.filtered === 'VIRGINIA') {
     options.filtered = false;
   } else {
-    options.filtered = 'Agency';
+    options.filtered = 'VIRGINIA';
   }
   updateTable();
   });
-  document.getElementById('filter-Congressional_District').addEventListener('click', function () {
-  if (options.filtered === 'Congressional_District') {
+  document.getElementById('filter-CALIFORNIA').addEventListener('click', function () {
+  if (options.filtered === 'CALIFORNIA') {
     options.filtered = false;
   } else {
-    options.filtered = 'Congressional_District';
+    options.filtered = 'CALIFORNIA';
   }
   updateTable();
   });
