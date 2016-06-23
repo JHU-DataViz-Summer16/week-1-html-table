@@ -177,7 +177,7 @@
 
         if (options.filtered === 'filter-r') { 
             data = data.filter(function (a) { 
-            return a.rate > 15}) 
+            return a.rate > 15;}); 
         }; 
 
         var rows = tbody.selectAll("tr")
@@ -242,7 +242,7 @@
             }  else {
                options.filtered = 'filter-r'; 
                d3.select('#filter-byrate').classed('active', true); 
-               console.log("check"); 
+               console.log("check");  
 
             }
             updateTable(); 
