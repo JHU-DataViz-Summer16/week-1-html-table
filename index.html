@@ -236,18 +236,18 @@
 
         d3.select('#filter-byrate')
           .on("click", function() {
-
             if (options.filtered === 'filter-r') {
                 d3.select('#filter-byrate').classed('active', false); 
                 options.filtered = false;
+                updateTable(); 
             }  else {
                options.filtered = 'filter-r'; 
                d3.select('#filter-byrate').classed('active', true); 
+               updateTable(); 
             }
-
-            updateTable(); 
-
           }); 
+
+        updateTable(); 
 
 </script> 
 </body>
