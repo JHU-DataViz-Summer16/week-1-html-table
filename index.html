@@ -1,49 +1,256 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Week 1: HTML Tables</title><!-- Latest compiled and minified CSS -->
+  <title>National Homelessness</title>
+
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300,700' rel='stylesheet' type='text/css'>
+  
   <style>
-    .header {
-      text-align: center;
+    .section {padding: 1em 0;} 
+
+    .header {text-align: left;} 
+
+    #data-table td {width: 25%;}
+
+    .bar {height: 20px; background: #5A5050;}
+
+    h1 {
+      color:#5A5050;
+      font-family: 'Open Sans Condensed', Helvetica, sans-serif;
+      font-size: 300%;
+    } 
+
+    h2 {
+      color:#5A5050;
+      font-family: 'Open Sans Condensed', Helvetica, sans-serif;
+      font-size: 110%;
+    } 
+
+    p {
+      color:#5A5050;
+      font-family: 'Open Sans Condensed', Helvetica, sans-serif;
+      font-size: 90%;
     }
-  </style>
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      white-space: nowrap; 
+      font-family: 'Open Sans Condensed', Helvetica, sans-serif;
+      font-weight: 680;
+      color: #5A5050;
+    }
+
+    th { 
+      background-color: #547A82;
+      font-family: 'Open Sans Condensed', Helvetica, sans-serif;
+      color: white;
+    }
+
+    tr:hover td{font-weight: bold;}
+
+    body {background-color: white;}
+   </style>
+
 </head>
+
 <body>
-  <div class="container">
-    <div class="header">
-      <h1>Week 1: HTML Tables</h1>
-      <p>We'll add our data to this table.</p>
+
+    <div class="header section">
+      <div class="container">
+        <h1>Homelessness in the United States</h1>
+        <p>Data Source: National Alliance to End Homelessness</p>
+        <p>*Note: Rate of homelessness in DC is an outlier at 120 people for every 10K, and has 
+           therefore been removed from the below table</p>
+      </div>
     </div>
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Fruit</th>
-          <th>Price</th>
-          <th>Quantity</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Apples</td>
-          <td>$0.55</td>
-          <td>5</td>
-        </tr>
-        <tr>
-          <td>Oranges</td>
-          <td>$0.80</td>
-          <td>10</td>
-        </tr>
-        <tr>
-          <td>Pears</td>
-          <td>$0.95</td>
-          <td>3</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
+    
+    <div class="controls section">
+      <div class="container">
+        <div class="btn-toolbar">
+
+          <p>Sort by Rate</p>
+          <div class="btn-group" role="group" aria-label="Sort">
+            <button type="button" class="btn btn-default" id="sort-asc">Ascending</button>
+            <button type="button" class="btn btn-default" id="sort-desc">Descending</button>
+          <p>Filter by Rate</p>
+          <div class="btn-group" role="group" aria-label="Filter">
+            <button type="button" class="btn btn-default" id="filter-byrate">States with Rate > 15%</button>
+          </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="main section">
+      <div class="container">
+        <table class="table" id="data-table">
+          <thead>
+            <tr>
+              <th>State</th>
+              <th>2014 Rate per 10K</th>
+              <th>Rate by Comparison</th>
+            </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
+
+    <script>
+      var states = [
+        {"state":"AK","rate":24.3},
+        {"state":"AL","rate":9.4},
+        {"state":"AR","rate":9.9},
+        {"state":"AZ","rate":15.8},
+        {"state":"CA","rate":29.7},
+        {"state":"CO","rate":19.0},
+        {"state":"CT","rate":12.4},
+        {"state":"DE","rate":9.7},
+        {"state":"FL","rate":21.2},
+        {"state":"GA","rate":16.5},
+        {"state":"HI","rate":49.3},
+        {"state":"IA","rate":10.1},
+        {"state":"ID","rate":13.1},
+        {"state":"IL","rate":10.2},
+        {"state":"IN","rate":9.1},
+        {"state":"KS","rate":9.6},
+        {"state":"KY","rate":11.6},
+        {"state":"LA","rate":10.0},
+        {"state":"MA","rate":31.7},
+        {"state":"MD","rate":13.3},
+        {"state":"ME","rate":20.5},
+        {"state":"MI","rate":12.4},
+        {"state":"MN","rate":15.5},
+        {"state":"MO","rate":12.0},
+        {"state":"MS","rate":7.4},
+        {"state":"MT","rate":17.2},
+        {"state":"NC","rate":11.7},
+        {"state":"ND","rate":17.4},
+        {"state":"NE","rate":16.2},
+        {"state":"NH","rate":10.4},
+        {"state":"NJ","rate":13.1},
+        {"state":"NM","rate":13.2},
+        {"state":"NV","rate":37.8},
+        {"state":"NY","rate":41.0},
+        {"state":"OH","rate":10.2},
+        {"state":"OK","rate":10.9},
+        {"state":"OR","rate":31.0},
+        {"state":"PA","rate":12.0},
+        {"state":"PR","rate":11.4},
+        {"state":"RI","rate":11.3},
+        {"state":"SC","rate":10.6},
+        {"state":"SD","rate":10.5},
+        {"state":"TN","rate":14.5},
+        {"state":"TX","rate":10.8},
+        {"state":"UT","rate":10.6},
+        {"state":"VA","rate":8.5},
+        {"state":"VT","rate":24.9},
+        {"state":"WA","rate":26.5},
+        {"state":"WI","rate":10.5},
+        {"state":"WV","rate":10.9},
+        {"state":"WY","rate":13.0}
+      ]; 
+
+      var MAX_RATE = 49.3; 
+
+      var options = {
+      	sorted: false, 
+      	filtered: false, 
+      	page: 0
+      }; 
+
+      var tbody = d3.select("tbody"); 
+
+      function updateTable() {
+
+        tbody.html(""); 
+
+        var data = states.slice()
+
+        if (options.filtered === 'filter-r') { 
+            data = data.filter(function (a) { 
+            return a.rate > 15}); 
+        }
+
+        var rows = tbody.selectAll("tr")
+          .data(states)
+          .enter()
+          .append("tr"); 
+
+        rows.append("td")
+          .html(function(d) {return d.state}); 
+        
+        rows.append("td")
+          .html(function (d) {return d.rate}); 
+
+        rows.append("td")
+          .append("div")
+          .classed("bar", true)
+          .style("width", function (d) {return ((d.rate / MAX_RATE) *100) + '%'})
+
+        }; 
+
+        updateTable(); 
+
+        d3.select('#sort-asc')
+          .on("click", function() {
+
+            if (d3.select('#sort-asc').classed('active') === false) {
+              d3.select('#sort-asc').classed('active', true);
+              d3.select('#sort-desc').classed('active', false); 
+              d3.selectAll("tbody tr").sort(function (a, b) {
+                return d3.ascending(a.rate, b.rate); 
+              }); 
+            } else { 
+              d3.select('#sort-asc').classed('active', false); 
+
+            updateTable(); 
+            }
+
+          }); 
+
+        d3.select('#sort-desc')
+          .on("click", function() {
+
+            if (d3.select('#sort-desc').classed('active') === false) {
+              d3.select('#sort-desc').classed('active', true);
+              d3.select('#sort-asc').classed('active', false); 
+              d3.selectAll("tbody tr").sort(function (a, b) {
+                return d3.descending(a.rate, b.rate); 
+              }); 
+            } else { 
+              d3.select('#sort-desc').classed('active', false); 
+
+            updateTable(); 
+            }
+
+          }); 
+
+        d3.select('#filter-byrate')
+          .on("click", function() {
+            if (options.filtered === 'filter-r') {
+                d3.select('#filter-byrate').classed('active', false); 
+                options.filtered = false;
+            }  else {
+               options.filtered = 'filter-r'; 
+               d3.select('#filter-byrate').classed('active', true); 
+               console.log("check"); //nothing happens
+
+            }
+            updateTable(); 
+            
+          }); 
+
+        updateTable(); 
+
+</script> 
 </body>
 </html>
