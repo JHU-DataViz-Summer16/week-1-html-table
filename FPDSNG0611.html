@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Federal Procurement Data System Report</title><!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <style>
+    .section { padding: 1em 0; }
+    .header {
+      background: linear-gradient(to bottom, #337ab7 0%, #135a97 100%);
+      color: white;
+      padding: 1em 0 2em;
+    }
+    #data-table { table-layout: fixed; }
+    #data-table th:last child {width: 200px}
+
+    .bar {
+      height: 20px;
+      /* Note that we'll set the width dynamically using Javascript. */
+      background: #337ab7;
+    }
+  </style>
+</head>
+<body>
+<div class="header section">
+  <div class="container">
+    <h1>Federal Procurement Data 2011 and 2012</h1>
+    <p>Contracts Reported to FPDS</p>
+  </div>
+</div>
+<div class="controls section">
+  <div class="container">
+    <div class="btn-toolbar">
+      <div class="btn-group">
+        <button type="button" class="btn btn-default" id="sort-asc">Ascending</button>
+        <button type="button" class="btn btn-default" id="sort-desc">Descending</button>
+      </div>
+      <div class="btn-group">
+        <button type="button" class="btn btn-default" id="filter-MARYLAND">Maryland</button>
+        <button type="button" class="btn btn-default" id="filter-VIRGINIA">Virginia</button>
+        <button type="button" class="btn btn-default" id="filter-CALIFORNIA">California</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="main section">
+  <div class="container">
+    <table class="table" id="data-table">
+      <thead>
+        <tr>
+          <th>Agency Name</th>
+          <th>Annual Contract Revenue</th>
+          <th>State</th>
+          <th>Country</th>
+          <th>Congressional District Code</th>
+          <th>Contracting Agency</th>
+          <th>Contract Date</th>
+          <th>Vendor Name</th>
+          <th>Chart</th>
+        </tr> 
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+    <nav>
+      <ul class="pager">
+        <li class="previous"><a href="#" id="page-prev">Previous</a></li>
+        <li class="next"><a href="#" id="page-next">Next</a></li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
+<script>  
+//contracts data from FPDS NG sorted by Agency Name Country Annual Contract Revenue and Contract data.  removed outliers. reduced columns. truncated to only greater than 10k dollar values.
+var contracts = [
+{"Agency":"AGRICULTURAL RESEARCH SERVICE","Annual_Contract_Revenue":800000000,"State":"CALIFORNIA","Country":"USA","Congressional_District":11,"Contracting_Agency":"AGRICULTURAL RESEARCH SERVICE","Contract_Date":2011,"Vendor":"HITACHI HIGH TECHNOLOGIES AMERICA, INC"},
+{"Agency":"AGRICULTURAL RESEARCH SERVICE","Annual_Contract_Revenue":90000000,"State":"NORTH CAROLINA","Country":"USA","Congressional_District":11,"Contracting_Agency":"AGRICULTURAL RESEARCH SERVICE","Contract_Date":2011,"Vendor":"THERMO FISHER SCIENTIFIC (ASHEVILLE) LLC"},
+{"Agency":"BUREAU OF RECLAMATION","Annual_Contract_Revenue":300000010.2,"State":"MONTANA","Country":"USA","Congressional_District":0,"Contracting_Agency":"BUREAU OF RECLAMATION","Contract_Date":2011,"Vendor":"HELENA SAND&GRAVEL, INC."},
+{"Agency":"BUREAU OF THE CENSUS","Annual_Contract_Revenue":1040000000,"State":"VIRGINIA","Country":"USA","Congressional_District":10,"Contracting_Agency":"BUREAU OF THE CENSUS","Contract_Date":2011,"Vendor":"HEWLETT-PACKARD COMPANY"},
+{"Agency":"BUREAU OF THE FISCAL SERVICE","Annual_Contract_Revenue":1800000000,"State":"NEW JERSEY","Country":"USA","Congressional_District":7,"Contracting_Agency":"BUREAU OF THE FISCAL SERVICE","Contract_Date":2012,"Vendor":"CELLCO PARTNERSHIP DBA VERIZON WIRELESS"},
+{"Agency":"DEPARTMENTAL OFFICES","Annual_Contract_Revenue":72960000,"State":"MINNESOTA","Country":"USA","Congressional_District":2,"Contracting_Agency":"DEPARTMENTAL OFFICES","Contract_Date":2012,"Vendor":"WEST PUBLISHING CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":1800000000,"State":"MASSACHUSETTS","Country":"USA","Congressional_District":6,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2011,"Vendor":"GENERAL ELECTRIC COMPANY"},
+{"Agency":"DOD","Annual_Contract_Revenue":1800000000,"State":"NEW JERSEY","Country":"USA","Congressional_District":7,"Contracting_Agency":"DEPT OF THE AIR FORCE","Contract_Date":2011,"Vendor":"CELLCO PARTNERSHIP DBA VERIZON WIRELESS"},
+{"Agency":"DOD","Annual_Contract_Revenue":1800000000,"State":"NEW YORK","Country":"USA","Congressional_District":2,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2011,"Vendor":"GE AVIATION SYSTEMS LLC"},
+{"Agency":"DOD","Annual_Contract_Revenue":1800000000,"State":"NEW YORK","Country":"USA","Congressional_District":25,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2012,"Vendor":"G E INSPECTION TECHNOLOGIES, LP"},
+{"Agency":"DOD","Annual_Contract_Revenue":1800000000,"State":"PENNSYLVANIA","Country":"USA","Congressional_District":4,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2011,"Vendor":"CONVERTEAM INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":1800000000,"State":"PENNSYLVANIA","Country":"USA","Congressional_District":4,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2012,"Vendor":"CONVERTEAM INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":1800000000,"State":"WISCONSIN","Country":"USA","Congressional_District":5,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"GE MEDICAL SYSTEMS INFORMATION TECHNOLOGIES, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":1500000000,"State":"MICHIGAN","Country":"USA","Congressional_District":3,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2012,"Vendor":"GE AVIATION SYSTEMS LLC"},
+{"Agency":"DOD","Annual_Contract_Revenue":1130000000,"State":"MARYLAND","Country":"USA","Congressional_District":8,"Contracting_Agency":"DEPT OF THE ARMY","Contract_Date":2011,"Vendor":"HEWLETT-PACKARD COMPANY"},
+{"Agency":"DOD","Annual_Contract_Revenue":1130000000,"State":"MARYLAND","Country":"USA","Congressional_District":8,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2011,"Vendor":"HEWLETT-PACKARD COMPANY"},
+{"Agency":"DOD","Annual_Contract_Revenue":1100000000,"State":"TEXAS","Country":"USA","Congressional_District":12,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"TTI, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":994999992.3,"State":"NEW JERSEY","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEPT OF THE ARMY","Contract_Date":2011,"Vendor":"CELLCO PARTNERSHIP"},
+{"Agency":"DOD","Annual_Contract_Revenue":994999992.3,"State":"NEW JERSEY","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2011,"Vendor":"CELLCO PARTNERSHIP"},
+{"Agency":"DOD","Annual_Contract_Revenue":994999992.3,"State":"NEW JERSEY","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2011,"Vendor":"CELLCO PARTNERSHIP"},
+{"Agency":"DOD","Annual_Contract_Revenue":985560023,"State":"VIRGINIA","Country":"USA","Congressional_District":10,"Contracting_Agency":"DEFENSE FINANCE AND ACCOUNTING SERVICE (DFAS)","Contract_Date":2011,"Vendor":"INTERNATIONAL BUSINESS MACHINES CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":934999982.1,"State":"MASSACHUSETTS","Country":"USA","Congressional_District":9,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2012,"Vendor":"GENERAL DYNAMICS C4 SYSTEMS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":909999964.2,"State":"OHIO","Country":"USA","Congressional_District":12,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"CARDINAL HEALTH, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":909999964.2,"State":"OHIO","Country":"USA","Congressional_District":12,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"CARDINAL HEALTH, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":909999964.2,"State":"OHIO","Country":"USA","Congressional_District":12,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"CARDINAL HEALTH, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":909999964.2,"State":"OHIO","Country":"USA","Congressional_District":12,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"CARDINAL HEALTH, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":909999964.2,"State":"OHIO","Country":"USA","Congressional_District":12,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"CARDINAL HEALTH, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":909999964.2,"State":"OHIO","Country":"USA","Congressional_District":12,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"CARDINAL HEALTH, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":909999964.2,"State":"OHIO","Country":"USA","Congressional_District":12,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2012,"Vendor":"CARDINAL HEALTH, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":909999964.2,"State":"OHIO","Country":"USA","Congressional_District":12,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2012,"Vendor":"CARDINAL HEALTH, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":909999964.2,"State":"OHIO","Country":"USA","Congressional_District":12,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2012,"Vendor":"CARDINAL HEALTH, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":909999964.2,"State":"OHIO","Country":"USA","Congressional_District":12,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2012,"Vendor":"CARDINAL HEALTH, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":909999964.2,"State":"OHIO","Country":"USA","Congressional_District":12,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2012,"Vendor":"CARDINAL HEALTH, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":909999964.2,"State":"OHIO","Country":"USA","Congressional_District":12,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2012,"Vendor":"CARDINAL HEALTH, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":909999964.2,"State":"OHIO","Country":"USA","Congressional_District":12,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2012,"Vendor":"CARDINAL HEALTH, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":899999989.8,"State":"CALIFORNIA","Country":"USA","Congressional_District":13,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2012,"Vendor":"MICROGENICS CORP"},
+{"Agency":"DOD","Annual_Contract_Revenue":860000010.2,"State":"CALIFORNIA","Country":"USA","Congressional_District":50,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2011,"Vendor":"CARDINAL HEALTH SOLUTIONS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":840033000,"State":"NEW YORK","Country":"USA","Congressional_District":17,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"DHS SYSTEMS LLC"},
+{"Agency":"DOD","Annual_Contract_Revenue":777000000,"State":"CALIFORNIA","Country":"USA","Congressional_District":15,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2012,"Vendor":"ABBOTT LABORATORIES"},
+{"Agency":"DOD","Annual_Contract_Revenue":700000010.2,"State":"PENNSYLVANIA","Country":"USA","Congressional_District":6,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"AMERISOURCEBERGEN DRUG CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":700000010.2,"State":"PENNSYLVANIA","Country":"USA","Congressional_District":6,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"AMERISOURCEBERGEN DRUG CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":700000010.2,"State":"PENNSYLVANIA","Country":"USA","Congressional_District":6,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"AMERISOURCEBERGEN DRUG CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":700000010.2,"State":"PENNSYLVANIA","Country":"USA","Congressional_District":6,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2012,"Vendor":"AMERISOURCEBERGEN DRUG CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":700000010.2,"State":"PENNSYLVANIA","Country":"USA","Congressional_District":6,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2012,"Vendor":"AMERISOURCEBERGEN DRUG CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":700000010.2,"State":"PENNSYLVANIA","Country":"USA","Congressional_District":6,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2012,"Vendor":"AMERISOURCEBERGEN DRUG CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":700000010.2,"State":"PENNSYLVANIA","Country":"USA","Congressional_District":6,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2012,"Vendor":"AMERISOURCEBERGEN DRUG CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":700000010.2,"State":"PENNSYLVANIA","Country":"USA","Congressional_District":6,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2012,"Vendor":"AMERISOURCEBERGEN DRUG CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":700000010.2,"State":"PENNSYLVANIA","Country":"USA","Congressional_District":6,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2012,"Vendor":"AMERISOURCEBERGEN DRUG CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":628999987.2,"State":"MISSOURI","Country":"USA","Congressional_District":1,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"MCDONNELL DOUGLAS CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":628999987.2,"State":"MISSOURI","Country":"USA","Congressional_District":1,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"MCDONNELL DOUGLAS CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":624103330,"State":"MASSACHUSETTS","Country":"USA","Congressional_District":4,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2012,"Vendor":"DEPUY MITEK, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":605000007.7,"State":"ALABAMA","Country":"USA","Congressional_District":5,"Contracting_Agency":"DEPT OF THE ARMY","Contract_Date":2012,"Vendor":"THE BOEING COMPANY"},
+{"Agency":"DOD","Annual_Contract_Revenue":605000007.7,"State":"ARIZONA","Country":"USA","Congressional_District":6,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"BOEING COMPANY, THE"},
+{"Agency":"DOD","Annual_Contract_Revenue":605000007.7,"State":"ARIZONA","Country":"USA","Congressional_District":6,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"BOEING COMPANY, THE"},
+{"Agency":"DOD","Annual_Contract_Revenue":605000007.7,"State":"ARIZONA","Country":"USA","Congressional_District":6,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"BOEING COMPANY, THE"},
+{"Agency":"DOD","Annual_Contract_Revenue":605000007.7,"State":"ARIZONA","Country":"USA","Congressional_District":6,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"BOEING COMPANY, THE"},
+{"Agency":"DOD","Annual_Contract_Revenue":605000007.7,"State":"ARIZONA","Country":"USA","Congressional_District":6,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"BOEING COMPANY, THE"},
+{"Agency":"DOD","Annual_Contract_Revenue":605000007.7,"State":"CALIFORNIA","Country":"USA","Congressional_District":30,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2011,"Vendor":"BOEING COMPANY, THE"},
+{"Agency":"DOD","Annual_Contract_Revenue":605000007.7,"State":"CALIFORNIA","Country":"USA","Congressional_District":46,"Contracting_Agency":"DEFENSE CONTRACT MANAGEMENT AGENCY (DCMA)","Contract_Date":2011,"Vendor":"BOEING COMPANY, THE"},
+{"Agency":"DOD","Annual_Contract_Revenue":605000007.7,"State":"CALIFORNIA","Country":"USA","Congressional_District":46,"Contracting_Agency":"DEPT OF THE AIR FORCE","Contract_Date":2011,"Vendor":"BOEING COMPANY, THE"},
+{"Agency":"DOD","Annual_Contract_Revenue":605000007.7,"State":"MISSOURI","Country":"USA","Congressional_District":1,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"BOEING COMPANY, THE"},
+{"Agency":"DOD","Annual_Contract_Revenue":605000007.7,"State":"MISSOURI","Country":"USA","Congressional_District":1,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"BOEING COMPANY, THE"},
+{"Agency":"DOD","Annual_Contract_Revenue":605000007.7,"State":"MISSOURI","Country":"USA","Congressional_District":1,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"BOEING COMPANY, THE"},
+{"Agency":"DOD","Annual_Contract_Revenue":605000007.7,"State":"PENNSYLVANIA","Country":"USA","Congressional_District":1,"Contracting_Agency":"DEPT OF THE ARMY","Contract_Date":2012,"Vendor":"THE BOEING COMPANY"},
+{"Agency":"DOD","Annual_Contract_Revenue":600000000,"State":"CALIFORNIA","Country":"USA","Congressional_District":37,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"BOEING COMPANY, THE"},
+{"Agency":"DOD","Annual_Contract_Revenue":560900014.1,"State":"VIRGINIA","Country":"USA","Congressional_District":3,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2012,"Vendor":"MAERSK LINE, LIMITED"},
+{"Agency":"DOD","Annual_Contract_Revenue":560900014.1,"State":"VIRGINIA","Country":"USA","Congressional_District":3,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2012,"Vendor":"MAERSK LINE, LIMITED"},
+{"Agency":"DOD","Annual_Contract_Revenue":558000000,"State":"CALIFORNIA","Country":"USA","Congressional_District":23,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2012,"Vendor":"KIDDE TECHNOLOGIES INC"},
+{"Agency":"DOD","Annual_Contract_Revenue":558000000,"State":"NORTH CAROLINA","Country":"USA","Congressional_District":3,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"KIDDE TECHNOLOGIES INC"},
+{"Agency":"DOD","Annual_Contract_Revenue":555000012.8,"State":"WASHINGTON","Country":"USA","Congressional_District":9,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2011,"Vendor":"THE BOEING COMPANY"},
+{"Agency":"DOD","Annual_Contract_Revenue":552900000,"State":"ILLINOIS","Country":"USA","Congressional_District":3,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2011,"Vendor":"CARRIER RENTAL SYSTEMS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":547999989.8,"State":"CONNECTICUT","Country":"USA","Congressional_District":1,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"HAMILTON SUNDSTRAND CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":547999989.8,"State":"CONNECTICUT","Country":"USA","Congressional_District":1,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"HAMILTON SUNDSTRAND CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":499999989.8,"State":"NEW YORK","Country":"USA","Congressional_District":26,"Contracting_Agency":"DEPT OF THE AIR FORCE","Contract_Date":2011,"Vendor":"ORTHO-CLINICAL DIAGNOSTICS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":488526929.9,"State":"OHIO","Country":"USA","Congressional_District":14,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2012,"Vendor":"SAINT-GOBAIN CERAMICS&PLASTICS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":449999994.9,"State":"","Country":"DENMARK","Congressional_District":null,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"ARLA FOODS A.M.B.A"},
+{"Agency":"DOD","Annual_Contract_Revenue":449999994.9,"State":"","Country":"GERMANY","Congressional_District":null,"Contracting_Agency":"DEFENSE COMMISSARY AGENCY  (DECA)","Contract_Date":2011,"Vendor":"HERMANN ARMBRUSTER GMBH & CO. BACKWAREN"},
+{"Agency":"DOD","Annual_Contract_Revenue":449999994.9,"State":"","Country":"PORTUGAL","Congressional_District":null,"Contracting_Agency":"DEFENSE COMMISSARY AGENCY  (DECA)","Contract_Date":2011,"Vendor":"EMATER - EMPRESA ABASTECEDORA DE MERCEARIAS TERCEIRENSE, S.A."},
+{"Agency":"DOD","Annual_Contract_Revenue":448999997.4,"State":"NEW YORK","Country":"USA","Congressional_District":22,"Contracting_Agency":"DEFENSE CONTRACT MANAGEMENT AGENCY (DCMA)","Contract_Date":2012,"Vendor":"LOCKHEED MARTIN CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":443900000,"State":"PENNSYLVANIA","Country":"USA","Congressional_District":10,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2011,"Vendor":"LOCKHEED MARTIN CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":432599982.1,"State":"TEXAS","Country":"USA","Congressional_District":12,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2012,"Vendor":"LOCKHEED MARTIN CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":427000012.8,"State":"GEORGIA","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEPT OF THE AIR FORCE","Contract_Date":2011,"Vendor":"LOCKHEED MARTIN CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":418999992.3,"State":"CALIFORNIA","Country":"USA","Congressional_District":25,"Contracting_Agency":"DEPT OF THE AIR FORCE","Contract_Date":2011,"Vendor":"LOCKHEED MARTIN CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":418999992.3,"State":"CALIFORNIA","Country":"USA","Congressional_District":25,"Contracting_Agency":"DEPT OF THE AIR FORCE","Contract_Date":2011,"Vendor":"LOCKHEED MARTIN CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":418999992.3,"State":"COLORADO","Country":"USA","Congressional_District":null,"Contracting_Agency":"MISSILE DEFENSE AGENCY (MDA)","Contract_Date":2011,"Vendor":"LOCKHEED MARTIN CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":418999992.3,"State":"KENTUCKY","Country":"USA","Congressional_District":6,"Contracting_Agency":"U.S. SPECIAL OPERATIONS COMMAND (USSOCOM)","Contract_Date":2011,"Vendor":"LOCKHEED MARTIN CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":418999992.3,"State":"KENTUCKY","Country":"USA","Congressional_District":6,"Contracting_Agency":"U.S. SPECIAL OPERATIONS COMMAND (USSOCOM)","Contract_Date":2011,"Vendor":"LOCKHEED MARTIN CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":418999992.3,"State":"KENTUCKY","Country":"USA","Congressional_District":6,"Contracting_Agency":"U.S. SPECIAL OPERATIONS COMMAND (USSOCOM)","Contract_Date":2011,"Vendor":"LOCKHEED MARTIN CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":418999992.3,"State":"KENTUCKY","Country":"USA","Congressional_District":6,"Contracting_Agency":"U.S. SPECIAL OPERATIONS COMMAND (USSOCOM)","Contract_Date":2011,"Vendor":"LOCKHEED MARTIN CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":418999992.3,"State":"NEW YORK","Country":"USA","Congressional_District":22,"Contracting_Agency":"DEPT OF THE AIR FORCE","Contract_Date":2012,"Vendor":"LOCKHEED MARTIN INTEGRATED SYSTEMS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":418999992.3,"State":"NEW YORK","Country":"USA","Congressional_District":22,"Contracting_Agency":"DEPT OF THE AIR FORCE","Contract_Date":2012,"Vendor":"LOCKHEED MARTIN INTEGRATED SYSTEMS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":418999992.3,"State":"VIRGINIA","Country":"USA","Congressional_District":2,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2011,"Vendor":"LOCKHEED MARTIN INTEGRATED SYSTEMS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":418999992.3,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"DEPT OF THE ARMY","Contract_Date":2011,"Vendor":"LOCKHEED MARTIN INTEGRATED SYSTEMS, INC"},
+{"Agency":"DOD","Annual_Contract_Revenue":418999992.3,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"DEPT OF THE ARMY","Contract_Date":2011,"Vendor":"LOCKHEED MARTIN INTEGRATED SYSTEMS, INC"},
+{"Agency":"DOD","Annual_Contract_Revenue":414040000,"State":"NEW YORK","Country":"USA","Congressional_District":25,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2012,"Vendor":"LOCKHEED MARTIN CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":395650000,"State":"CALIFORNIA","Country":"USA","Congressional_District":14,"Contracting_Agency":"DEPT OF THE ARMY","Contract_Date":2012,"Vendor":"SAVI TECHNOLOGY, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":389279989.8,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2012,"Vendor":"SPRINT COMMUNICATIONS COMPANY L.P."},
+{"Agency":"DOD","Annual_Contract_Revenue":372200000,"State":"MICHIGAN","Country":"USA","Congressional_District":3,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2012,"Vendor":"EATON CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":359999979.5,"State":"FLORIDA","Country":"USA","Congressional_District":8,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"SYSCO CENTRAL FLORIDA, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":352140001.3,"State":"DISTRICT OF COLUMBIA","Country":"USA","Congressional_District":0,"Contracting_Agency":"DEPT OF THE ARMY","Contract_Date":2011,"Vendor":"FEDERAL EXPRESS CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":348000010.2,"State":"TEXAS","Country":"USA","Congressional_District":null,"Contracting_Agency":"DEPT OF THE AIR FORCE","Contract_Date":2011,"Vendor":"LOCKHEED MARTIN CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":346000015.4,"State":"HAWAII","Country":"USA","Congressional_District":1,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2012,"Vendor":"BAE SYSTEMS SPECTRAL SOLUTIONS LLC"},
+{"Agency":"DOD","Annual_Contract_Revenue":337463337,"State":"PENNSYLVANIA","Country":"USA","Congressional_District":2,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2012,"Vendor":"COMCAST CABLE COMMUNICATIONS, LLC"},
+{"Agency":"DOD","Annual_Contract_Revenue":329999994.9,"State":"TENNESSEE","Country":"USA","Congressional_District":9,"Contracting_Agency":"USTRANSCOM","Contract_Date":2011,"Vendor":"FEDEX CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":329999994.9,"State":"TENNESSEE","Country":"USA","Congressional_District":9,"Contracting_Agency":"USTRANSCOM","Contract_Date":2011,"Vendor":"FEDEX CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":329999994.9,"State":"TENNESSEE","Country":"USA","Congressional_District":9,"Contracting_Agency":"USTRANSCOM","Contract_Date":2011,"Vendor":"FEDEX CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":329999994.9,"State":"TENNESSEE","Country":"USA","Congressional_District":9,"Contracting_Agency":"USTRANSCOM","Contract_Date":2011,"Vendor":"FEDEX CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":329999994.9,"State":"TENNESSEE","Country":"USA","Congressional_District":9,"Contracting_Agency":"USTRANSCOM","Contract_Date":2011,"Vendor":"FEDEX CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":329999994.9,"State":"TENNESSEE","Country":"USA","Congressional_District":9,"Contracting_Agency":"USTRANSCOM","Contract_Date":2011,"Vendor":"FEDEX CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":329999994.9,"State":"VIRGINIA","Country":"USA","Congressional_District":4,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"SYSCO FOOD SERVICES OF HAMPTON ROADS, INC"},
+{"Agency":"DOD","Annual_Contract_Revenue":329999994.9,"State":"VIRGINIA","Country":"USA","Congressional_District":4,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"SYSCO FOOD SERVICES OF HAMPTON ROADS, INC"},
+{"Agency":"DOD","Annual_Contract_Revenue":329999994.9,"State":"VIRGINIA","Country":"USA","Congressional_District":4,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"SYSCO FOOD SERVICES OF HAMPTON ROADS, INC"},
+{"Agency":"DOD","Annual_Contract_Revenue":329999994.9,"State":"VIRGINIA","Country":"USA","Congressional_District":4,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"SYSCO FOOD SERVICES OF HAMPTON ROADS, INC"},
+{"Agency":"DOD","Annual_Contract_Revenue":329999994.9,"State":"VIRGINIA","Country":"USA","Congressional_District":4,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"SYSCO FOOD SERVICES OF HAMPTON ROADS, INC"},
+{"Agency":"DOD","Annual_Contract_Revenue":329999994.9,"State":"VIRGINIA","Country":"USA","Congressional_District":4,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"SYSCO FOOD SERVICES OF HAMPTON ROADS, INC"},
+{"Agency":"DOD","Annual_Contract_Revenue":329999994.9,"State":"VIRGINIA","Country":"USA","Congressional_District":4,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"SYSCO FOOD SERVICES OF HAMPTON ROADS, INC"},
+{"Agency":"DOD","Annual_Contract_Revenue":323740000,"State":"","Country":"CANADA","Congressional_District":null,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2012,"Vendor":"GENERAL DYNAMICS LAND SYSTEMS - CANADA CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":323214745.6,"State":"VIRGINIA","Country":"USA","Congressional_District":4,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"SYSCO HAMPTON ROADS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":323214745.6,"State":"VIRGINIA","Country":"USA","Congressional_District":4,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"SYSCO HAMPTON ROADS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":321370009.6,"State":"CALIFORNIA","Country":"USA","Congressional_District":36,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2012,"Vendor":"NORTHROP GRUMMAN SYSTEMS CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":321370009.6,"State":"CALIFORNIA","Country":"USA","Congressional_District":50,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2012,"Vendor":"NORTHROP GRUMMAN SYSTEMS CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":321370009.6,"State":"CALIFORNIA","Country":"USA","Congressional_District":50,"Contracting_Agency":"DEPT OF THE AIR FORCE","Contract_Date":2011,"Vendor":"NORTHROP GRUMMAN SYSTEMS CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":321370009.6,"State":"CALIFORNIA","Country":"USA","Congressional_District":50,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2012,"Vendor":"NORTHROP GRUMMAN SYSTEMS CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":321370009.6,"State":"VIRGINIA","Country":"USA","Congressional_District":10,"Contracting_Agency":"DEPT OF THE AIR FORCE","Contract_Date":2011,"Vendor":"NORTHROP GRUMMAN SYSTEMS CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":321370009.6,"State":"VIRGINIA","Country":"USA","Congressional_District":10,"Contracting_Agency":"DEPT OF THE ARMY","Contract_Date":2011,"Vendor":"NORTHROP GRUMMAN SPACE&MISSION SYSTEMS CORP."},
+{"Agency":"DOD","Annual_Contract_Revenue":320000000,"State":"FLORIDA","Country":"USA","Congressional_District":24,"Contracting_Agency":"DEFENSE ADVANCED RESEARCH PROJECTS AGENCY  (DARPA)","Contract_Date":2011,"Vendor":"LOCKHEED MARTIN CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":320000000,"State":"FLORIDA","Country":"USA","Congressional_District":24,"Contracting_Agency":"DEPT OF THE AIR FORCE","Contract_Date":2011,"Vendor":"LOCKHEED MARTIN CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":319019991,"State":"COLORADO","Country":"USA","Congressional_District":5,"Contracting_Agency":"MISSILE DEFENSE AGENCY (MDA)","Contract_Date":2011,"Vendor":"NORTHROP GRUMMAN SPACE&MISSION SYSTEMS CORP."},
+{"Agency":"DOD","Annual_Contract_Revenue":319019991,"State":"MARYLAND","Country":"USA","Congressional_District":3,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"NORTHROP GRUMMAN SYSTEMS CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":319019991,"State":"MARYLAND","Country":"USA","Congressional_District":6,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2012,"Vendor":"NORTHROP GRUMMAN SYSTEMS CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":319019991,"State":"MARYLAND","Country":"USA","Congressional_District":6,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2012,"Vendor":"NORTHROP GRUMMAN SYSTEMS CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":318026670.1,"State":"VIRGINIA","Country":"USA","Congressional_District":3,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2012,"Vendor":"EARL INDUSTRIES, L.L.C."},
+{"Agency":"DOD","Annual_Contract_Revenue":314660003.8,"State":"ALABAMA","Country":"USA","Congressional_District":5,"Contracting_Agency":"DEPT OF THE ARMY","Contract_Date":2011,"Vendor":"JOHNSON CONTROLS BUILDING AUTOMATION SYSTEMS LLC"},
+{"Agency":"DOD","Annual_Contract_Revenue":312490000,"State":"VERMONT","Country":"USA","Congressional_District":0,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2012,"Vendor":"GENERAL DYNAMICS ARMAMENT AND TECHNICAL PRODUCTS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":307029995.5,"State":"ILLINOIS","Country":"USA","Congressional_District":8,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"NORTHROP GRUMMAN SYSTEMS CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":307029995.5,"State":"VIRGINIA","Country":"USA","Congressional_District":10,"Contracting_Agency":"DEPT OF THE AIR FORCE","Contract_Date":2011,"Vendor":"NORTHROP GRUMMAN TECHNICAL SERVICES, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":307029995.5,"State":"VIRGINIA","Country":"USA","Congressional_District":10,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2011,"Vendor":"NORTHROP GRUMMAN TECHNICAL SERVICES INC"},
+{"Agency":"DOD","Annual_Contract_Revenue":300000000,"State":"OHIO","Country":"USA","Congressional_District":15,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2011,"Vendor":"HONEYWELL INTERNATIONAL INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":296999997.4,"State":"MARYLAND","Country":"USA","Congressional_District":3,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2011,"Vendor":"WINDERMERE INFORMATION TECHNOLOGY SYSTEMS, LLC"},
+{"Agency":"DOD","Annual_Contract_Revenue":295070003.2,"State":"TEXAS","Country":"USA","Congressional_District":1,"Contracting_Agency":"DEPT OF THE ARMY","Contract_Date":2011,"Vendor":"GENERAL DYNAMICS SATCOM TECHNOLOGIES, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":295070000,"State":"CALIFORNIA","Country":"USA","Congressional_District":51,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"AXSYS TECHNOLOGIES, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":295070000,"State":"CONNECTICUT","Country":"USA","Congressional_District":2,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"ELECTRIC BOAT CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":295000000,"State":"","Country":"CANADA","Congressional_District":null,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"GENERAL DYNAMICS LAND SYSTEMS - CANADA CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":288983330,"State":"CALIFORNIA","Country":"USA","Congressional_District":24,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"ALCOA GLOBAL FASTENERS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":285650001,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2011,"Vendor":"ORACLE AMERICA, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":280000000,"State":"INDIANA","Country":"USA","Congressional_District":3,"Contracting_Agency":"DEFENSE CONTRACT MANAGEMENT AGENCY (DCMA)","Contract_Date":2011,"Vendor":"BAE SYSTEMS CONTROLS INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":280000000,"State":"NEW HAMPSHIRE","Country":"USA","Congressional_District":1,"Contracting_Agency":"DEPT OF THE ARMY","Contract_Date":2012,"Vendor":"BAE SYSTEMS INFORMATION AND ELECTRONIC SYSTEMS INTEGRATION I"},
+{"Agency":"DOD","Annual_Contract_Revenue":280000000,"State":"NEW HAMPSHIRE","Country":"USA","Congressional_District":2,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2011,"Vendor":"BAE SYSTEMS INFORMATION AND ELECTRONIC SYSTEMS INTEGRATION I"},
+{"Agency":"DOD","Annual_Contract_Revenue":280000000,"State":"NEW JERSEY","Country":"USA","Congressional_District":3,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2011,"Vendor":"LOCKHEED MARTIN CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":280000000,"State":"NEW JERSEY","Country":"USA","Congressional_District":4,"Contracting_Agency":"DEPT OF THE ARMY","Contract_Date":2011,"Vendor":"LOCKHEED MARTIN INTEGRATED SYSTEMS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":280000000,"State":"TEXAS","Country":"USA","Congressional_District":25,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"BAE SYSTEMS INFORMATION AND ELECTRONIC SYSTEMS INTEGRATION I"},
+{"Agency":"DOD","Annual_Contract_Revenue":274020000,"State":"MARYLAND","Country":"USA","Congressional_District":6,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2012,"Vendor":"NORTHROP GRUMMAN SYSTEMS CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":270000005,"State":"MASSACHUSETTS","Country":"USA","Congressional_District":9,"Contracting_Agency":"DEPT OF THE AIR FORCE","Contract_Date":2011,"Vendor":"GENERAL DYNAMICS INFORMATION TECHNOLOGY, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":270000005,"State":"MASSACHUSETTS","Country":"USA","Congressional_District":9,"Contracting_Agency":"DEPT OF THE AIR FORCE","Contract_Date":2012,"Vendor":"GENERAL DYNAMICS INFORMATION TECHNOLOGY, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":270000005,"State":"MASSACHUSETTS","Country":"USA","Congressional_District":9,"Contracting_Agency":"DEPT OF THE AIR FORCE","Contract_Date":2012,"Vendor":"GENERAL DYNAMICS INFORMATION TECHNOLOGY, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":270000005,"State":"MASSACHUSETTS","Country":"USA","Congressional_District":9,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2011,"Vendor":"GENERAL DYNAMICS INFORMATION TECHNOLOGY, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":270000005,"State":"MASSACHUSETTS","Country":"USA","Congressional_District":9,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2012,"Vendor":"GENERAL DYNAMICS INFORMATION TECHNOLOGY, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":270000000,"State":"ALABAMA","Country":"USA","Congressional_District":3,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2012,"Vendor":"BAE SYSTEMS LAND&ARMAMENTS, L.P."},
+{"Agency":"DOD","Annual_Contract_Revenue":270000000,"State":"ALABAMA","Country":"USA","Congressional_District":3,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2012,"Vendor":"BAE SYSTEMS LAND&ARMAMENTS, L.P."},
+{"Agency":"DOD","Annual_Contract_Revenue":254299996,"State":"CALIFORNIA","Country":"USA","Congressional_District":25,"Contracting_Agency":"DEPT OF THE AIR FORCE","Contract_Date":2011,"Vendor":"NORTHROP GRUMMAN SYSTEMS CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":250180000,"State":"MINNESOTA","Country":"USA","Congressional_District":4,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"3M COMPANY"},
+{"Agency":"DOD","Annual_Contract_Revenue":250179993,"State":"MINNESOTA","Country":"USA","Congressional_District":4,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"3M COMPANY"},
+{"Agency":"DOD","Annual_Contract_Revenue":250000000,"State":"ARIZONA","Country":"USA","Congressional_District":7,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2012,"Vendor":"RAYTHEON COMPANY"},
+{"Agency":"DOD","Annual_Contract_Revenue":249999994,"State":"KENTUCKY","Country":"USA","Congressional_District":3,"Contracting_Agency":"DEFENSE CONTRACT MANAGEMENT AGENCY (DCMA)","Contract_Date":2011,"Vendor":"BAE SYSTEMS LAND&ARMAMENTS INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":249999994,"State":"KENTUCKY","Country":"USA","Congressional_District":3,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2011,"Vendor":"BAE SYSTEMS LAND&ARMAMENTS INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":240000000,"State":"WISCONSIN","Country":"USA","Congressional_District":5,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2012,"Vendor":"QUEST TECHNOLOGIES, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":230000005,"State":"ARIZONA","Country":"USA","Congressional_District":7,"Contracting_Agency":"DEPT OF THE ARMY","Contract_Date":2012,"Vendor":"RAYTHEON COMPANY"},
+{"Agency":"DOD","Annual_Contract_Revenue":220000010,"State":"MARYLAND","Country":"USA","Congressional_District":3,"Contracting_Agency":"DEPT OF THE ARMY","Contract_Date":2012,"Vendor":"MOTOROLA SOLUTIONS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":220000010,"State":"MARYLAND","Country":"USA","Congressional_District":3,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2011,"Vendor":"MOTOROLA SOLUTIONS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":220000000,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"XEROX CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":213019996,"State":"MICHIGAN","Country":"USA","Congressional_District":15,"Contracting_Agency":"DEFENSE ADVANCED RESEARCH PROJECTS AGENCY  (DARPA)","Contract_Date":2011,"Vendor":"GENERAL DYNAMICS ADVANCED INFORMATION SYSTEMS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":210000000,"State":"INDIANA","Country":"USA","Congressional_District":3,"Contracting_Agency":"DEPT OF THE ARMY","Contract_Date":2012,"Vendor":"RAYTHEON COMPANY"},
+{"Agency":"DOD","Annual_Contract_Revenue":202580009,"State":"NORTH CAROLINA","Country":"USA","Congressional_District":4,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"DEERE&COMPANY"},
+{"Agency":"DOD","Annual_Contract_Revenue":192630005,"State":"SOUTH CAROLINA","Country":"USA","Congressional_District":2,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"U.S. FOODSERVICE, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":180000000,"State":"GEORGIA","Country":"USA","Congressional_District":7,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"A. E. PETSCHE COMPANY, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":180000000,"State":"MARYLAND","Country":"USA","Congressional_District":7,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2012,"Vendor":"NURAD TECHNOLOGIES, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":179999989,"State":"CALIFORNIA","Country":"USA","Congressional_District":49,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"JOSEPH WEBB FOODS, INC"},
+{"Agency":"DOD","Annual_Contract_Revenue":179999989,"State":"GEORGIA","Country":"USA","Congressional_District":13,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"U.S. FOODSERVICE, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":179999989,"State":"GEORGIA","Country":"USA","Congressional_District":13,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"U.S. FOODSERVICE, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":179999989,"State":"GEORGIA","Country":"USA","Congressional_District":13,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"U.S. FOODSERVICE, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":179999989,"State":"GEORGIA","Country":"USA","Congressional_District":13,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"U.S. FOODSERVICE, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":179999989,"State":"GEORGIA","Country":"USA","Congressional_District":13,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"U.S. FOODSERVICE, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":179999989,"State":"GEORGIA","Country":"USA","Congressional_District":13,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"U.S. FOODSERVICE, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":179999989,"State":"MARYLAND","Country":"USA","Congressional_District":3,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"U.S. FOODSERVICE, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":179999989,"State":"MARYLAND","Country":"USA","Congressional_District":3,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"U.S. FOODSERVICE, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":179999989,"State":"MARYLAND","Country":"USA","Congressional_District":7,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2012,"Vendor":"NURAD TECHNOLOGIES, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":179999989,"State":"NEW MEXICO","Country":"USA","Congressional_District":1,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"U.S. FOODSERVICE, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":179999989,"State":"OKLAHOMA","Country":"USA","Congressional_District":5,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"U.S. FOODSERVICE, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":179999989,"State":"OKLAHOMA","Country":"USA","Congressional_District":5,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"U.S. FOODSERVICE, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":179999989,"State":"OKLAHOMA","Country":"USA","Congressional_District":5,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"U.S. FOODSERVICE, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":179999989,"State":"OKLAHOMA","Country":"USA","Congressional_District":5,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"U.S. FOODSERVICE, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":176670000,"State":"WASHINGTON","Country":"USA","Congressional_District":1,"Contracting_Agency":"DEPT OF THE ARMY","Contract_Date":2012,"Vendor":"FRESENIUS KABI, LLC"},
+{"Agency":"DOD","Annual_Contract_Revenue":167399997,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"DEFENSE THREAT REDUCTION AGENCY (DTRA)","Contract_Date":2011,"Vendor":"COMPUTER SCIENCES CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":164000000,"State":"NEW JERSEY","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"RICOH AMERICAS CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":163000002,"State":"ILLINOIS","Country":"USA","Congressional_District":9,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"XEROX CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":161999994,"State":"CALIFORNIA","Country":"USA","Congressional_District":44,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2012,"Vendor":"COMPUTER SCIENCES CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":160000000,"State":"MASSACHUSETTS","Country":"USA","Congressional_District":9,"Contracting_Agency":"DEPT OF THE ARMY","Contract_Date":2012,"Vendor":"ILLINOIS TOOL WORKS INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":158100340,"State":"OHIO","Country":"USA","Congressional_District":3,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"ARROW ELECTRONICS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":154410373,"State":"COLORADO","Country":"USA","Congressional_District":6,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2011,"Vendor":"ARROW ENTERPRISE COMPUTING SOLUTIONS INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":152000000,"State":"VIRGINIA","Country":"USA","Congressional_District":10,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"HP ENTERPRISE SERVICES, LLC"},
+{"Agency":"DOD","Annual_Contract_Revenue":150000000,"State":"ILLINOIS","Country":"USA","Congressional_District":13,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"NAVISTAR DEFENSE LLC"},
+{"Agency":"DOD","Annual_Contract_Revenue":150000000,"State":"ILLINOIS","Country":"USA","Congressional_District":13,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"NAVISTAR DEFENSE LLC"},
+{"Agency":"DOD","Annual_Contract_Revenue":150000000,"State":"ILLINOIS","Country":"USA","Congressional_District":13,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2012,"Vendor":"NAVISTAR DEFENSE LLC"},
+{"Agency":"DOD","Annual_Contract_Revenue":150000000,"State":"ILLINOIS","Country":"USA","Congressional_District":13,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2012,"Vendor":"NAVISTAR DEFENSE LLC"},
+{"Agency":"DOD","Annual_Contract_Revenue":149010001,"State":"TEXAS","Country":"USA","Congressional_District":4,"Contracting_Agency":"DEPT OF THE AIR FORCE","Contract_Date":2011,"Vendor":"L-3 COMMUNICATIONS CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":146000000,"State":"","Country":"AUSTRALIA","Congressional_District":null,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2012,"Vendor":"THALES AUSTRALIA LIMITED"},
+{"Agency":"DOD","Annual_Contract_Revenue":140000000,"State":"ARIZONA","Country":"USA","Congressional_District":7,"Contracting_Agency":"MISSILE DEFENSE AGENCY (MDA)","Contract_Date":2012,"Vendor":"RAYTHEON COMPANY"},
+{"Agency":"DOD","Annual_Contract_Revenue":140000000,"State":"CALIFORNIA","Country":"USA","Congressional_District":40,"Contracting_Agency":"DEPT OF THE ARMY","Contract_Date":2012,"Vendor":"THALES-RAYTHEON SYSTEMS COMPANY LLC"},
+{"Agency":"DOD","Annual_Contract_Revenue":140000000,"State":"FLORIDA","Country":"USA","Congressional_District":10,"Contracting_Agency":"DEPT OF THE AIR FORCE","Contract_Date":2011,"Vendor":"RAYTHEON COMPANY"},
+{"Agency":"DOD","Annual_Contract_Revenue":140000000,"State":"MASSACHUSETTS","Country":"USA","Congressional_District":3,"Contracting_Agency":"DEPT OF THE AIR FORCE","Contract_Date":2011,"Vendor":"RAYTHEON COMPANY"},
+{"Agency":"DOD","Annual_Contract_Revenue":140000000,"State":"TEXAS","Country":"USA","Congressional_District":4,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2012,"Vendor":"RAYTHEON COMPANY"},
+{"Agency":"DOD","Annual_Contract_Revenue":140000000,"State":"WASHINGTON","Country":"USA","Congressional_District":9,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"SYSCO SEATTLE, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":140000000,"State":"WASHINGTON","Country":"USA","Congressional_District":9,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"SYSCO SEATTLE, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":139609999,"State":"TEXAS","Country":"USA","Congressional_District":4,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2012,"Vendor":"L-3 COMMUNICATIONS CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":137194219,"State":"CONNECTICUT","Country":"USA","Congressional_District":5,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"BARDEN CORPORATION, THE"},
+{"Agency":"DOD","Annual_Contract_Revenue":130000000,"State":"CONNECTICUT","Country":"USA","Congressional_District":5,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2011,"Vendor":"CANBERRA INDUSTRIES, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":129999994,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"QWEST GOVERNMENT SERVICES INCORPORATED (8481)"},
+{"Agency":"DOD","Annual_Contract_Revenue":129999994,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"QWEST GOVERNMENT SERVICES INCORPORATED (8481)"},
+{"Agency":"DOD","Annual_Contract_Revenue":129999994,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"QWEST GOVERNMENT SERVICES INCORPORATED (8481)"},
+{"Agency":"DOD","Annual_Contract_Revenue":129999994,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"QWEST GOVERNMENT SERVICES INCORPORATED (8481)"},
+{"Agency":"DOD","Annual_Contract_Revenue":129999994,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"QWEST GOVERNMENT SERVICES INCORPORATED (8481)"},
+{"Agency":"DOD","Annual_Contract_Revenue":129999994,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"QWEST GOVERNMENT SERVICES INCORPORATED (8481)"},
+{"Agency":"DOD","Annual_Contract_Revenue":129999994,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"QWEST GOVERNMENT SERVICES INCORPORATED (8481)"},
+{"Agency":"DOD","Annual_Contract_Revenue":129999994,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"QWEST GOVERNMENT SERVICES INCORPORATED (8481)"},
+{"Agency":"DOD","Annual_Contract_Revenue":129999994,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"QWEST GOVERNMENT SERVICES INCORPORATED (8481)"},
+{"Agency":"DOD","Annual_Contract_Revenue":129999994,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"QWEST GOVERNMENT SERVICES INCORPORATED (8481)"},
+{"Agency":"DOD","Annual_Contract_Revenue":129999994,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"QWEST GOVERNMENT SERVICES INCORPORATED (8481)"},
+{"Agency":"DOD","Annual_Contract_Revenue":129999994,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"QWEST GOVERNMENT SERVICES INCORPORATED (8481)"},
+{"Agency":"DOD","Annual_Contract_Revenue":129999994,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"QWEST GOVERNMENT SERVICES INCORPORATED (8481)"},
+{"Agency":"DOD","Annual_Contract_Revenue":129999994,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"QWEST GOVERNMENT SERVICES INCORPORATED (8481)"},
+{"Agency":"DOD","Annual_Contract_Revenue":129999994,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"QWEST GOVERNMENT SERVICES INCORPORATED (8481)"},
+{"Agency":"DOD","Annual_Contract_Revenue":129999994,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"QWEST GOVERNMENT SERVICES INCORPORATED (8481)"},
+{"Agency":"DOD","Annual_Contract_Revenue":129999994,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"QWEST GOVERNMENT SERVICES INCORPORATED (8481)"},
+{"Agency":"DOD","Annual_Contract_Revenue":129999994,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"QWEST GOVERNMENT SERVICES INCORPORATED (8481)"},
+{"Agency":"DOD","Annual_Contract_Revenue":129999994,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"QWEST GOVERNMENT SERVICES INCORPORATED (8481)"},
+{"Agency":"DOD","Annual_Contract_Revenue":129999994,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"QWEST GOVERNMENT SERVICES INCORPORATED (8481)"},
+{"Agency":"DOD","Annual_Contract_Revenue":129999994,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"QWEST GOVERNMENT SERVICES INCORPORATED (8481)"},
+{"Agency":"DOD","Annual_Contract_Revenue":129999994,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"QWEST GOVERNMENT SERVICES INCORPORATED (8481)"},
+{"Agency":"DOD","Annual_Contract_Revenue":129999994,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"QWEST GOVERNMENT SERVICES INCORPORATED (8481)"},
+{"Agency":"DOD","Annual_Contract_Revenue":129999994,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"QWEST GOVERNMENT SERVICES INCORPORATED (8481)"},
+{"Agency":"DOD","Annual_Contract_Revenue":129999994,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"QWEST GOVERNMENT SERVICES INCORPORATED (8481)"},
+{"Agency":"DOD","Annual_Contract_Revenue":126974556,"State":"CALIFORNIA","Country":"USA","Congressional_District":17,"Contracting_Agency":"DEPT OF THE AIR FORCE","Contract_Date":2011,"Vendor":"PACIFIC SCIENTIFIC ENERGETIC MATERIALS COMPANY CALIFORNIA, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":124000000,"State":"PENNSYLVANIA","Country":"USA","Congressional_District":17,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2012,"Vendor":"TYCO ELECTRONICS CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":123616650,"State":"WASHINGTON","Country":"USA","Congressional_District":2,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2012,"Vendor":"FLUKE ELECTRONICS CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":120000000,"State":"NEW JERSEY","Country":"USA","Congressional_District":1,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2012,"Vendor":"L-3 COMMUNICATIONS CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":120000000,"State":"NEW YORK","Country":"USA","Congressional_District":27,"Contracting_Agency":"DEPT OF THE ARMY","Contract_Date":2012,"Vendor":"WASTE MANAGEMENT OF NEW YORK, L.L.C."},
+{"Agency":"DOD","Annual_Contract_Revenue":120000000,"State":"OKLAHOMA","Country":"USA","Congressional_District":1,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"L-3 COMMUNICATIONS WESTWOOD CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":119609999,"State":"TEXAS","Country":"USA","Congressional_District":6,"Contracting_Agency":"DEPT OF THE AIR FORCE","Contract_Date":2011,"Vendor":"L-3 COMMUNICATIONS CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":119606999,"State":"UTAH","Country":"USA","Congressional_District":1,"Contracting_Agency":"U.S. SPECIAL OPERATIONS COMMAND (USSOCOM)","Contract_Date":2011,"Vendor":"L-3 COMMUNICATIONS CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":119600005,"State":"OHIO","Country":"USA","Congressional_District":2,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2012,"Vendor":"L-3 COMMUNICATIONS CINCINNATI ELECTRONICS CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":116800000,"State":"LOUISIANA","Country":"USA","Congressional_District":2,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"CADILLAC GAGE TEXTRON INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":116800000,"State":"LOUISIANA","Country":"USA","Congressional_District":2,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2012,"Vendor":"CADILLAC GAGE TEXTRON INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":114933329,"State":"INDIANA","Country":"USA","Congressional_District":9,"Contracting_Agency":"DEPT OF THE ARMY","Contract_Date":2011,"Vendor":"CUMMINS INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":112000000,"State":"TEXAS","Country":"USA","Congressional_District":21,"Contracting_Agency":"DEPT OF THE AIR FORCE","Contract_Date":2011,"Vendor":"GSD&M IDEA CITY LLC"},
+{"Agency":"DOD","Annual_Contract_Revenue":112000000,"State":"TEXAS","Country":"USA","Congressional_District":21,"Contracting_Agency":"DEPT OF THE AIR FORCE","Contract_Date":2011,"Vendor":"GSD&M IDEA CITY LLC"},
+{"Agency":"DOD","Annual_Contract_Revenue":110000000,"State":"VIRGINIA","Country":"USA","Congressional_District":1,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2012,"Vendor":"FERGUSON ENTERPRISES, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":108226662,"State":"NEW JERSEY","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"SCIENCE APPLICATIONS INTERNATIONAL CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":108226662,"State":"NEW JERSEY","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"SCIENCE APPLICATIONS INTERNATIONAL CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":108226662,"State":"NEW JERSEY","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"SCIENCE APPLICATIONS INTERNATIONAL CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":108226662,"State":"NEW JERSEY","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"SCIENCE APPLICATIONS INTERNATIONAL CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":108226662,"State":"NEW JERSEY","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"SCIENCE APPLICATIONS INTERNATIONAL CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":108226662,"State":"NEW JERSEY","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"SCIENCE APPLICATIONS INTERNATIONAL CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":108226662,"State":"NEW JERSEY","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"SCIENCE APPLICATIONS INTERNATIONAL CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":108226662,"State":"NEW JERSEY","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"SCIENCE APPLICATIONS INTERNATIONAL CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":108226662,"State":"NEW JERSEY","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"SCIENCE APPLICATIONS INTERNATIONAL CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":108226662,"State":"NEW JERSEY","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"SCIENCE APPLICATIONS INTERNATIONAL CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":108226662,"State":"NEW JERSEY","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"SCIENCE APPLICATIONS INTERNATIONAL CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":100000000,"State":"CALIFORNIA","Country":"USA","Congressional_District":35,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2012,"Vendor":"PARKER-HANNIFIN, CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":100000000,"State":"CALIFORNIA","Country":"USA","Congressional_District":48,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"PARKER-HANNIFIN, CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":100000000,"State":"CALIFORNIA","Country":"USA","Congressional_District":48,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2011,"Vendor":"PARKER-HANNIFIN CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":100000000,"State":"FLORIDA","Country":"USA","Congressional_District":23,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2012,"Vendor":"THERMO ELECTRON NORTH AMERICA LLC"},
+{"Agency":"DOD","Annual_Contract_Revenue":100000000,"State":"OHIO","Country":"USA","Congressional_District":10,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2012,"Vendor":"RADIOMETER AMERICA INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":100000000,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"CANON U.S.A., INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":100000000,"State":"","Country":"JAPAN","Congressional_District":null,"Contracting_Agency":"DOD EDUCATION ACTIVITY (DODEA)","Contract_Date":2011,"Vendor":"JUMBO TOURS CO.,LTD."},
+{"Agency":"DOD","Annual_Contract_Revenue":99580000,"State":"TEXAS","Country":"USA","Congressional_District":26,"Contracting_Agency":"DEPT OF THE ARMY","Contract_Date":2012,"Vendor":"ALCON LABORATORIES, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":96000000,"State":"MASSACHUSETTS","Country":"USA","Congressional_District":6,"Contracting_Agency":"DEFENSE CONTRACT MANAGEMENT AGENCY (DCMA)","Contract_Date":2011,"Vendor":"HENSCHEL INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":95070003,"State":"WASHINGTON","Country":"USA","Congressional_District":9,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"PRAXAIR, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":95070003,"State":"WASHINGTON","Country":"USA","Congressional_District":9,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"PRAXAIR, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":95050199,"State":"HAWAII","Country":"USA","Congressional_District":1,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2012,"Vendor":"EAN HOLDINGS, LLC"},
+{"Agency":"DOD","Annual_Contract_Revenue":94660003,"State":"CONNECTICUT","Country":"USA","Congressional_District":5,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"PRAXAIR, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":93116666,"State":"NEBRASKA","Country":"USA","Congressional_District":2,"Contracting_Agency":"DEPT OF THE ARMY","Contract_Date":2012,"Vendor":"KIEWITPHELPS"},
+{"Agency":"DOD","Annual_Contract_Revenue":93040005,"State":"ILLINOIS","Country":"USA","Congressional_District":14,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2012,"Vendor":"SKF USA INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":93040000,"State":"PENNSYLVANIA","Country":"USA","Congressional_District":13,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"SKF USA INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":90491330,"State":"TENNESSEE","Country":"USA","Congressional_District":4,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2011,"Vendor":"JACOBS TECHNOLOGY INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":90000000,"State":"NEW YORK","Country":"USA","Congressional_District":4,"Contracting_Agency":"DEPT OF THE ARMY","Contract_Date":2012,"Vendor":"MARRIOTT INTERNATIONAL, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":90000000,"State":"PENNSYLVANIA","Country":"USA","Congressional_District":18,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2012,"Vendor":"FISHER SCIENTIFIC COMPANY L.L.C."},
+{"Agency":"DOD","Annual_Contract_Revenue":89999994,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"SCIENCE APPLICATIONS INTERNATIONAL CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":89999994,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2011,"Vendor":"SCIENCE APPLICATIONS INTERNATIONAL CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":86590003,"State":"","Country":"JAPAN","Congressional_District":null,"Contracting_Agency":"DEPT OF THE AIR FORCE","Contract_Date":2011,"Vendor":"DAIICHI BUSSAN CO,. LTD"},
+{"Agency":"DOD","Annual_Contract_Revenue":83000002,"State":"CALIFORNIA","Country":"USA","Congressional_District":53,"Contracting_Agency":"DEPT OF THE ARMY","Contract_Date":2012,"Vendor":"SCIENCE APPLICATIONS INTERNATIONAL CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":83000002,"State":"CALIFORNIA","Country":"USA","Congressional_District":53,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2011,"Vendor":"SCIENCE APPLICATIONS INTERNATIONAL CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":83000002,"State":"NEW JERSEY","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"SCIENCE APPLICATIONS INTERNATIONAL CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":83000002,"State":"NEW JERSEY","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"SCIENCE APPLICATIONS INTERNATIONAL CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":83000002,"State":"NEW JERSEY","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"SCIENCE APPLICATIONS INTERNATIONAL CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":83000002,"State":"NEW JERSEY","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"SCIENCE APPLICATIONS INTERNATIONAL CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":83000002,"State":"NEW JERSEY","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"SCIENCE APPLICATIONS INTERNATIONAL CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":83000002,"State":"NEW JERSEY","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2012,"Vendor":"SCIENCE APPLICATIONS INTERNATIONAL CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":83000002,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"DEFENSE CONTRACT MANAGEMENT AGENCY (DCMA)","Contract_Date":2012,"Vendor":"SCIENCE APPLICATIONS INTERNATIONAL CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":83000002,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"DEPT OF THE AIR FORCE","Contract_Date":2011,"Vendor":"SCIENCE APPLICATIONS INTERNATIONAL CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":83000002,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"DEPT OF THE ARMY","Contract_Date":2011,"Vendor":"SCIENCE APPLICATIONS INTERNATIONAL CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":83000002,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2011,"Vendor":"SCIENCE APPLICATIONS INTERNATIONAL CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":83000002,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2012,"Vendor":"SCIENCE APPLICATIONS INTERNATIONAL CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":83000000,"State":"NEW JERSEY","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2012,"Vendor":"SCIENCE APPLICATIONS INTERNATIONAL CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":83000000,"State":"NEW JERSEY","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2012,"Vendor":"SCIENCE APPLICATIONS INTERNATIONAL CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":83000000,"State":"NEW JERSEY","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2012,"Vendor":"SCIENCE APPLICATIONS INTERNATIONAL CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":80000000,"State":"CALIFORNIA","Country":"USA","Congressional_District":10,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2012,"Vendor":"UNIVERSAL PROPULSION COMPANY, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":80000000,"State":"MASSACHUSETTS","Country":"USA","Congressional_District":7,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2012,"Vendor":"BOSTON SCIENTIFIC CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":80000000,"State":"SOUTH CAROLINA","Country":"USA","Congressional_District":6,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2011,"Vendor":"OTIS ELEVATOR COMPANY"},
+{"Agency":"DOD","Annual_Contract_Revenue":79501400,"State":"WISCONSIN","Country":"USA","Congressional_District":5,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2012,"Vendor":"WAUKESHA BEARINGS CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":78080000,"State":"NEW YORK","Country":"USA","Congressional_District":2,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2012,"Vendor":"EDO CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":78080000,"State":"NEW YORK","Country":"USA","Congressional_District":2,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2012,"Vendor":"EDO CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":76686668,"State":"OHIO","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2012,"Vendor":"THE SHERWIN-WILLIAMS COMPANY"},
+{"Agency":"DOD","Annual_Contract_Revenue":73244001,"State":"WISCONSIN","Country":"USA","Congressional_District":6,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2012,"Vendor":"OSHKOSH CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":73244000,"State":"WISCONSIN","Country":"USA","Congressional_District":6,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"OSHKOSH CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":73244000,"State":"WISCONSIN","Country":"USA","Congressional_District":6,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"OSHKOSH CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":73244000,"State":"WISCONSIN","Country":"USA","Congressional_District":6,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"OSHKOSH CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":73244000,"State":"WISCONSIN","Country":"USA","Congressional_District":6,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"OSHKOSH CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":72960000,"State":"MINNESOTA","Country":"USA","Congressional_District":2,"Contracting_Agency":"DEPT OF THE AIR FORCE","Contract_Date":2011,"Vendor":"WEST PUBLISHING CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":72960000,"State":"MINNESOTA","Country":"USA","Congressional_District":2,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2012,"Vendor":"WEST PUBLISHING CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":72000000,"State":"CALIFORNIA","Country":"USA","Congressional_District":53,"Contracting_Agency":"DEPT OF THE ARMY","Contract_Date":2011,"Vendor":"SCIENCE APPLICATIONS INTERNATIONAL CORPORATION (SAIC CANADA)"},
+{"Agency":"DOD","Annual_Contract_Revenue":71000002,"State":"OHIO","Country":"USA","Congressional_District":14,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"GOODRICH CORPORATION"},
+{"Agency":"DOD","Annual_Contract_Revenue":69669000,"State":"COLORADO","Country":"USA","Congressional_District":5,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2012,"Vendor":"AMI INDUSTRIES, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":68860892,"State":"MICHIGAN","Country":"USA","Congressional_District":3,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2011,"Vendor":"DOVER FLUID MANAGEMENT, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":68000000,"State":"FLORIDA","Country":"USA","Congressional_District":1,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"L-3 COMMUNICATIONS INTEGRATED SYSTEMS L.P."},
+{"Agency":"DOD","Annual_Contract_Revenue":64999997,"State":"VIRGINIA","Country":"USA","Congressional_District":7,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"OWENS&MINOR DISTRIBUTION, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64999997,"State":"VIRGINIA","Country":"USA","Congressional_District":7,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"OWENS&MINOR DISTRIBUTION, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64999997,"State":"VIRGINIA","Country":"USA","Congressional_District":7,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"OWENS&MINOR DISTRIBUTION, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64999997,"State":"VIRGINIA","Country":"USA","Congressional_District":7,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"OWENS&MINOR DISTRIBUTION, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64999997,"State":"VIRGINIA","Country":"USA","Congressional_District":7,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"OWENS&MINOR DISTRIBUTION, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64999997,"State":"VIRGINIA","Country":"USA","Congressional_District":7,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"OWENS&MINOR DISTRIBUTION, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64999997,"State":"VIRGINIA","Country":"USA","Congressional_District":7,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"OWENS&MINOR DISTRIBUTION, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64999997,"State":"VIRGINIA","Country":"USA","Congressional_District":7,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"OWENS&MINOR DISTRIBUTION, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64999997,"State":"VIRGINIA","Country":"USA","Congressional_District":7,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"OWENS&MINOR DISTRIBUTION, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64999997,"State":"VIRGINIA","Country":"USA","Congressional_District":7,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"OWENS&MINOR DISTRIBUTION, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64999997,"State":"VIRGINIA","Country":"USA","Congressional_District":7,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"OWENS&MINOR DISTRIBUTION, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64999997,"State":"VIRGINIA","Country":"USA","Congressional_District":7,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"OWENS&MINOR DISTRIBUTION, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64999997,"State":"VIRGINIA","Country":"USA","Congressional_District":7,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"OWENS&MINOR DISTRIBUTION, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64999997,"State":"VIRGINIA","Country":"USA","Congressional_District":7,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"OWENS&MINOR DISTRIBUTION, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64999997,"State":"VIRGINIA","Country":"USA","Congressional_District":7,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"OWENS&MINOR DISTRIBUTION, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64999997,"State":"VIRGINIA","Country":"USA","Congressional_District":7,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"OWENS&MINOR DISTRIBUTION, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64999997,"State":"VIRGINIA","Country":"USA","Congressional_District":7,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"OWENS&MINOR DISTRIBUTION, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64999997,"State":"VIRGINIA","Country":"USA","Congressional_District":7,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"OWENS&MINOR DISTRIBUTION, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64999997,"State":"VIRGINIA","Country":"USA","Congressional_District":7,"Contracting_Agency":"DEFENSE LOGISTICS AGENCY","Contract_Date":2011,"Vendor":"OWENS&MINOR DISTRIBUTION, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64999997,"State":"","Country":"JAPAN","Congressional_District":null,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2011,"Vendor":"TOKYU BLDG MAINTENANCE CO., LTD."},
+{"Agency":"DOD","Annual_Contract_Revenue":64989998,"State":"TEXAS","Country":"USA","Congressional_District":26,"Contracting_Agency":"DEPT OF THE NAVY","Contract_Date":2011,"Vendor":"ALCON LABORATORIES, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64880000,"State":"VIRGINIA","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"CAPROCK GOVERNMENT SOLUTIONS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64880000,"State":"VIRGINIA","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"CAPROCK GOVERNMENT SOLUTIONS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64880000,"State":"VIRGINIA","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"CAPROCK GOVERNMENT SOLUTIONS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64880000,"State":"VIRGINIA","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"CAPROCK GOVERNMENT SOLUTIONS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64880000,"State":"VIRGINIA","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"CAPROCK GOVERNMENT SOLUTIONS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64880000,"State":"VIRGINIA","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"CAPROCK GOVERNMENT SOLUTIONS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64880000,"State":"VIRGINIA","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"CAPROCK GOVERNMENT SOLUTIONS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64880000,"State":"VIRGINIA","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"CAPROCK GOVERNMENT SOLUTIONS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64880000,"State":"VIRGINIA","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"CAPROCK GOVERNMENT SOLUTIONS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64880000,"State":"VIRGINIA","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"CAPROCK GOVERNMENT SOLUTIONS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64880000,"State":"VIRGINIA","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"CAPROCK GOVERNMENT SOLUTIONS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64880000,"State":"VIRGINIA","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"CAPROCK GOVERNMENT SOLUTIONS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64880000,"State":"VIRGINIA","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"CAPROCK GOVERNMENT SOLUTIONS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64880000,"State":"VIRGINIA","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"CAPROCK GOVERNMENT SOLUTIONS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64880000,"State":"VIRGINIA","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"CAPROCK GOVERNMENT SOLUTIONS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64880000,"State":"VIRGINIA","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"CAPROCK GOVERNMENT SOLUTIONS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64880000,"State":"VIRGINIA","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"CAPROCK GOVERNMENT SOLUTIONS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64880000,"State":"VIRGINIA","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"CAPROCK GOVERNMENT SOLUTIONS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64880000,"State":"VIRGINIA","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"CAPROCK GOVERNMENT SOLUTIONS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64880000,"State":"VIRGINIA","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"CAPROCK GOVERNMENT SOLUTIONS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64880000,"State":"VIRGINIA","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"CAPROCK GOVERNMENT SOLUTIONS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64880000,"State":"VIRGINIA","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"CAPROCK GOVERNMENT SOLUTIONS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64880000,"State":"VIRGINIA","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"CAPROCK GOVERNMENT SOLUTIONS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64880000,"State":"VIRGINIA","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"CAPROCK GOVERNMENT SOLUTIONS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64880000,"State":"VIRGINIA","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"CAPROCK GOVERNMENT SOLUTIONS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64880000,"State":"VIRGINIA","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"CAPROCK GOVERNMENT SOLUTIONS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64880000,"State":"VIRGINIA","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"CAPROCK GOVERNMENT SOLUTIONS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64880000,"State":"VIRGINIA","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"CAPROCK GOVERNMENT SOLUTIONS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64880000,"State":"VIRGINIA","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"CAPROCK GOVERNMENT SOLUTIONS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64880000,"State":"VIRGINIA","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"CAPROCK GOVERNMENT SOLUTIONS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64880000,"State":"VIRGINIA","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"CAPROCK GOVERNMENT SOLUTIONS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64880000,"State":"VIRGINIA","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"CAPROCK GOVERNMENT SOLUTIONS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64880000,"State":"VIRGINIA","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"CAPROCK GOVERNMENT SOLUTIONS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64880000,"State":"VIRGINIA","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"CAPROCK GOVERNMENT SOLUTIONS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64880000,"State":"VIRGINIA","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"CAPROCK GOVERNMENT SOLUTIONS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64880000,"State":"VIRGINIA","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"CAPROCK GOVERNMENT SOLUTIONS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64880000,"State":"VIRGINIA","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"CAPROCK GOVERNMENT SOLUTIONS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64880000,"State":"VIRGINIA","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"CAPROCK GOVERNMENT SOLUTIONS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64880000,"State":"VIRGINIA","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"CAPROCK GOVERNMENT SOLUTIONS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64880000,"State":"VIRGINIA","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"CAPROCK GOVERNMENT SOLUTIONS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64880000,"State":"VIRGINIA","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"CAPROCK GOVERNMENT SOLUTIONS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64880000,"State":"VIRGINIA","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"CAPROCK GOVERNMENT SOLUTIONS, INC."},
+{"Agency":"DOD","Annual_Contract_Revenue":64880000,"State":"VIRGINIA","Country":"USA","Congressional_District":11,"Contracting_Agency":"DEFENSE INFORMATION SYSTEMS AGENCY (DISA)","Contract_Date":2011,"Vendor":"CAPROCK GOVERNMENT SOLUTIONS, INC."},
+{"Agency":"DRUG ENFORCEMENT ADMINISTRATION","Annual_Contract_Revenue":389279989.8,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"DRUG ENFORCEMENT ADMINISTRATION","Contract_Date":2011,"Vendor":"NEXTEL OF CALIFORNIA, INC."},
+{"Agency":"DRUG ENFORCEMENT ADMINISTRATION","Annual_Contract_Revenue":389279989.8,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"DRUG ENFORCEMENT ADMINISTRATION","Contract_Date":2011,"Vendor":"SPRINT COMMUNICATIONS COMPANY L.P."},
+{"Agency":"DRUG ENFORCEMENT ADMINISTRATION","Annual_Contract_Revenue":352140001.3,"State":"DISTRICT OF COLUMBIA","Country":"USA","Congressional_District":0,"Contracting_Agency":"DRUG ENFORCEMENT ADMINISTRATION","Contract_Date":2011,"Vendor":"FEDERAL EXPRESS CORPORATION"},
+{"Agency":"DRUG ENFORCEMENT ADMINISTRATION","Annual_Contract_Revenue":220000010,"State":"MARYLAND","Country":"USA","Congressional_District":3,"Contracting_Agency":"DRUG ENFORCEMENT ADMINISTRATION","Contract_Date":2011,"Vendor":"MOTOROLA SOLUTIONS, INC."},
+{"Agency":"DRUG ENFORCEMENT ADMINISTRATION","Annual_Contract_Revenue":140000000,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"DRUG ENFORCEMENT ADMINISTRATION","Contract_Date":2011,"Vendor":"RAYTHEON COMPANY"},
+{"Agency":"EDUCATION, DEPARTMENT OF","Annual_Contract_Revenue":220000010,"State":"FLORIDA","Country":"USA","Congressional_District":10,"Contracting_Agency":"EDUCATION, DEPARTMENT OF","Contract_Date":2012,"Vendor":"XEROX CORPORATION"},
+{"Agency":"ENERGY, DEPARTMENT OF","Annual_Contract_Revenue":200000000,"State":"CALIFORNIA","Country":"USA","Congressional_District":10,"Contracting_Agency":"ENERGY, DEPARTMENT OF","Contract_Date":2011,"Vendor":"LAWRENCE LIVERMORE NATIONAL SECURITY LIMITED LIABILITY COMPANY"},
+{"Agency":"FEDERAL ACQUISITION SERVICE","Annual_Contract_Revenue":3500000000,"State":"MARYLAND","Country":"USA","Congressional_District":2,"Contracting_Agency":"FEDERAL ACQUISITION SERVICE","Contract_Date":2011,"Vendor":"CYTEC ENGINEERED MATERIALS INC"},
+{"Agency":"FEDERAL ACQUISITION SERVICE","Annual_Contract_Revenue":600000000,"State":"TEXAS","Country":"USA","Congressional_District":24,"Contracting_Agency":"FEDERAL ACQUISITION SERVICE","Contract_Date":2011,"Vendor":"AVIALL SERVICES, INC."},
+{"Agency":"FEDERAL ACQUISITION SERVICE","Annual_Contract_Revenue":122389995,"State":"GEORGIA","Country":"USA","Congressional_District":11,"Contracting_Agency":"FEDERAL ACQUISITION SERVICE","Contract_Date":2011,"Vendor":"PRC - DESOTO INTERNATIONAL, INC."},
+{"Agency":"FEDERAL ACQUISITION SERVICE","Annual_Contract_Revenue":122389995,"State":"GEORGIA","Country":"USA","Congressional_District":11,"Contracting_Agency":"FEDERAL ACQUISITION SERVICE","Contract_Date":2011,"Vendor":"PRC - DESOTO INTERNATIONAL, INC."},
+{"Agency":"FEDERAL ACQUISITION SERVICE","Annual_Contract_Revenue":122389995,"State":"GEORGIA","Country":"USA","Congressional_District":11,"Contracting_Agency":"FEDERAL ACQUISITION SERVICE","Contract_Date":2011,"Vendor":"PRC - DESOTO INTERNATIONAL, INC."},
+{"Agency":"FEDERAL ACQUISITION SERVICE","Annual_Contract_Revenue":122389995,"State":"GEORGIA","Country":"USA","Congressional_District":11,"Contracting_Agency":"FEDERAL ACQUISITION SERVICE","Contract_Date":2011,"Vendor":"PRC - DESOTO INTERNATIONAL, INC."},
+{"Agency":"FEDERAL ACQUISITION SERVICE","Annual_Contract_Revenue":95000002,"State":"GEORGIA","Country":"USA","Congressional_District":11,"Contracting_Agency":"FEDERAL ACQUISITION SERVICE","Contract_Date":2011,"Vendor":"PRC - DESOTO INTERNATIONAL, INC."},
+{"Agency":"FEDERAL ACQUISITION SERVICE","Annual_Contract_Revenue":90000000,"State":"OHIO","Country":"USA","Congressional_District":14,"Contracting_Agency":"FEDERAL ACQUISITION SERVICE","Contract_Date":2011,"Vendor":"NMTC, INC."},
+{"Agency":"FEDERAL ACQUISITION SERVICE","Annual_Contract_Revenue":73244000,"State":"WISCONSIN","Country":"USA","Congressional_District":6,"Contracting_Agency":"FEDERAL ACQUISITION SERVICE","Contract_Date":2011,"Vendor":"OSHKOSH CORPORATION"},
+{"Agency":"FEDERAL HIGHWAY ADMINISTRATION","Annual_Contract_Revenue":71461601,"State":"NEW YORK","Country":"USA","Congressional_District":8,"Contracting_Agency":"FEDERAL HIGHWAY ADMINISTRATION","Contract_Date":2011,"Vendor":"PARSONS BRINCKERHOFF QUADE AND DOUGLAS INCORPORATED (1569)"},
+{"Agency":"FEDERAL PRISON SYSTEM","Annual_Contract_Revenue":1190000000,"State":"ARIZONA","Country":"USA","Congressional_District":null,"Contracting_Agency":"FEDERAL PRISON SYSTEM","Contract_Date":2011,"Vendor":"AT&T CORP."},
+{"Agency":"FEDERAL PRISON SYSTEM","Annual_Contract_Revenue":739999989.8,"State":"CALIFORNIA","Country":"USA","Congressional_District":50,"Contracting_Agency":"FEDERAL PRISON SYSTEM","Contract_Date":2011,"Vendor":"CAREFUSION SOLUTIONS, LLC"},
+{"Agency":"FEDERAL PRISON SYSTEM","Annual_Contract_Revenue":389280000,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"FEDERAL PRISON SYSTEM","Contract_Date":2011,"Vendor":"SPRINT COMMUNICATIONS COMPANY L.P."},
+{"Agency":"FEDERAL PRISON SYSTEM","Annual_Contract_Revenue":352140001.3,"State":"TENNESSEE","Country":"USA","Congressional_District":9,"Contracting_Agency":"FEDERAL PRISON SYSTEM","Contract_Date":2011,"Vendor":"FEDERAL EXPRESS CORPORATION"},
+{"Agency":"FEDERAL PRISON SYSTEM","Annual_Contract_Revenue":337463333.3,"State":"PENNSYLVANIA","Country":"USA","Congressional_District":2,"Contracting_Agency":"FEDERAL PRISON SYSTEM","Contract_Date":2011,"Vendor":"COMCAST CABLE COMMUNICATIONS, LLC"},
+{"Agency":"FEDERAL PRISON SYSTEM","Annual_Contract_Revenue":200000000,"State":"CALIFORNIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"FEDERAL PRISON SYSTEM","Contract_Date":2011,"Vendor":"MCKESSON CORPORATION"},
+{"Agency":"FEDERAL PRISON SYSTEM","Annual_Contract_Revenue":200000000,"State":"CALIFORNIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"FEDERAL PRISON SYSTEM","Contract_Date":2011,"Vendor":"MCKESSON CORPORATION"},
+{"Agency":"FEDERAL PRISON SYSTEM","Annual_Contract_Revenue":200000000,"State":"CALIFORNIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"FEDERAL PRISON SYSTEM","Contract_Date":2011,"Vendor":"MCKESSON CORPORATION"},
+{"Agency":"FEDERAL PRISON SYSTEM","Annual_Contract_Revenue":200000000,"State":"CALIFORNIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"FEDERAL PRISON SYSTEM","Contract_Date":2011,"Vendor":"MCKESSON CORPORATION"},
+{"Agency":"FEDERAL PRISON SYSTEM","Annual_Contract_Revenue":200000000,"State":"CALIFORNIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"FEDERAL PRISON SYSTEM","Contract_Date":2011,"Vendor":"MCKESSON CORPORATION"},
+{"Agency":"FEDERAL PRISON SYSTEM","Annual_Contract_Revenue":200000000,"State":"CALIFORNIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"FEDERAL PRISON SYSTEM","Contract_Date":2011,"Vendor":"MCKESSON CORPORATION"},
+{"Agency":"FEDERAL PRISON SYSTEM","Annual_Contract_Revenue":200000000,"State":"CALIFORNIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"FEDERAL PRISON SYSTEM","Contract_Date":2011,"Vendor":"MCKESSON CORPORATION"},
+{"Agency":"FEDERAL PRISON SYSTEM","Annual_Contract_Revenue":200000000,"State":"CALIFORNIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"FEDERAL PRISON SYSTEM","Contract_Date":2011,"Vendor":"MCKESSON CORPORATION"},
+{"Agency":"FEDERAL PRISON SYSTEM","Annual_Contract_Revenue":200000000,"State":"CALIFORNIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"FEDERAL PRISON SYSTEM","Contract_Date":2011,"Vendor":"MCKESSON CORPORATION"},
+{"Agency":"FEDERAL PRISON SYSTEM","Annual_Contract_Revenue":200000000,"State":"CALIFORNIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"FEDERAL PRISON SYSTEM","Contract_Date":2011,"Vendor":"MCKESSON CORPORATION"},
+{"Agency":"FEDERAL PRISON SYSTEM","Annual_Contract_Revenue":200000000,"State":"CALIFORNIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"FEDERAL PRISON SYSTEM","Contract_Date":2011,"Vendor":"MCKESSON CORPORATION"},
+{"Agency":"FEDERAL PRISON SYSTEM","Annual_Contract_Revenue":200000000,"State":"CALIFORNIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"FEDERAL PRISON SYSTEM","Contract_Date":2011,"Vendor":"MCKESSON CORPORATION"},
+{"Agency":"FEDERAL PRISON SYSTEM","Annual_Contract_Revenue":200000000,"State":"CALIFORNIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"FEDERAL PRISON SYSTEM","Contract_Date":2011,"Vendor":"MCKESSON CORPORATION"},
+{"Agency":"FEDERAL PRISON SYSTEM","Annual_Contract_Revenue":200000000,"State":"CALIFORNIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"FEDERAL PRISON SYSTEM","Contract_Date":2011,"Vendor":"MCKESSON CORPORATION"},
+{"Agency":"FEDERAL PRISON SYSTEM","Annual_Contract_Revenue":200000000,"State":"CALIFORNIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"FEDERAL PRISON SYSTEM","Contract_Date":2011,"Vendor":"MCKESSON CORPORATION"},
+{"Agency":"FEDERAL PRISON SYSTEM","Annual_Contract_Revenue":200000000,"State":"CALIFORNIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"FEDERAL PRISON SYSTEM","Contract_Date":2011,"Vendor":"MCKESSON CORPORATION"},
+{"Agency":"FEDERAL PRISON SYSTEM","Annual_Contract_Revenue":81000000,"State":"CALIFORNIA","Country":"USA","Congressional_District":34,"Contracting_Agency":"FEDERAL PRISON SYSTEM","Contract_Date":2011,"Vendor":"SOUTHERN CALIFORNIA GAS COMPANY"},
+{"Agency":"FOOD SAFETY AND INSPECTION SERVICE","Annual_Contract_Revenue":153057331,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"FOOD SAFETY AND INSPECTION SERVICE","Contract_Date":2011,"Vendor":"EMC CORPORATION"},
+{"Agency":"HOUSING AND URBAN DEVELOPMENT, DEPARTMENT OF","Annual_Contract_Revenue":80000000,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"HOUSING AND URBAN DEVELOPMENT, DEPARTMENT OF","Contract_Date":2011,"Vendor":"CANON USA INCORPORATED"},
+{"Agency":"INTERNAL REVENUE SERVICE","Annual_Contract_Revenue":8900000000,"State":"MARYLAND","Country":"USA","Congressional_District":null,"Contracting_Agency":"INTERNAL REVENUE SERVICE","Contract_Date":2012,"Vendor":"INTERNATIONAL BUSINESS MACHINES CORPORATION"},
+{"Agency":"INTERNAL REVENUE SERVICE","Annual_Contract_Revenue":100000000,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"INTERNAL REVENUE SERVICE","Contract_Date":2012,"Vendor":"CANON U.S.A., INC."},
+{"Agency":"INTERNATIONAL BOUNDARY AND WATER COMMISSION: U.S.-MEXICO","Annual_Contract_Revenue":150000000,"State":"TEXAS","Country":"USA","Congressional_District":20,"Contracting_Agency":"INTERNATIONAL BOUNDARY AND WATER COMMISSION: U.S.-MEXICO","Contract_Date":2011,"Vendor":"GLOBAL OPERATIONS TEXAS, L.P."},
+{"Agency":"MINE SAFETY AND HEALTH ADMINISTRATION","Annual_Contract_Revenue":256453324,"State":"PENNSYLVANIA","Country":"USA","Congressional_District":14,"Contracting_Agency":"MINE SAFETY AND HEALTH ADMINISTRATION","Contract_Date":2011,"Vendor":"COMCAST OF CALIFORNIA/PENNSYLVANIA/UTAH/WASHINGTON, INC."},
+{"Agency":"NASA","Annual_Contract_Revenue":600000000,"State":"WASHINGTON","Country":"USA","Congressional_District":7,"Contracting_Agency":"NASA","Contract_Date":2012,"Vendor":"THE BOEING COMPANY"},
+{"Agency":"NASA","Annual_Contract_Revenue":418999992.3,"State":"MARYLAND","Country":"USA","Congressional_District":8,"Contracting_Agency":"NASA","Contract_Date":2011,"Vendor":"LOCKHEED MARTIN CORPORATION"},
+{"Agency":"NASA","Annual_Contract_Revenue":149519994,"State":"INDIANA","Country":"USA","Congressional_District":7,"Contracting_Agency":"NASA","Contract_Date":2012,"Vendor":"ROLLS-ROYCE NORTH AMERICAN TECHNOLOGIES INC."},
+{"Agency":"NASA","Annual_Contract_Revenue":145249996,"State":"VIRGINIA","Country":"USA","Congressional_District":10,"Contracting_Agency":"NASA","Contract_Date":2011,"Vendor":"COMPUTER SCIENCES CORPORATION"},
+{"Agency":"NASA","Annual_Contract_Revenue":94660003,"State":"CONNECTICUT","Country":"USA","Congressional_District":5,"Contracting_Agency":"NASA","Contract_Date":2012,"Vendor":"PRAXAIR, INC."},
+{"Agency":"NASA","Annual_Contract_Revenue":78000000,"State":"CALIFORNIA","Country":"USA","Congressional_District":53,"Contracting_Agency":"NASA","Contract_Date":2011,"Vendor":"SCIENCE APPLICATIONS INTERNATIONAL CORPORATION"},
+{"Agency":"NASA","Annual_Contract_Revenue":67593497,"State":"VIRGINIA","Country":"USA","Congressional_District":10,"Contracting_Agency":"NASA","Contract_Date":2011,"Vendor":"ORBITAL SCIENCES CORP"},
+{"Agency":"NATIONAL PARK SERVICE","Annual_Contract_Revenue":1190000000,"State":"VIRGINIA","Country":"USA","Congressional_District":11,"Contracting_Agency":"NATIONAL PARK SERVICE","Contract_Date":2012,"Vendor":"AT&T CORP."},
+{"Agency":"NATIONAL PARK SERVICE","Annual_Contract_Revenue":220000010,"State":"MARYLAND","Country":"USA","Congressional_District":3,"Contracting_Agency":"NATIONAL PARK SERVICE","Contract_Date":2012,"Vendor":"MOTOROLA SOLUTIONS, INC."},
+{"Agency":"NATIONAL PARK SERVICE","Annual_Contract_Revenue":125290004,"State":"CALIFORNIA","Country":"USA","Congressional_District":32,"Contracting_Agency":"NATIONAL PARK SERVICE","Contract_Date":2012,"Vendor":"SOUTHERN CALIFORNIA EDISON COMPANY"},
+{"Agency":"NATIONAL PARK SERVICE","Annual_Contract_Revenue":120000000,"State":"TEXAS","Country":"USA","Congressional_District":18,"Contracting_Agency":"NATIONAL PARK SERVICE","Contract_Date":2011,"Vendor":"WASTE MANAGEMENT, INC."},
+{"Agency":"NATIONAL PARK SERVICE","Annual_Contract_Revenue":100000000,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"NATIONAL PARK SERVICE","Contract_Date":2012,"Vendor":"CANON U.S.A., INC."},
+{"Agency":"NUCLEAR REGULATORY COMMISSION","Annual_Contract_Revenue":1800000000,"State":"NEW JERSEY","Country":"USA","Congressional_District":7,"Contracting_Agency":"NUCLEAR REGULATORY COMMISSION","Contract_Date":2012,"Vendor":"CELLCO PARTNERSHIP DBA VERIZON WIRELESS"},
+{"Agency":"OFFICE OF POLICY, BUDGET AND ADMINISTRATION","Annual_Contract_Revenue":800000000,"State":"MINNESOTA","Country":"USA","Congressional_District":2,"Contracting_Agency":"OFFICE OF POLICY, BUDGET AND ADMINISTRATION","Contract_Date":2011,"Vendor":"UNITED STATES POSTAL SERVICE"},
+{"Agency":"OFFICE OF THE SECRETARY","Annual_Contract_Revenue":1400000000,"State":"GEORGIA","Country":"USA","Congressional_District":5,"Contracting_Agency":"OFFICE OF THE SECRETARY","Contract_Date":2011,"Vendor":"AT&T MOBILITY LLC"},
+{"Agency":"PROGRAM SUPPORT CENTER","Annual_Contract_Revenue":250000000,"State":"MARYLAND","Country":"USA","Congressional_District":4,"Contracting_Agency":"PROGRAM SUPPORT CENTER","Contract_Date":2011,"Vendor":"COMCAST OF POTOMAC, LLC"},
+{"Agency":"SECURITIES AND EXCHANGE COMMISSION","Annual_Contract_Revenue":72000000,"State":"VIRGINIA","Country":"USA","Congressional_District":11,"Contracting_Agency":"SECURITIES AND EXCHANGE COMMISSION","Contract_Date":2011,"Vendor":"SCIENCE APPLICATIONS INTERNATIONAL CORPORATION"},
+{"Agency":"SMITHSONIAN INSTITUTION","Annual_Contract_Revenue":650000015.4,"State":"TEXAS","Country":"USA","Congressional_District":10,"Contracting_Agency":"SMITHSONIAN INSTITUTION","Contract_Date":2011,"Vendor":"DELL FEDERAL SYSTEMS L.P."},
+{"Agency":"SMITHSONIAN INSTITUTION","Annual_Contract_Revenue":650000015.4,"State":"TEXAS","Country":"USA","Congressional_District":10,"Contracting_Agency":"SMITHSONIAN INSTITUTION","Contract_Date":2011,"Vendor":"DELL FEDERAL SYSTEMS L.P."},
+{"Agency":"STATE, DEPARTMENT OF","Annual_Contract_Revenue":1400000000,"State":"GEORGIA","Country":"USA","Congressional_District":5,"Contracting_Agency":"STATE, DEPARTMENT OF","Contract_Date":2012,"Vendor":"AT&T MOBILITY LLC"},
+{"Agency":"U.S. CITIZENSHIP AND IMMIGRATION SERVICES","Annual_Contract_Revenue":240000000,"State":"NEW JERSEY","Country":"USA","Congressional_District":5,"Contracting_Agency":"U.S. CITIZENSHIP AND IMMIGRATION SERVICES","Contract_Date":2011,"Vendor":"SHARP ELECTRONICS CORPORATION"},
+{"Agency":"U.S. CITIZENSHIP AND IMMIGRATION SERVICES","Annual_Contract_Revenue":240000000,"State":"NEW JERSEY","Country":"USA","Congressional_District":5,"Contracting_Agency":"U.S. CITIZENSHIP AND IMMIGRATION SERVICES","Contract_Date":2011,"Vendor":"SHARP ELECTRONICS CORPORATION"},
+{"Agency":"U.S. COAST GUARD","Annual_Contract_Revenue":1800000000,"State":"NEW JERSEY","Country":"USA","Congressional_District":7,"Contracting_Agency":"U.S. COAST GUARD","Contract_Date":2011,"Vendor":"CELLCO PARTNERSHIP DBA VERIZON WIRELESS"},
+{"Agency":"U.S. COAST GUARD","Annual_Contract_Revenue":724480000,"State":"ILLINOIS","Country":"USA","Congressional_District":10,"Contracting_Agency":"U.S. COAST GUARD","Contract_Date":2011,"Vendor":"SIEMENS INDUSTRY, INC."},
+{"Agency":"U.S. COAST GUARD","Annual_Contract_Revenue":582843280,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"U.S. COAST GUARD","Contract_Date":2011,"Vendor":"EADS CASA NORTH AMERICA, INC."},
+{"Agency":"U.S. COAST GUARD","Annual_Contract_Revenue":120000000,"State":"NEW HAMPSHIRE","Country":"USA","Congressional_District":2,"Contracting_Agency":"U.S. COAST GUARD","Contract_Date":2011,"Vendor":"L-3 COMMUNICATIONS KLEIN ASSOCIATES, INC."},
+{"Agency":"U.S. CUSTOMS AND BORDER PROTECTION","Annual_Contract_Revenue":1800000000,"State":"NEW JERSEY","Country":"USA","Congressional_District":7,"Contracting_Agency":"U.S. CUSTOMS AND BORDER PROTECTION","Contract_Date":2011,"Vendor":"CELLCO PARTNERSHIP DBA VERIZON WIRELESS"},
+{"Agency":"U.S. CUSTOMS AND BORDER PROTECTION","Annual_Contract_Revenue":1400000000,"State":"GEORGIA","Country":"USA","Congressional_District":5,"Contracting_Agency":"U.S. CUSTOMS AND BORDER PROTECTION","Contract_Date":2011,"Vendor":"AT&T MOBILITY LLC"},
+{"Agency":"U.S. CUSTOMS AND BORDER PROTECTION","Annual_Contract_Revenue":83000002,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"U.S. CUSTOMS AND BORDER PROTECTION","Contract_Date":2011,"Vendor":"SCIENCE APPLICATIONS INTERNATIONAL CORPORATION"},
+{"Agency":"U.S. MARSHALS SERVICE","Annual_Contract_Revenue":440000020.5,"State":"NEW JERSEY","Country":"USA","Congressional_District":11,"Contracting_Agency":"U.S. MARSHALS SERVICE","Contract_Date":2011,"Vendor":"CELLCO PARTNERSHIP"},
+{"Agency":"U.S. MARSHALS SERVICE","Annual_Contract_Revenue":440000020.5,"State":"NEW JERSEY","Country":"USA","Congressional_District":11,"Contracting_Agency":"U.S. MARSHALS SERVICE","Contract_Date":2011,"Vendor":"CELLCO PARTNERSHIP"},
+{"Agency":"U.S. MARSHALS SERVICE","Annual_Contract_Revenue":366399979.5,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"U.S. MARSHALS SERVICE","Contract_Date":2011,"Vendor":"SPRINT COMMUNICATIONS COMPANY LP"},
+{"Agency":"U.S. MARSHALS SERVICE","Annual_Contract_Revenue":360386666.7,"State":"PENNSYLVANIA","Country":"USA","Congressional_District":2,"Contracting_Agency":"U.S. MARSHALS SERVICE","Contract_Date":2011,"Vendor":"COMCAST CABLE COMMUNICATIONS, LLC"},
+{"Agency":"U.S. MARSHALS SERVICE","Annual_Contract_Revenue":187980595,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"U.S. MARSHALS SERVICE","Contract_Date":2011,"Vendor":"ADT SECURITY SERVICES, INC."},
+{"Agency":"U.S. MARSHALS SERVICE","Annual_Contract_Revenue":187980595,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"U.S. MARSHALS SERVICE","Contract_Date":2011,"Vendor":"ADT SECURITY SERVICES, INC."},
+{"Agency":"U.S. MARSHALS SERVICE","Annual_Contract_Revenue":86659287,"State":"CALIFORNIA","Country":"USA","Congressional_District":51,"Contracting_Agency":"U.S. MARSHALS SERVICE","Contract_Date":2011,"Vendor":"COX COMMUNICATIONS SAN DIEGO, INC."},
+{"Agency":"US MINT","Annual_Contract_Revenue":921130025,"State":"MARYLAND","Country":"USA","Congressional_District":8,"Contracting_Agency":"US MINT","Contract_Date":2012,"Vendor":"INTERNATIONAL BUSINESS MACHINES CORPORATION"},
+{"Agency":"USDA, OFFICE OF THE CHIEF FINANCIAL OFFICER","Annual_Contract_Revenue":962780000,"State":"MARYLAND","Country":"USA","Congressional_District":8,"Contracting_Agency":"USDA, OFFICE OF THE CHIEF FINANCIAL OFFICER","Contract_Date":2011,"Vendor":"INTERNATIONAL BUSINESS MACHINES CORPORATION"},
+{"Agency":"USDA, OFFICE OF THE CHIEF FINANCIAL OFFICER","Annual_Contract_Revenue":100000000,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"USDA, OFFICE OF THE CHIEF FINANCIAL OFFICER","Contract_Date":2011,"Vendor":"CANON U.S.A., INC."},
+{"Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Annual_Contract_Revenue":1500000000,"State":"WISCONSIN","Country":"USA","Congressional_District":5,"Contracting_Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Contract_Date":2012,"Vendor":"GENERAL ELECTRIC COMPANY"},
+{"Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Annual_Contract_Revenue":1500000000,"State":"WISCONSIN","Country":"USA","Congressional_District":5,"Contracting_Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Contract_Date":2012,"Vendor":"GENERAL ELECTRIC COMPANY"},
+{"Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Annual_Contract_Revenue":1090000000,"State":"NORTH CAROLINA","Country":"USA","Congressional_District":8,"Contracting_Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Contract_Date":2012,"Vendor":"MCKESSON CORPORATION"},
+{"Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Annual_Contract_Revenue":1060000000,"State":"PENNSYLVANIA","Country":"USA","Congressional_District":6,"Contracting_Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Contract_Date":2012,"Vendor":"SIEMENS MEDICAL SOLUTIONS USA, INC."},
+{"Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Annual_Contract_Revenue":800000000,"State":"TEXAS","Country":"USA","Congressional_District":3,"Contracting_Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Contract_Date":2012,"Vendor":"US BIOSERVICES CORP"},
+{"Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Annual_Contract_Revenue":739999989.8,"State":"CALIFORNIA","Country":"USA","Congressional_District":50,"Contracting_Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Contract_Date":2012,"Vendor":"CAREFUSION SOLUTIONS, LLC"},
+{"Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Annual_Contract_Revenue":720873308.2,"State":"PENNSYLVANIA","Country":"USA","Congressional_District":6,"Contracting_Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Contract_Date":2012,"Vendor":"SIEMENS MEDICAL SOLUTIONS USA, INC."},
+{"Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Annual_Contract_Revenue":700000000,"State":"RHODE ISLAND","Country":"USA","Congressional_District":1,"Contracting_Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Contract_Date":2012,"Vendor":"CVS CAREMARK CORPORATION"},
+{"Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Annual_Contract_Revenue":624103330,"State":"INDIANA","Country":"USA","Congressional_District":3,"Contracting_Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Contract_Date":2012,"Vendor":"DEPUY ORTHOPAEDICS, INC."},
+{"Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Annual_Contract_Revenue":624103330,"State":"MASSACHUSETTS","Country":"USA","Congressional_District":4,"Contracting_Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Contract_Date":2012,"Vendor":"DEPUY SPINE, INC."},
+{"Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Annual_Contract_Revenue":624103330,"State":"MASSACHUSETTS","Country":"USA","Congressional_District":4,"Contracting_Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Contract_Date":2012,"Vendor":"DEPUY SPINE, INC."},
+{"Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Annual_Contract_Revenue":622463344.6,"State":"INDIANA","Country":"USA","Congressional_District":3,"Contracting_Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Contract_Date":2012,"Vendor":"DEPUY ORTHOPAEDICS, INC."},
+{"Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Annual_Contract_Revenue":622463344.6,"State":"INDIANA","Country":"USA","Congressional_District":3,"Contracting_Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Contract_Date":2012,"Vendor":"DEPUY ORTHOPAEDICS, INC."},
+{"Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Annual_Contract_Revenue":480000000,"State":"MASSACHUSETTS","Country":"USA","Congressional_District":9,"Contracting_Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Contract_Date":2012,"Vendor":"MASSACHUSETTS, COMMONWEALTH OF"},
+{"Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Annual_Contract_Revenue":389279989.8,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Contract_Date":2012,"Vendor":"SPRINT COMMUNICATIONS COMPANY L.P."},
+{"Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Annual_Contract_Revenue":378857963.5,"State":"INDIANA","Country":"USA","Congressional_District":5,"Contracting_Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Contract_Date":2012,"Vendor":"ROCHE DIAGNOSTICS CORPORATION"},
+{"Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Annual_Contract_Revenue":318196674.6,"State":"ILLINOIS","Country":"USA","Congressional_District":10,"Contracting_Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Contract_Date":2012,"Vendor":"ABBOTT LABORATORIES INC"},
+{"Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Annual_Contract_Revenue":179999989,"State":"ILLINOIS","Country":"USA","Congressional_District":9,"Contracting_Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Contract_Date":2012,"Vendor":"US FOODS, INC."},
+{"Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Annual_Contract_Revenue":164000000,"State":"NEW JERSEY","Country":"USA","Congressional_District":11,"Contracting_Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Contract_Date":2012,"Vendor":"RICOH AMERICAS CORPORATION"},
+{"Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Annual_Contract_Revenue":158169999,"State":"FLORIDA","Country":"USA","Congressional_District":4,"Contracting_Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Contract_Date":2012,"Vendor":"MEDTRONIC USA INC"},
+{"Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Annual_Contract_Revenue":130000000,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Contract_Date":2012,"Vendor":"QWEST GOVERNMENT SERVICES INC"},
+{"Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Annual_Contract_Revenue":104579420,"State":"MISSOURI","Country":"USA","Congressional_District":6,"Contracting_Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Contract_Date":2013,"Vendor":"MOTION INDUSTRIES, INC."},
+{"Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Annual_Contract_Revenue":100000000,"State":"VIRGINIA","Country":"USA","Congressional_District":8,"Contracting_Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Contract_Date":2012,"Vendor":"CANON U.S.A., INC."},
+{"Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Annual_Contract_Revenue":92570275,"State":"MASSACHUSETTS","Country":"USA","Congressional_District":9,"Contracting_Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Contract_Date":2012,"Vendor":"SIEMENS MEDICAL SOLUTIONS DIAGNOSTICS"},
+{"Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Annual_Contract_Revenue":89999994,"State":"NORTH CAROLINA","Country":"USA","Congressional_District":11,"Contracting_Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Contract_Date":2012,"Vendor":"THERMO FISHER SCIENTIFIC (ASHEVILLE) LLC"},
+{"Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Annual_Contract_Revenue":80000000,"State":"MASSACHUSETTS","Country":"USA","Congressional_District":3,"Contracting_Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Contract_Date":2012,"Vendor":"ATHENA DIAGNOSTICS, INC."},
+{"Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Annual_Contract_Revenue":80000000,"State":"MASSACHUSETTS","Country":"USA","Congressional_District":7,"Contracting_Agency":"VETERANS AFFAIRS, DEPARTMENT OF","Contract_Date":2012,"Vendor":"BOSTON SCIENTIFIC CORPORATION"}];
+var MAX_ANNUAL_CONTRACT_REVENUE = 8900000000;
+var options = {
+    sorted: false,
+    filtered: false,
+    page: 0
+  };
+function updateTable() { 
+  // Make a copy of the data
+  var data = contracts.slice();
+  if (options.sorted) {
+      if (options.sorted === 'asc') {
+        data.sort(function (a, b) { return a.Annual_Contract_Revenue - b.Annual_Contract_Revenue; });
+      } else if (options.sorted === 'desc') {
+        data.sort(function (a, b) { return b.Annual_Contract_Revenue - a.Annual_Contract_Revenue; });
+        // Note that this is just the opposite of the above.
+      }
+    }
+
+  if (options.filtered) {data = data.filter(function (d) { return d.State ===options.filtered;})
+  }
+
+  var table = document.getElementById('data-table');
+  var tbody = table.getElementsByTagName('tbody')[0];
+  tbody.innerHTML = "";
+
+  data.forEach(function (d) {
+    var row = document.createElement('tr');
+
+    var Agency = document.createElement('td');
+    Agency.innerHTML = d.Agency;
+    row.appendChild(Agency);
+
+    var Annual_Contract_Revenue = document.createElement('td');
+    Annual_Contract_Revenue.innerHTML = d.Annual_Contract_Revenue;
+    row.appendChild(Annual_Contract_Revenue);
+
+    var State = document.createElement('td');
+    State.innerHTML = d.State;
+    row.appendChild(State);
+
+    var Country = document.createElement('td');
+    Country.innerHTML = d.Country;
+    row.appendChild(Country);
+
+    var Congressional_District = document.createElement('td');
+    Congressional_District.innerHTML = d.Congressional_District;
+    row.appendChild(Congressional_District);
+
+    var Contracting_Agency = document.createElement('td');
+    Contracting_Agency.innerHTML = d.Contracting_Agency;
+    row.appendChild(Contracting_Agency);
+
+    var Contract_Date = document.createElement('td');
+    Contract_Date.innerHTML = d.Contract_Date;
+    row.appendChild(Contract_Date);
+
+    var Vendor = document.createElement('td');
+    Vendor.innerHTML = d.Vendor;
+    row.appendChild(Vendor);
+
+    var barWrapper = document.createElement('td');
+    var bar = document.createElement('div');
+    bar.setAttribute('class', 'bar'); 
+
+    var Annual_Contract_RevenuePercentage = d.Annual_Contract_Revenue / MAX_ANNUAL_CONTRACT_REVENUE;
+    bar.setAttribute('style', 'width:' + (Annual_Contract_RevenuePercentage * 100) + '%;'); 
+    barWrapper.appendChild(bar);
+    row.appendChild(barWrapper);
+
+    tbody.appendChild(row);   
+  });
+  }
+  updateTable();
+  document.getElementById('sort-asc').addEventListener('click', function () {
+  if (options.sorted === 'asc') {
+    options.sorted = false;
+  } else {
+    options.sorted = 'asc';
+  }
+  updateTable();
+  });
+  document.getElementById('sort-desc').addEventListener('click', function () {
+  if (options.sorted === 'desc') {
+    options.sorted = false;
+  } else {
+    options.sorted = 'desc';
+  }
+  updateTable();
+  });
+  document.getElementById('filter-MARYLAND').addEventListener('click', function () {
+  if (options.filtered === 'MARYLAND') {
+    options.filtered = false;
+  } else {
+    options.filtered = 'MARYLAND';
+  }
+  updateTable();
+  });
+  document.getElementById('filter-VIRGINIA').addEventListener('click', function () {
+  if (options.filtered === 'VIRGINIA') {
+    options.filtered = false;
+  } else {
+    options.filtered = 'VIRGINIA';
+  }
+  updateTable();
+  });
+  document.getElementById('filter-CALIFORNIA').addEventListener('click', function () {
+  if (options.filtered === 'CALIFORNIA') {
+    options.filtered = false;
+  } else {
+    options.filtered = 'CALIFORNIA';
+  }
+  updateTable();
+  });
+</script>
+</body>
+</html>
